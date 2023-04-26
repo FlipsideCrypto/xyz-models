@@ -8,7 +8,7 @@
 WITH base AS (
     SELECT
         t.block_id,
-        --t.block_timestamp,
+        t.block_timestamp,
         t.tx_id,
         t.gas_used,
         t.gas_wanted,
@@ -44,9 +44,19 @@ WITH base AS (
         ) AS attribute_value,
         t._inserted_timestamp
     FROM
-        base_table -- jinja reference to transactions table needed here
+        {{ ref('silver__transactions') }} -- jinja reference to transactions table needed here
         t,
     LATERAL FLATTEN(input => msgs) f
+
+    {% if is_incremental() %}
+    WHERE
+    _inserted_timestamp :: DATE >= (
+        SELECT
+        MAX(_inserted_timestamp) :: DATE - 2
+        FROM
+        {{ this }}
+    )
+    {% endif %}
 ), 
 exec_actions AS (
   SELECT
@@ -81,7 +91,7 @@ GROUPING AS (
 FINAL AS (
   SELECT
     block_id,
-    --block_timestamp,
+    block_timestamp,
     A.tx_id,
     tx_succeeded,
     msg_group,
@@ -116,7 +126,7 @@ FINAL AS (
 )
 SELECT
   block_id,
-  --block_timestamp,
+  block_timestamp,
   tx_id,
   tx_succeeded,
   msg_group,

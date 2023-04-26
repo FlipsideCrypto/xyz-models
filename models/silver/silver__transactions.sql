@@ -23,7 +23,7 @@ WITH base_table AS (
     tx.value :tx_result :log AS tx_log,
     _inserted_timestamp,
     tx.value as val
-FROM EVMOS.BRONZE.SAMPLE_TXS t,  -- jinjafy thissss
+FROM {{ ref('bronze__transactions') }} t, 
 LATERAL FLATTEN(input => data :data :result :txs) tx
 
 {% if is_incremental() %}

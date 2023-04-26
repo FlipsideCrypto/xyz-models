@@ -8,3 +8,9 @@ sources:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+  - name: bronze 
+    database: evmos
+    schema: bronze 
+    tables: 
+      - name: sample_blocks
+      - name: sample_txs
