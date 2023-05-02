@@ -8,9 +8,15 @@ sources:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+      - name: address_labels
   - name: bronze 
     database: evmos
     schema: bronze 
     tables: 
       - name: sample_blocks
       - name: sample_txs
+  - name: osmo
+    database: osmosis
+    schema: silver
+    tables: 
+      - name: asset_metadata

@@ -1,12 +1,19 @@
-{{ config(
-    materialized = 'incremental',
-    unique_key = 'block_height',
-    cluster_by = ['_inserted_timestamp::date'],
-    merge_update_columns = ["block_height"],
+{{ config (
+    materialized = 'view'
 ) }}
 
-SELECT 
-    block_height, 
-    data, 
-    _inserted_timestamp 
-FROM {{ source('bronze', 'sample_blocks') }}
+SELECT
+    block_height,
+    DATA,
+    _inserted_timestamp
+FROM
+    {{ source(
+        'bronze',
+        'sample_blocks'
+    ) }}
+WHERE
+    DATA: error IS NULL 
+
+qualify(ROW_NUMBER() over (PARTITION BY block_height
+ORDER BY
+    _inserted_timestamp DESC)) = 1

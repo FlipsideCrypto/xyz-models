@@ -10,7 +10,7 @@ WITH base_table AS (
 
     SELECT
     tx.value :height :: INTEGER AS block_id, 
-    tx.value :hash :: STRING as tx_id, 
+    tx_id, 
     tx.value :tx_result :codespace :: STRING as codespace,
     tx.value :tx_result :gas_used :: NUMBER as gas_used, 
     tx.value :tx_result :gas_wanted :: NUMBER as gas_wanted, 
@@ -62,7 +62,3 @@ WHERE
             {{ this }}
     )
 {% endif %}
-
-qualify(ROW_NUMBER() over (PARTITION BY tx_id
-ORDER BY
-    b._inserted_timestamp DESC)) = 1
