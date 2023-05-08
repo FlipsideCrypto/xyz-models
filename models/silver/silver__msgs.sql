@@ -6,58 +6,58 @@
 ) }}
 
 WITH base AS (
-    SELECT
-        t.block_id,
-        t.block_timestamp,
-        t.tx_id,
-        t.gas_used,
-        t.gas_wanted,
-        t.tx_succeeded,
-        f.value AS msg,
-        f.index :: INT AS msg_index,
-        msg :type :: STRING AS msg_type,
-        IFF(
-          TRY_BASE64_DECODE_STRING(
-            msg :attributes [0] :key :: STRING
-          ) = 'action',
-          TRUE,
-          FALSE
-        ) AS is_action,
-        NULLIF(
-          (conditional_true_event(is_action) over (PARTITION BY tx_id
-          ORDER BY
-            msg_index ASC) -1),
-            -1
-        ) AS msg_group,
-        IFF(
-          TRY_BASE64_DECODE_STRING(
-            msg :attributes [0] :key :: STRING
-          ) = 'module',
-          TRUE,
-          FALSE
-        ) AS is_module,
-        TRY_BASE64_DECODE_STRING(
-          msg :attributes [0] :key :: STRING
-        ) AS attribute_key,
-        TRY_BASE64_DECODE_STRING(
-          msg :attributes [0] :value :: STRING
-        ) AS attribute_value,
-        t._inserted_timestamp
-    FROM
-        {{ ref('silver__transactions') }} -- jinja reference to transactions table needed here
-        t,
+
+  SELECT
+    t.block_id,
+    t.block_timestamp,
+    t.tx_id,
+    t.gas_used,
+    t.gas_wanted,
+    t.tx_succeeded,
+    f.value AS msg,
+    f.index :: INT AS msg_index,
+    msg :type :: STRING AS msg_type,
+    IFF(
+      TRY_BASE64_DECODE_STRING(
+        msg :attributes [0] :key :: STRING
+      ) = 'action',
+      TRUE,
+      FALSE
+    ) AS is_action,
+    NULLIF(
+      (conditional_true_event(is_action) over (PARTITION BY tx_id
+      ORDER BY
+        msg_index ASC) -1),
+        -1
+    ) AS msg_group,
+    IFF(
+      TRY_BASE64_DECODE_STRING(
+        msg :attributes [0] :key :: STRING
+      ) = 'module',
+      TRUE,
+      FALSE
+    ) AS is_module,
+    TRY_BASE64_DECODE_STRING(
+      msg :attributes [0] :key :: STRING
+    ) AS attribute_key,
+    TRY_BASE64_DECODE_STRING(
+      msg :attributes [0] :value :: STRING
+    ) AS attribute_value,
+    t._inserted_timestamp
+  FROM
+    {{ ref('silver__transactions') }} -- jinja REFERENCE TO transactions TABLE needed here t,
     LATERAL FLATTEN(input => msgs) f
 
-    {% if is_incremental() %}
-    WHERE
-    _inserted_timestamp :: DATE >= (
-        SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-        FROM
-        {{ this }}
-    )
-    {% endif %}
-), 
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp :: DATE >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 2
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 exec_actions AS (
   SELECT
     DISTINCT tx_id,

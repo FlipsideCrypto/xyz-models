@@ -9,30 +9,35 @@
 WITH base_table AS (
 
     SELECT
-    tx.value :height :: INTEGER AS block_id, 
-    tx_id, 
-    tx.value :tx_result :codespace :: STRING as codespace,
-    tx.value :tx_result :gas_used :: NUMBER as gas_used, 
-    tx.value :tx_result :gas_wanted :: NUMBER as gas_wanted, 
-    CASE
-        WHEN tx.value :tx_result :code :: NUMBER = 0 THEN TRUE
-        ELSE FALSE
-    END AS tx_succeeded,
-    tx.value :tx_result :code :: NUMBER AS tx_code,
-    tx.value :tx_result :events AS msgs,
-    tx.value :tx_result :log AS tx_log,
-    _inserted_timestamp,
-    tx.value as val
-FROM {{ ref('bronze__transactions') }} t, 
-LATERAL FLATTEN(input => data :data :result :txs) tx
+        block_id,
+        tx_id,
+        tx.value :tx_result :codespace :: STRING AS codespace,
+        tx.value :tx_result :gas_used :: NUMBER AS gas_used,
+        tx.value :tx_result :gas_wanted :: NUMBER AS gas_wanted,
+        CASE
+            WHEN tx.value :tx_result :code :: NUMBER = 0 THEN TRUE
+            ELSE FALSE
+        END AS tx_succeeded,
+        tx.value :tx_result :code :: NUMBER AS tx_code,
+        tx.value :tx_result :events AS msgs,
+        tx.value :tx_result :log AS tx_log,
+        _inserted_timestamp,
+        tx.value AS val
+    FROM
+        {{ ref('bronze__transactions') }}
+        t,
+        LATERAL FLATTEN(
+            input => DATA :data :result :txs
+        ) tx
 
 {% if is_incremental() %}
-WHERE _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
+WHERE
+    _inserted_timestamp :: DATE >= (
+        SELECT
+            MAX(_inserted_timestamp) :: DATE - 2
+        FROM
+            {{ this }}
+    )
 {% endif %}
 )
 SELECT
