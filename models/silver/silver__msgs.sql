@@ -45,7 +45,7 @@ WITH base AS (
     ) AS attribute_value,
     t._inserted_timestamp
   FROM
-    {{ ref('silver__transactions') }} -- jinja REFERENCE TO transactions TABLE needed here t,
+    {{ ref('silver__transactions') }} t,
     LATERAL FLATTEN(input => msgs) f
 
 {% if is_incremental() %}
@@ -67,7 +67,7 @@ exec_actions AS (
   WHERE
     msg_type = 'message'
     AND attribute_key = 'action'
-    AND LOWER(attribute_value) LIKE '%exec%' -- there are none currently
+    AND LOWER(attribute_value) LIKE '%exec%' 
 ),
 GROUPING AS (
   SELECT

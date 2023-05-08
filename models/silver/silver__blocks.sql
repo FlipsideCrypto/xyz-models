@@ -36,7 +36,7 @@ SELECT
     block_id
   ) _unique_key
 FROM
-  {{ ref('bronze__blocks') }}
+  {{ ref('bronze__tendermint_blocks') }}
 WHERE
   data [0] :error IS NULL
   AND DATA :error IS NULL

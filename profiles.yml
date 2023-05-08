@@ -4,7 +4,7 @@ evmos:
     dev:
       type: snowflake
       account: vna27887.us-east-1
-      role: DBT_CLOUD_EVMOS
+      role: INTERNAL_DEV
       user: jessica@flipsidecrypto.com
       authenticator: externalbrowser
       region: us-east-1

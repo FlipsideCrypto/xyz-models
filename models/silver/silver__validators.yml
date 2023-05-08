@@ -23,7 +23,7 @@ models:
                 - STRING
                 - VARCHAR
           - dbt_expectations.expect_column_values_to_be_in_set:
-              value_set: ['axelar']
+              value_set: ['evmos']
       - name: CREATOR
         description: "{{ doc('creator') }}"
         tests:

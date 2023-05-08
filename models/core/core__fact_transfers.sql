@@ -11,7 +11,6 @@ SELECT
     sender,
     amount,
     currency,
-    DECIMAL,
     receiver
 FROM
     {{ ref('silver__transfers') }}

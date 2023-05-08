@@ -41,7 +41,7 @@ SELECT
     value, 
     _partition_by_block_id,
     block_number as block_id,
-    DATA :data :result :txs :hash :: STRING AS tx_id,
+    value :data :hash :: STRING AS tx_id,
     metadata, 
     array_index,
     DATA,
@@ -56,6 +56,6 @@ FROM
 JOIN meta m
 ON m.file_name = metadata$filename
 WHERE
-    DATA: error IS NULL qualify(ROW_NUMBER() over (PARTITION BY tx_id
+    DATA: error IS NULL qualify(ROW_NUMBER() over (PARTITION BY value :data :hash :: STRING
 ORDER BY
     _inserted_timestamp DESC)) = 1

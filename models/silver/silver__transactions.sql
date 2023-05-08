@@ -6,54 +6,23 @@
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
 ) }}
 
-WITH base_table AS (
-
-    SELECT
-        block_id,
-        tx_id,
-        tx.value :tx_result :codespace :: STRING AS codespace,
-        tx.value :tx_result :gas_used :: NUMBER AS gas_used,
-        tx.value :tx_result :gas_wanted :: NUMBER AS gas_wanted,
-        CASE
-            WHEN tx.value :tx_result :code :: NUMBER = 0 THEN TRUE
-            ELSE FALSE
-        END AS tx_succeeded,
-        tx.value :tx_result :code :: NUMBER AS tx_code,
-        tx.value :tx_result :events AS msgs,
-        tx.value :tx_result :log AS tx_log,
-        _inserted_timestamp,
-        tx.value AS val
-    FROM
-        {{ ref('bronze__transactions') }}
-        t,
-        LATERAL FLATTEN(
-            input => DATA :data :result :txs
-        ) tx
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp :: DATE >= (
-        SELECT
-            MAX(_inserted_timestamp) :: DATE - 2
-        FROM
-            {{ this }}
-    )
-{% endif %}
-)
 SELECT
     b.block_id,
     block_timestamp,
     tx_id,
-    codespace,
-    gas_used,
-    gas_wanted,
-    tx_succeeded,
-    tx_code,
-    msgs,
-    tx_log :: STRING AS tx_log,
+    b.data :tx_result :codespace :: STRING AS codespace,
+    b.data :tx_result :gas_used :: NUMBER AS gas_used,
+    b.data :tx_result :gas_wanted :: NUMBER AS gas_wanted,
+    CASE
+        WHEN b.data :tx_result :code :: NUMBER = 0 THEN TRUE
+        ELSE FALSE
+    END AS tx_succeeded,
+    b.data :tx_result :code :: NUMBER AS tx_code,
+    b.data :tx_result :events AS msgs,
+    b.data :tx_result :log AS tx_log,
     b._inserted_timestamp
 FROM
-    base_table b
+    {{ ref('bronze__tendermint_transactions') }} b
     LEFT OUTER JOIN {{ ref('silver__blocks') }}
     bb
     ON b.block_id = bb.block_id
@@ -61,6 +30,13 @@ FROM
 {% if is_incremental() %}
 WHERE
     bb._inserted_timestamp :: DATE >= (
+        SELECT
+            MAX(_inserted_timestamp) :: DATE - 2
+        FROM
+            {{ this }}
+    )
+AND  
+    b._inserted_timestamp :: DATE >= (
         SELECT
             MAX(_inserted_timestamp) :: DATE - 2
         FROM
