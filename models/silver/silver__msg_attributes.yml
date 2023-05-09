@@ -5,7 +5,9 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - _UNIQUE_KEY
+            - TX_ID
+            - MSG_INDEX
+            - ATTRIBUTE_INDEX
     columns:
       - name: BLOCK_ID
         description: "{{ doc('block_id') }}"

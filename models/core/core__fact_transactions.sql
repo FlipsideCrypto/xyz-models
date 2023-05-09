@@ -34,6 +34,8 @@ spender AS (
         {{ ref('silver__msg_attributes') }}
     WHERE
         attribute_key = 'acc_seq'
+        OR (msg_type = 'transfer'
+        AND attribute_key = 'sender')
 
 {% if is_incremental() %}
 AND _inserted_timestamp :: DATE >= CURRENT_DATE -2
@@ -52,11 +54,12 @@ SELECT
     codespace,
     COALESCE(
         fee,
-        '0uosmo'
+        '0uevmos'
     ) AS fee,
     gas_used,
     gas_wanted,
     tx_code,
+    tx_type,
     msgs
 FROM
     {{ ref('silver__transactions') }}

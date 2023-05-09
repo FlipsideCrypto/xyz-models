@@ -70,6 +70,10 @@ models:
         description: "The underlying json from the messages or events within the transactions"
         tests: 
           - not_null
+      - name: TX_TYPE
+        description: "The transaction type"
+        tests: 
+          - not_null
       - name: TX_LOG
         description:  "{{ doc('tx_log') }}"
         tests: 

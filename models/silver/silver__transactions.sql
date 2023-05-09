@@ -3,7 +3,6 @@
     unique_key = "tx_id",
     incremental_strategy = 'delete+insert',
     cluster_by = 'block_timestamp::DATE',
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
 ) }}
 
 SELECT
@@ -19,10 +18,16 @@ SELECT
     END AS tx_succeeded,
     b.data :tx_result :code :: NUMBER AS tx_code,
     b.data :tx_result :events AS msgs,
-    b.data :tx_result :log AS tx_log,
+    TRY_BASE64_DECODE_STRING(
+        DATA :tx_result :data
+    ) AS tx_type,
+    TRY_PARSE_JSON(
+        b.data :tx_result :log
+    ) AS tx_log,
     b._inserted_timestamp
 FROM
-    {{ ref('bronze__tendermint_transactions') }} b
+    {{ ref('bronze__tendermint_transactions') }}
+    b
     LEFT OUTER JOIN {{ ref('silver__blocks') }}
     bb
     ON b.block_id = bb.block_id
@@ -35,8 +40,7 @@ WHERE
         FROM
             {{ this }}
     )
-AND  
-    b._inserted_timestamp :: DATE >= (
+    AND b._inserted_timestamp :: DATE >= (
         SELECT
             MAX(_inserted_timestamp) :: DATE - 2
         FROM

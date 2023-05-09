@@ -5,7 +5,8 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - _UNIQUE_KEY
+            - CHAIN_ID
+            - BLOCK_ID
       - sequence_gaps:
           column_name: block_ID
           where: BLOCK_TIMESTAMP <= CURRENT_DATE - 1 

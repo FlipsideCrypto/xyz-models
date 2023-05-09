@@ -21,12 +21,6 @@ SELECT
         ORDER BY
             DATA :delegator_shares :: INT DESC
     ) AS RANK,
-    DATA AS raw_metadata,
-    concat_ws(
-        '-',
-        address,
-        creator,
-        blockchain
-    ) AS unique_key
+    DATA AS raw_metadata
 FROM
     {{ ref('bronze_api__get_validator_metadata_lcd') }}

@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "_unique_key",
+  unique_key = "CONCAT_WS('-', tx_id, msg_index)",
   incremental_strategy = 'delete+insert',
   cluster_by = ['block_timestamp::DATE'],
 ) }}
@@ -112,11 +112,6 @@ FINAL AS (
     A.msg_index,
     msg_type,
     msg,
-    concat_ws(
-      '-',
-      A.tx_id,
-      A.msg_index
-    ) AS _unique_key,
     _inserted_timestamp
   FROM
     base A
@@ -134,7 +129,6 @@ SELECT
   msg_index,
   msg_type,
   msg,
-  _unique_key,
   _inserted_timestamp
 FROM
   FINAL

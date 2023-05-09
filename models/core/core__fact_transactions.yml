@@ -48,6 +48,10 @@ models:
         description: "{{ doc('tx_code') }}"
         tests: 
           - dbt_expectations.expect_column_to_exist 
+      - name: TX_TYPE 
+        description: "The type of transaction"
+        tests: 
+          - dbt_expectations.expect_column_to_exist 
       - name: MSGS
         description: "The underlying json from the messages or events within the transactions"
         tests: 

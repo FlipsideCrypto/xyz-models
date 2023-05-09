@@ -1,11 +1,11 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "unique_key",
+    unique_key = "CONCAT_WS('-', tx_id, block_id, msg_index, currency)",
     incremental_strategy = 'delete+insert',
     cluster_by = 'block_timestamp::DATE',
 ) }}
 
-WITH cosmos_txs AS (
+WITH evmos_txs AS (
 
     SELECT
         DISTINCT tx_id
@@ -14,7 +14,8 @@ WITH cosmos_txs AS (
     WHERE
         attribute_value IN (
             '/cosmos.bank.v1beta1.MsgSend',
-            '/cosmos.bank.v1beta1.MsgMultiSend'
+            '/cosmos.bank.v1beta1.MsgMultiSend', 
+            '/ibc.applications.transfer.v1.MsgTransfer'
         )
 
 {% if is_incremental() %}
@@ -83,7 +84,7 @@ msg_index AS (
         attribute_key,
         m.msg_index
     FROM
-        cosmos_txs v
+        evmos_txs v
         LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
         m
         ON v.tx_id = m.tx_id
@@ -111,7 +112,7 @@ receiver AS (
         m.msg_index,
         attribute_value AS receiver
     FROM
-        cosmos_txs v
+        evmos_txs v
         LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
         m
         ON v.tx_id = m.tx_id
@@ -119,7 +120,8 @@ receiver AS (
         ON v.tx_id = s.tx_id
         AND m.block_id = s.block_id
     WHERE
-        msg_type = 'transfer'
+        msg_type = 'ibc_transfer'
+        OR msg_type = 'transfer'
         AND attribute_key = 'recipient'
         AND m.msg_index > s.msg_index
 
@@ -156,7 +158,7 @@ amount AS (
             TRY_PARSE_JSON(attribute_value) [1] :denom
         ) AS currency
     FROM
-        cosmos_txs v
+        evmos_txs v
         LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
         m
         ON v.tx_id = m.tx_id
@@ -189,14 +191,7 @@ evmos_txs_final AS (
         amount,
         currency,
         receiver,
-        _inserted_timestamp,
-        concat_ws(
-            '-',
-            r.block_id,
-            r.tx_id,
-            r.msg_index,
-            currency
-        ) AS unique_key
+        _inserted_timestamp
     FROM
         receiver r
         LEFT OUTER JOIN amount C
@@ -210,6 +205,9 @@ evmos_txs_final AS (
         t
         ON r.tx_id = t.tx_id
         AND r.block_id = t.block_id
+    WHERE 
+        amount IS NOT NULL
+        AND sender IS NOT NULL
 
 {% if is_incremental() %}
 AND _inserted_timestamp :: DATE >= (
@@ -235,14 +233,7 @@ ibc_in_tx AS (
             ELSE TRY_PARSE_JSON(attribute_value) :denom :: STRING
         END AS currency,
         TRY_PARSE_JSON(attribute_value) :receiver :: STRING AS receiver,
-        _inserted_timestamp,
-        concat_ws(
-            '-',
-            block_id,
-            tx_id,
-            msg_index,
-            currency
-        ) AS unique_key
+        _inserted_timestamp
     FROM
         {{ ref('silver__msg_attributes') }}
     WHERE
@@ -291,14 +282,7 @@ ibc_out_tx AS (
             ELSE TRY_PARSE_JSON(attribute_value) :denom :: STRING
         END AS currency,
         TRY_PARSE_JSON(attribute_value) :receiver :: STRING AS receiver,
-        _inserted_timestamp,
-        concat_ws(
-            '-',
-            block_id,
-            tx_id,
-            msg_index,
-            currency
-        ) AS unique_key
+        _inserted_timestamp
     FROM
         {{ ref('silver__msg_attributes') }}
     WHERE
@@ -343,8 +327,7 @@ ibc_tx_final AS (
         i.currency,
         i.receiver,
         msg_index,
-        _inserted_timestamp,
-        unique_key
+        _inserted_timestamp
     FROM
         ibc_transfers_agg i
 )
@@ -359,8 +342,7 @@ SELECT
     currency,
     receiver,
     msg_index,
-    _inserted_timestamp,
-    unique_key
+    _inserted_timestamp
 FROM
     ibc_tx_final
 UNION ALL
@@ -375,7 +357,6 @@ SELECT
     currency,
     receiver,
     msg_index,
-    _inserted_timestamp,
-    unique_key
+    _inserted_timestamp
 FROM
     evmos_txs_final

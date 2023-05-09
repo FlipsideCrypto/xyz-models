@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = 'tx_id',
     cluster_by = ['_inserted_timestamp::date'],
-    merge_update_columns = ["block_id"],
+    merge_update_columns = ["data", "_inserted_timestamp"],
 ) }}
 
 WITH meta AS (

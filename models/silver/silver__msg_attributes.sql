@@ -1,8 +1,9 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "_unique_key",
+  unique_key = "CONCAT_WS('-', tx_id, msg_index, attribute_index)",
   incremental_strategy = 'delete+insert',
   cluster_by = ['block_timestamp::DATE'],
+  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
 ) }}
 
 SELECT
@@ -21,12 +22,6 @@ SELECT
   TRY_BASE64_DECODE_STRING(
     b.value :value :: STRING
   ) AS attribute_value,
-  concat_ws(
-    '-',
-    tx_id,
-    msg_index,
-    attribute_index
-  ) AS _unique_key,
   _inserted_timestamp
 FROM
   {{ ref('silver__msgs') }} A,

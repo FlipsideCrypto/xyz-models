@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "_unique_key",
+  unique_key = "CONCAT_WS('-', chain_id, block_id)",
   incremental_strategy = 'delete+insert',
   cluster_by = ['block_timestamp::DATE'],
 ) }}
@@ -29,12 +29,7 @@ SELECT
     DATA [0] :result :block :header :validators_hash :: STRING,
     DATA :result :block :header :validators_hash :: STRING
   ) AS validator_hash,
-  _inserted_timestamp :: TIMESTAMP AS _inserted_timestamp,
-  concat_ws(
-    '-',
-    chain_id,
-    block_id
-  ) _unique_key
+  _inserted_timestamp :: TIMESTAMP AS _inserted_timestamp
 FROM
   {{ ref('bronze__tendermint_blocks') }}
 WHERE
