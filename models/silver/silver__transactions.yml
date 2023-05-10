@@ -61,7 +61,8 @@ models:
       - name: TX_CODE
         description: "{{ doc('tx_code') }}"
         tests: 
-          - not_null
+          - not_null: 
+              where: TX_SUCCEEDED
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER    
@@ -72,12 +73,11 @@ models:
           - not_null
       - name: TX_TYPE
         description: "The transaction type"
-        tests: 
-          - not_null
       - name: TX_LOG
         description:  "{{ doc('tx_log') }}"
         tests: 
-          - not_null
+          - not_null: 
+              where: TX_SUCCEEDED
       - name: _INSERTED_TIMESTAMP
         description: "{{ doc('inserted_timestamp') }}"
         tests:

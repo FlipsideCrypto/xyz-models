@@ -18,7 +18,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "streamline", "tendermint_tx_search") }}'
+                table_name => '{{ source( "streamline", "tendermint_transactions") }}'
             )
         ) A
 
@@ -43,7 +43,6 @@ SELECT
     block_number as block_id,
     value :data :hash :: STRING AS tx_id,
     metadata, 
-    array_index,
     DATA,
     TO_TIMESTAMP(
         m._inserted_timestamp
@@ -51,7 +50,7 @@ SELECT
 FROM
     {{ source(
         'streamline',
-        'tendermint_tx_search'
+        'tendermint_transactions'
     ) }}
 JOIN meta m
 ON m.file_name = metadata$filename
