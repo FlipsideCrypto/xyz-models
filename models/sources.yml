@@ -15,3 +15,21 @@ sources:
     tables:
       - name: blocks
       - name: transactions
+      - name: address_labels
+  - name: bronze 
+    database: evmos
+    schema: bronze 
+    tables: 
+      - name: sample_blocks
+      - name: sample_txs
+  - name: streamline 
+    database: streamline
+    schema: evmos_dev
+    tables: 
+      - name: tendermint_block
+      - name: tendermint_tx_search
+  - name: osmo
+    database: osmosis
+    schema: silver
+    tables: 
+      - name: asset_metadata
