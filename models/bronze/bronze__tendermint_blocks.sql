@@ -18,7 +18,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "streamline", "tendermint_block") }}'
+                table_name => '{{ source( "streamline", "tendermint_blocks") }}'
             )
         ) A
 
@@ -48,7 +48,7 @@ SELECT
 FROM
     {{ source(
         'streamline',
-        'tendermint_block'
+        'tendermint_blocks'
     ) }}
 JOIN meta m
 ON m.file_name = metadata$filename

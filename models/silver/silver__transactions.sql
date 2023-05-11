@@ -32,8 +32,9 @@ FROM
     bb
     ON b.block_id = bb.block_id
 
+WHERE tx_id is not null
 {% if is_incremental() %}
-WHERE
+AND
     bb._inserted_timestamp :: DATE >= (
         SELECT
             MAX(_inserted_timestamp) :: DATE - 2
