@@ -6,33 +6,44 @@
     )
 ) }}
 
-WITH last_3_days AS (
-    {% if var('STREAMLINE_RUN_HISTORY')%}
-        SELECT 
-            0 AS block_number
-    {% else %}
-        SELECT
-            MAX(block_number) - 100000 AS block_number --aprox 3 days
-        FROM
-            {{ ref("streamline__blocks") }}
-    {% endif %}
-),
-tbl AS (
+WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
+
     SELECT
-        block_number
+        0 AS block_number
+    {% else %}
+    SELECT
+        MAX(block_number) - 100000 AS block_number --aprox 3 days
     FROM
         {{ ref("streamline__blocks") }}
-    WHERE
-        (
+    {% endif %}),
+    tbl AS (
+        SELECT
+            block_number
+        FROM
+            {{ ref("streamline__blocks") }}
+        WHERE
+            (
+                block_number >= (
+                    SELECT
+                        block_number
+                    FROM
+                        last_3_days
+                )
+            )
+            AND block_number IS NOT NULL
+        EXCEPT
+        SELECT
+            block_number
+        FROM
+            {{ ref("streamline__complete_tendermint_transactions") }}
+        WHERE
             block_number >= (
                 SELECT
                     block_number
                 FROM
                     last_3_days
             )
-        )
-        AND block_number IS NOT NULL
-)
+    )
 SELECT
     block_number
 FROM

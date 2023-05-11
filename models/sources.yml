@@ -14,8 +14,11 @@ sources:
     schema: |
       {{ "EVMOS_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "EVMOS" }}
     tables:
-      - name: blocks
-      - name: transactions
+      - name: eth_blocks
+      - name: eth_transactions
+      - name: tendermint_blocks
+      - name: tendermint_transactions
+      - name: tendermint_validators
       - name: address_labels
   - name: bronze 
     database: evmos
