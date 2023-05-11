@@ -4,4 +4,6 @@
     ) }}
     {{ create_udf_get_chainhead() }}
     {{ create_udf_json_rpc() }}
+    {{ create_udf_get_tendermint_transactions() }}
+    {{ create_udf_get_tendermint_validators() }}
 {% endmacro %}
