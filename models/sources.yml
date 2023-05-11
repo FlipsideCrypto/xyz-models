@@ -7,6 +7,7 @@ sources:
     tables:
       - name: dim_date_hours
       - name: address_tags
+      - name: address_labels
       - name: dim_dates
   - name: bronze_streamline
     database: streamline

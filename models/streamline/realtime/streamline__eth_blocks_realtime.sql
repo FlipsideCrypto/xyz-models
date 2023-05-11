@@ -1,7 +1,7 @@
 {{ config (
     materialized = "view",
     post_hook = if_data_call_function(
-        func = "{{this.schema}}.udf_json_rpc(object_construct('url_route','tendermint_rpc', 'sql_source', '{{this.identifier}}', 'external_table', 'tendermint_tx_search', 'exploded_key','[\"result\", \"txs\"]', 'method', 'eth_getBlockByNumber', 'producer_batch_size',1000, 'producer_limit_size', 1000000, 'worker_batch_size',100, 'producer_batch_chunks_size', 1000))",
+        func = "{{this.schema}}.udf_json_rpc(object_construct('url_route','eth_rpc', 'sql_source', '{{this.identifier}}', 'external_table', 'eth_blocks', 'method', 'eth_getBlockByNumber', 'producer_batch_size',1000, 'producer_limit_size', 1000000, 'worker_batch_size',100, 'producer_batch_chunks_size', 1000))",
         target = "{{this.schema}}.{{this.identifier}}"
     )
 ) }}
@@ -19,7 +19,8 @@ WITH last_3_days AS (
 ),
 tbl AS (
     SELECT
-        block_number
+        block_number,
+        block_number_hex
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
@@ -34,6 +35,12 @@ tbl AS (
         AND block_number IS NOT NULL
 )
 SELECT
-    block_number
+    block_number,
+    'eth_getBlockByNumber' AS method,
+    CONCAT(
+        block_number_hex,
+        '_-_',
+        'false'
+    ) AS params
 FROM
     tbl
