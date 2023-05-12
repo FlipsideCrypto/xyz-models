@@ -2,9 +2,38 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'xyz' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'evmos' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_date_hours
       - name: address_tags
+      - name: address_labels
       - name: dim_dates
+  - name: bronze_streamline
+    database: streamline
+    schema: |
+      {{ "EVMOS_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "EVMOS" }}
+    tables:
+      - name: eth_blocks
+      - name: eth_transactions
+      - name: tendermint_blocks
+      - name: tendermint_transactions
+      - name: tendermint_validators
+      - name: address_labels
+  - name: bronze 
+    database: evmos
+    schema: bronze 
+    tables: 
+      - name: sample_blocks
+      - name: sample_txs
+  - name: streamline 
+    database: streamline
+    schema: evmos
+    tables: 
+      - name: tendermint_blocks
+      - name: tendermint_transactions
+  - name: osmo
+    database: osmosis
+    schema: silver
+    tables: 
+      - name: asset_metadata
