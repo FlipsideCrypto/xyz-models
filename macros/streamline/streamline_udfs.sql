@@ -7,8 +7,7 @@
 {% endmacro %}
 
 {% macro create_udf_json_rpc() %}
-    CREATE
-    OR REPLACE EXTERNAL FUNCTION streamline.udf_json_rpc(
+    CREATE EXTERNAL FUNCTION IF NOT EXISTS streamline.udf_json_rpc(
         json OBJECT
     ) returns ARRAY api_integration = aws_evmos_api AS {% if target.name == "prod" %}
         'https://n0reh6ugbf.execute-api.us-east-1.amazonaws.com/prod/bulk_get_json_rpc'
@@ -18,8 +17,7 @@
 {% endmacro %}
 
 {% macro create_udf_get_tendermint_transactions() %}
-    CREATE
-    OR REPLACE EXTERNAL FUNCTION streamline.bulk_get_tendermint_transactions(
+    CREATE EXTERNAL FUNCTION IF NOT EXISTS streamline.bulk_get_tendermint_transactions(
         json OBJECT
     ) returns ARRAY api_integration = aws_evmos_api AS {% if target.name == "prod" %}
         'https://n0reh6ugbf.execute-api.us-east-1.amazonaws.com/prod/bulk_get_tendermint_transactions'
@@ -29,8 +27,7 @@
 {% endmacro %}
 
 {% macro create_udf_get_tendermint_validators() %}
-    CREATE
-    OR REPLACE EXTERNAL FUNCTION streamline.bulk_get_tendermint_validators(
+    CREATE EXTERNAL FUNCTION IF NOT EXISTS streamline.bulk_get_tendermint_validators(
         json OBJECT
     ) returns ARRAY api_integration = aws_evmos_api AS {% if target.name == "prod" %}
         'https://n0reh6ugbf.execute-api.us-east-1.amazonaws.com/prod/bulk_get_tendermint_validators'
