@@ -39,7 +39,3 @@ models:
         description: "{{ doc('receiver') }}"
         tests: 
           - dbt_expectations.expect_column_to_exist
-      - name: UNIQUE_KEY
-        description: "{{ doc('_unique_key') }}"
-        tests: 
-          - dbt_expectations.expect_column_to_exist
