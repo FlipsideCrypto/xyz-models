@@ -9,21 +9,20 @@ WITH base_transactions AS (
 
     SELECT
         block_id,
-        t.value :hash :: STRING AS tx_id,
-        t.value :tx_result :codespace AS codespace,
-        t.value :tx_result :gas_used :: NUMBER AS gas_used,
-        t.value :tx_result :gas_wanted :: NUMBER AS gas_wanted,
+        tx_id,
+        data :tx_result :codespace AS codespace,
+        data :tx_result :gas_used :: NUMBER AS gas_used,
+        data :tx_result :gas_wanted :: NUMBER AS gas_wanted,
         CASE
-            WHEN t.value :tx_result :code :: NUMBER = 0 THEN TRUE
+            WHEN data :tx_result :code :: NUMBER = 0 THEN TRUE
             ELSE FALSE
         END AS tx_succeeded,
-        t.value :tx_result :code :: NUMBER AS tx_code,
-        t.value :tx_result :events AS msgs,
-        t.value :tx_result :log :: STRING AS tx_log,
+        data :tx_result :code :: NUMBER AS tx_code,
+        data :tx_result :events AS msgs,
+        data :tx_result :log :: STRING AS tx_log,
         _inserted_timestamp
     FROM
-        {{ ref('bronze__tendermint_transactions') }},
-        TABLE(FLATTEN(DATA :result :txs)) t
+        {{ ref('bronze__tendermint_transactions') }}
 
 {% if is_incremental() %}
 WHERE

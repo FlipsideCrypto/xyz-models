@@ -35,8 +35,9 @@ FROM
 WHERE
   data [0] :error IS NULL
   AND DATA :error IS NULL
-  AND DATA :result :block :header :chain_id :: STRING IS NOT NULL 
-  AND DATA[0] :result :block :header :chain_id :: STRING IS NOT NULL
+  AND (DATA :result :block :header :chain_id :: STRING IS NOT NULL 
+  OR DATA[0] :result :block :header :chain_id :: STRING IS NOT NULL)
+
 
 {% if is_incremental() %}
 AND _inserted_timestamp :: DATE >= (
