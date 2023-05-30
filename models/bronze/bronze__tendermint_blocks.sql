@@ -53,7 +53,6 @@ FROM
     ) }} 
     JOIN meta m
     ON m.file_name = metadata$filename
-    {{ ref('bronze__streamline_FR_tendermint_blocks') }}
 
 WHERE
     DATA: error IS NULL qualify(ROW_NUMBER() over (PARTITION BY block_number
