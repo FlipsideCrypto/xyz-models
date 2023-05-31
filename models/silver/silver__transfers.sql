@@ -5,77 +5,72 @@
     cluster_by = 'block_timestamp::DATE',
 ) }}
 
-WITH evmos_txs AS (
+WITH base AS (
 
+    SELECT
+        *
+    FROM
+        {{ ref('silver__msg_attributes') }}
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
+tx AS (
+    SELECT
+        DISTINCT block_id,
+        block_timestamp,
+        tx_id,
+        tx_succeeded,
+        _inserted_timestamp
+    FROM
+        base
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
+evmos_txs AS (
     SELECT
         DISTINCT tx_id
     FROM
-        {{ ref('silver__msg_attributes') }}
+        base
     WHERE
         attribute_value IN (
             '/cosmos.bank.v1beta1.MsgSend',
-            '/cosmos.bank.v1beta1.MsgMultiSend', 
+            '/cosmos.bank.v1beta1.MsgMultiSend',
             '/ibc.applications.transfer.v1.MsgTransfer'
         )
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
-),
-sender_index AS (
-    SELECT
-        tx_id,
-        MIN(msg_index) AS msg_index
-    FROM
-        {{ ref('silver__msg_attributes') }}
-    WHERE
-        msg_type = 'tx'
-        AND attribute_key = 'acc_seq'
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
-GROUP BY
-    tx_id
 ),
 sender AS (
     SELECT
         m.block_id,
         m.tx_id,
-        s.msg_index,
+        m.msg_index,
         SPLIT_PART(
             attribute_value,
             '/',
             0
         ) AS sender
     FROM
-        {{ ref('silver__msg_attributes') }}
-        m
-        INNER JOIN sender_index s
-        ON m.tx_id = s.tx_id
-        AND m.msg_index = s.msg_index
+        base m
     WHERE
         msg_type = 'tx'
-        AND attribute_key = 'acc_seq'
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
+        AND attribute_key = 'acc_seq' qualify(ROW_NUMBER() over(PARTITION BY tx_id
+    ORDER BY
+        msg_index)) = 1
 ),
 msg_index AS (
     SELECT
@@ -85,8 +80,7 @@ msg_index AS (
         m.msg_index
     FROM
         evmos_txs v
-        LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
-        m
+        LEFT OUTER JOIN base m
         ON v.tx_id = m.tx_id
         INNER JOIN sender s
         ON v.tx_id = s.tx_id
@@ -95,15 +89,6 @@ msg_index AS (
         msg_type = 'transfer'
         AND attribute_key = 'amount'
         AND m.msg_index > s.msg_index
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 receiver AS (
     SELECT
@@ -113,8 +98,7 @@ receiver AS (
         attribute_value AS receiver
     FROM
         evmos_txs v
-        LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
-        m
+        LEFT OUTER JOIN base m
         ON v.tx_id = m.tx_id
         INNER JOIN sender s
         ON v.tx_id = s.tx_id
@@ -124,15 +108,6 @@ receiver AS (
         OR msg_type = 'transfer'
         AND attribute_key = 'recipient'
         AND m.msg_index > s.msg_index
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 amount AS (
     SELECT
@@ -159,8 +134,7 @@ amount AS (
         ) AS currency
     FROM
         evmos_txs v
-        LEFT OUTER JOIN {{ ref('silver__msg_attributes') }}
-        m
+        LEFT OUTER JOIN base m
         ON v.tx_id = m.tx_id
         INNER JOIN sender s
         ON v.tx_id = s.tx_id
@@ -169,15 +143,6 @@ amount AS (
         msg_type = 'transfer'
         AND attribute_key = 'amount'
         AND m.msg_index > s.msg_index
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 evmos_txs_final AS (
     SELECT
@@ -201,22 +166,12 @@ evmos_txs_final AS (
         LEFT OUTER JOIN sender s
         ON r.tx_id = s.tx_id
         AND r.block_id = s.block_id
-        LEFT OUTER JOIN {{ ref('silver__transactions') }}
-        t
+        LEFT OUTER JOIN tx t
         ON r.tx_id = t.tx_id
         AND r.block_id = t.block_id
-    WHERE 
+    WHERE
         amount IS NOT NULL
         AND sender IS NOT NULL
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 ibc_in_tx AS (
     SELECT
@@ -235,37 +190,19 @@ ibc_in_tx AS (
         TRY_PARSE_JSON(attribute_value) :receiver :: STRING AS receiver,
         _inserted_timestamp
     FROM
-        {{ ref('silver__msg_attributes') }}
+        base
     WHERE
         msg_type = 'write_acknowledgement'
         AND attribute_key = 'packet_data'
         AND TRY_PARSE_JSON(attribute_value): amount IS NOT NULL
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 ibc_out_txid AS (
     SELECT
         tx_id
     FROM
-        {{ ref('silver__msg_attributes') }}
+        base
     WHERE
         msg_type = 'ibc_transfer'
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 ibc_out_tx AS (
     SELECT
@@ -284,7 +221,7 @@ ibc_out_tx AS (
         TRY_PARSE_JSON(attribute_value) :receiver :: STRING AS receiver,
         _inserted_timestamp
     FROM
-        {{ ref('silver__msg_attributes') }}
+        base
     WHERE
         tx_id IN (
             SELECT
@@ -294,15 +231,6 @@ ibc_out_tx AS (
         )
         AND msg_type = 'send_packet'
         AND attribute_key = 'packet_data'
-
-{% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 ibc_transfers_agg AS (
     SELECT

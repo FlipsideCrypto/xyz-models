@@ -1,9 +1,9 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "CONCAT_WS('-', tx_id, msg_index, attribute_index)",
-  incremental_strategy = 'delete+insert',
-  cluster_by = ['block_timestamp::DATE'],
-  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+  unique_key = ["tx_id","msg_index","attribute_index"],
+  incremental_strategy = 'merge',
+  cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(msg_type,attribute_key,attribute_value);"
 ) }}
 
 SELECT
@@ -32,9 +32,9 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-  _inserted_timestamp :: DATE >= (
+  _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 2
+      MAX(_inserted_timestamp) _inserted_timestamp
     FROM
       {{ this }}
   )

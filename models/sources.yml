@@ -26,12 +26,6 @@ sources:
     tables: 
       - name: sample_blocks
       - name: sample_txs
-  - name: streamline 
-    database: streamline
-    schema: evmos
-    tables: 
-      - name: tendermint_blocks
-      - name: tendermint_transactions
   - name: osmo
     database: osmosis
     schema: silver

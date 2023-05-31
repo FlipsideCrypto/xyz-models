@@ -2,7 +2,7 @@
   materialized = 'incremental',
   unique_key = "CONCAT_WS('-', tx_id, msg_index)",
   incremental_strategy = 'delete+insert',
-  cluster_by = ['block_timestamp::DATE'],
+  cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE']
 ) }}
 
 WITH base AS (
@@ -45,14 +45,15 @@ WITH base AS (
     ) AS attribute_value,
     t._inserted_timestamp
   FROM
-    {{ ref('silver__transactions') }} t,
+    {{ ref('silver__transactions') }}
+    t,
     LATERAL FLATTEN(input => msgs) f
 
 {% if is_incremental() %}
 WHERE
-  _inserted_timestamp :: DATE >= (
+  _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 2
+      MAX(_inserted_timestamp) _inserted_timestamp
     FROM
       {{ this }}
   )
@@ -67,7 +68,7 @@ exec_actions AS (
   WHERE
     msg_type = 'message'
     AND attribute_key = 'action'
-    AND LOWER(attribute_value) LIKE '%exec%' 
+    AND LOWER(attribute_value) LIKE '%exec%'
 ),
 GROUPING AS (
   SELECT

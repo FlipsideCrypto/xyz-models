@@ -1,16 +1,19 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_id",
-    incremental_strategy = 'delete+insert',
-    cluster_by = 'block_timestamp::DATE',
+    incremental_strategy = 'merge',
+    cluster_by = ['_inserted_timestamp::DATE', 'block_timestamp::DATE' ]
 ) }}
-
+-- depends_on: {{ ref('bronze__streamline_tendermint_transactions') }}
 WITH base_transactions AS (
 
     SELECT
-        block_id,
-        t.value :tx_result :tx_id :: STRING AS tx_id,
-        t.value :tx_result :codespace AS codespace,
+        block_number AS block_id,
+        COALESCE(
+            t.value :tx_result :tx_id,
+            t.value :hash
+        ) :: STRING AS tx_id,
+        t.value :tx_result :codespace :STRING AS codespace,
         t.value :tx_result :gas_used :: NUMBER AS gas_used,
         t.value :tx_result :gas_wanted :: NUMBER AS gas_wanted,
         CASE
@@ -19,20 +22,30 @@ WITH base_transactions AS (
         END AS tx_succeeded,
         t.value :tx_result :code :: NUMBER AS tx_code,
         t.value :tx_result :events AS msgs,
-        t.value :tx_result :log :: STRING AS tx_log,
+        TRY_PARSE_JSON(
+            t.value :tx_result :log
+        ) AS tx_log,
         _inserted_timestamp
     FROM
-        {{ ref('bronze__tendermint_transactions') }} tt, 
-         TABLE(FLATTEN(DATA :result :txs)) t
 
 {% if is_incremental() %}
+{{ ref('bronze__streamline_tendermint_transactions') }}
+tt
+{% else %}
+    {{ ref('bronze__streamline_FR_tendermint_transactions') }}
+    tt
+{% endif %},
+TABLE(FLATTEN(DATA :result :txs)) t
 WHERE
-    _inserted_timestamp :: DATE >= (
-        SELECT
-            MAX(_inserted_timestamp) :: DATE - 2
-        FROM
-            {{ this }}
-    )
+    tx_id IS NOT NULL
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) _inserted_timestamp
+    FROM
+        {{ this }}
+)
 {% endif %}
 )
 SELECT
@@ -62,7 +75,7 @@ FROM
 WHERE
     b._inserted_timestamp :: DATE >= (
         SELECT
-            MAX(_inserted_timestamp) :: DATE - 2
+            MAX(_inserted_timestamp) :: DATE - 3
         FROM
             {{ this }}
     )

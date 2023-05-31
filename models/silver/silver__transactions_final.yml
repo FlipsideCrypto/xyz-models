@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: core__fact_transactions
+  - name: silver__transactions_final
     description: Records of all transactions that have occurred on Evmos. This schema is currently in lite mode, and contains data back to DATE.
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -45,6 +45,6 @@ models:
         tests: 
           - dbt_expectations.expect_column_to_exist  
       - name: MSGS
-        description: "{{ doc('msgs') }}" 
+        description: "The underlying json from the messages or events within the transactions"
         tests: 
           - dbt_expectations.expect_column_to_exist

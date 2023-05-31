@@ -8,7 +8,7 @@ models:
             - CHAIN_ID
             - BLOCK_ID
       - sequence_gaps:
-          column_name: block_ID
+          column_name: BLOCK_ID
           where: BLOCK_TIMESTAMP <= CURRENT_DATE - 1 
     columns:
       - name: BLOCK_ID

@@ -1,12 +1,13 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "CONCAT_WS('-', chain_id, block_id)",
-  incremental_strategy = 'delete+insert',
+  unique_key = ["chain_id", "block_id"],
+  incremental_strategy = 'merge',
   cluster_by = ['block_timestamp::DATE'],
 ) }}
+-- depends_on: {{ ref('bronze__streamline_tendermint_blocks') }}
 
 SELECT
-   block_id,
+  block_number AS block_id,
   COALESCE(
     DATA [0] :result :block :header :time :: TIMESTAMP,
     DATA :result :block :header :time :: TIMESTAMP
@@ -17,13 +18,13 @@ SELECT
   ) AS chain_id,
   ARRAY_SIZE(
     COALESCE(
-      data [0] :result :block :data :txs,
-      data :result :block :data :txs
+      DATA [0] :result :block :data :txs,
+      DATA :result :block :data :txs
     )
   ) AS tx_count,
   COALESCE(
-    data [0] :result :block :header :proposer_address :: STRING,
-    data :result :block :header :proposer_address :: STRING
+    DATA [0] :result :block :header :proposer_address :: STRING,
+    DATA :result :block :header :proposer_address :: STRING
   ) AS proposer_address,
   COALESCE(
     DATA [0] :result :block :header :validators_hash :: STRING,
@@ -31,19 +32,29 @@ SELECT
   ) AS validator_hash,
   _inserted_timestamp :: TIMESTAMP AS _inserted_timestamp
 FROM
-  {{ ref('bronze__tendermint_blocks') }}
-WHERE
-  data [0] :error IS NULL
-  AND DATA :error IS NULL
-  AND (DATA :result :block :header :chain_id :: STRING IS NOT NULL 
-  OR DATA[0] :result :block :header :chain_id :: STRING IS NOT NULL)
-
 
 {% if is_incremental() %}
-AND _inserted_timestamp :: DATE >= (
+{{ ref('bronze__streamline_tendermint_blocks') }}
+{% else %}
+  {{ ref('bronze__streamline_FR_tendermint_blocks') }}
+{% endif %}
+WHERE
+  DATA [0] :error IS NULL
+  AND DATA :error IS NULL
+  AND (
+    DATA :result :block :header :chain_id :: STRING IS NOT NULL
+    OR DATA [0] :result :block :header :chain_id :: STRING IS NOT NULL
+  )
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
   SELECT
-    MAX(_inserted_timestamp) :: DATE - 2
+    MAX(_inserted_timestamp) _inserted_timestamp
   FROM
     {{ this }}
 )
 {% endif %}
+
+qualify(ROW_NUMBER() over (PARTITION BY block_number
+ORDER BY
+  _inserted_timestamp DESC)) = 1
