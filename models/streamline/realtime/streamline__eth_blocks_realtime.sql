@@ -1,7 +1,7 @@
 {{ config (
     materialized = "view",
     post_hook = if_data_call_function(
-        func = "{{this.schema}}.udf_json_rpc(object_construct('url_route','eth_rpc', 'sql_source', '{{this.identifier}}', 'external_table', 'eth_blocks', 'method', 'eth_getBlockByNumber', 'producer_batch_size',10000, 'producer_limit_size', 2000000, 'worker_batch_size',100))",
+        func = "{{this.schema}}.udf_json_rpc(object_construct('url_route','eth_rpc', 'sql_source', '{{this.identifier}}', 'external_table', 'eth_blocks', 'method', 'eth_getBlockByNumber', 'producer_batch_size',1000, 'producer_limit_size', 2000000, 'worker_batch_size',100))",
         target = "{{this.schema}}.{{this.identifier}}"
     )
 ) }}
