@@ -1,4 +1,4 @@
-xyz:
+admin:
   target: dev
   outputs:
     dev:
