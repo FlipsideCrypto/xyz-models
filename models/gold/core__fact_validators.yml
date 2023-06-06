@@ -63,7 +63,3 @@ models:
         description: "{{ doc('raw_metadata') }}"
         tests: 
           - dbt_expectations.expect_column_to_exist
-      - name: UNIQUE_KEY
-        description: The unique key of the table
-        tests: 
-          - dbt_expectations.expect_column_to_exist
