@@ -129,11 +129,3 @@ models:
         description: "{{ doc('raw_metadata') }}"
         tests: 
           - not_null
-      - name: UNIQUE_KEY
-        description: The unique key of the table
-        tests: 
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING
-                - VARCHAR
