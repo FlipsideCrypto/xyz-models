@@ -19,7 +19,7 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
     tbl AS (
         SELECT
             block_number,
-            block_hash
+            data:result::STRING AS block_hash
         FROM
             {{ ref("bronze__streamline_blocks_hash") }}
         WHERE
@@ -32,6 +32,20 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
                 )
             )
             AND block_number IS NOT NULL
+            AND block_number NOT IN (
+                SELECT
+                    block_number
+                FROM
+                    {{ ref("streamline__complete_transactions") }}
+                WHERE
+                    block_number >= (
+                        SELECT
+                            block_number
+                        FROM
+                            last_3_days
+                    )
+                    AND block_number IS NOT NULL
+            )
     )
 SELECT
     block_number,

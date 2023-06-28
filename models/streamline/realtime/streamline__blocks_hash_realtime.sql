@@ -6,6 +6,7 @@
     )
 ) }}
 
+
 WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
 
     SELECT
@@ -18,8 +19,7 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
     {% endif %}),
     tbl AS (
         SELECT
-            block_number,
-            block_number_hex
+            block_number
         FROM
             {{ ref("streamline__blocks") }}
         WHERE
@@ -30,6 +30,19 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
                     FROM
                         last_3_days
                 )
+            )
+            AND block_number IS NOT NULL
+        EXCEPT
+        SELECT
+            block_number
+        FROM
+            {{ ref("streamline__complete_blocks_hash") }}
+        WHERE
+            block_number >= (
+                SELECT
+                    block_number
+                FROM
+                    last_3_days
             )
             AND block_number IS NOT NULL
     )
