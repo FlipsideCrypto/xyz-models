@@ -2,9 +2,17 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'xyz' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'BITCOIN' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+  - name: bronze_streamline
+    database: streamline
+    schema: |
+      {{ "BITCOIN_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "BITCOIN" }}
+    tables:
+      - name: blocks_hash
+      - name: blocks
+      - name: transactions

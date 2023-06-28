@@ -1,13 +1,10 @@
-
-# Please find and replace all instances of `xyz` with your project name.
-
 ## Profile Set Up
 
 #### Use the following within profiles.yml 
 ----
 
 ```yml
-xyz:
+bitcoin:
   target: dev
   outputs:
     dev:
@@ -17,7 +14,7 @@ xyz:
       user: <USERNAME>
       password: <PASSWORD>
       region: <REGION>
-      database: xyz_DEV
+      database: BITCOIN_DEV
       warehouse: <WAREHOUSE>
       schema: silver
       threads: 4
@@ -30,8 +27,6 @@ xyz:
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
 - Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
 - Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
-
 - Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
 
 ## Applying Model Tags
@@ -73,5 +68,5 @@ dbt run --var '{"UPDATE_SNOWFLAKE_TAGS":True}' -s models/core/core__fact_swaps.s
 
 ```
 select *
-from table(xyz.information_schema.tag_references('xyz.core.fact_blocks', 'table'));
+from table(bitcoin.information_schema.tag_references('bitcoin.core.fact_blocks', 'table'));
 ```
