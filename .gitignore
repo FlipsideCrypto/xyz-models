@@ -16,3 +16,8 @@ logs/
 .env
 .DS_Store
 .user.yml
+
+.dbt/.user.yml
+.github/workflows/.dbt/.user.yml
+
+local*

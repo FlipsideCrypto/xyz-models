@@ -1,9 +1,12 @@
-name: docs_update
+name: dbt_run_scheduled
+run-name: dbt_run_scheduled
 
 on:
-  push:
-    branches:
-      - "main"
+  workflow_dispatch:
+  # schedule:
+    # TODO - enable once pipeline created
+    # Runs "every hour" (see https://crontab.guru)
+    # - cron: '0 */1 * * *'
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
@@ -23,5 +26,10 @@ concurrency:
 
 jobs:
   called_workflow_template:
-    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_docs_updates.yml@main
+    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
+    with:
+      dbt_command: >
+        dbt run
+      environment: workflow_prod
+      warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit 
