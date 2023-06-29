@@ -1,5 +1,5 @@
-name: dbt_run_streamline_blocks_hash_realtime
-run-name: dbt_run_streamline_blocks_hash_realtime
+name: dbt_run_streamline_realtime
+run-name: dbt_run_streamline_realtime
 
 on:
   workflow_dispatch:
