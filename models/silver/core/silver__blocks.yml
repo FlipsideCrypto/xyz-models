@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: silver__blocks
+    description: |-
+      Raw Bitcoin blocks.
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+
+      - name: BITS
+        description: "{{ doc('bits') }}"
+
+      - name: CHAINWORK
+        description: "{{ doc('chainwork') }}"
+      
+      - name: DIFFICULTY
+        description: "{{ doc('difficulty') }}"
+      
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+
+      - name: MEDIANTIME_EPOCH
+        description: "{{ doc('mediantime_epoch') }}"
+      
+      - name: MEDIANTIME
+        description: "{{ doc('mediantime') }}"
+
+      - name: MERKLE_ROOT
+        description: "{{ doc('merkle_root') }}"
+
+      - name: TX_COUNT
+        description: "{{ doc('tx_count') }}"
+      
+      - name: NEXT_BLOCK_HASH
+        description: "{{ doc('next_block_hash') }}"
+
+      - name: NONCE
+        description: "{{ doc('nonce') }}"
+
+      - name: PREVIOUS_BLOCK_HASH
+        description: "{{ doc('previous_block_hash') }}"
+
+      - name: SIZE
+        description: "{{ doc('size') }}"
+
+      - name: STRIPPED_SIZE
+        description: "{{ doc('stripped_size') }}"
+
+      - name: BLOCK_TIMESTAMP_EPOCH
+        description: "{{ doc('block_timestamp_epoch') }}"
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+
+      - name: TX
+        description: "{{ doc('tx') }}"
+
+      - name: VERSION
+        description: "{{ doc('version') }}"
+
+      - name: VERSION_HEX
+        description: "{{ doc('version_hex') }}"
+
+      - name: WEIGHT
+        description: "{{ doc('weight') }}"
+
+      - name: ERROR
+        description: "{{ doc('error') }}"
+
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP
