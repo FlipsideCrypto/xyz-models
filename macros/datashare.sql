@@ -79,7 +79,7 @@ DECLARE
     FROM snowflake.account_usage.tables
     WHERE table_name = '_CREATE_GOLD'
     and table_schema = '_DATASHARE'
-    AND TABLE_CATALOG not like '%_DEV';
+    AND TABLE_CATALOG {{"" if target.database.upper().endswith("_DEV") else "NOT" }} LIKE '%_DEV';
 BEGIN
     create or replace temporary table results as
     SELECT ''::string AS db
