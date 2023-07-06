@@ -9,6 +9,7 @@
         {{ create_sp_grant_share_permissions_string_timestamp() }}
         {{ create_sp_grant_share_permissions_timestamp() }}
         {{ create_sp_grant_share_permissions() }}
+        {{ create_sp_grant_share_permissions_string() }}
     {% endset %}
     {% do run_query(sql) %}
 {% endmacro %}

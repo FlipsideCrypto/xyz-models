@@ -114,3 +114,20 @@ END;
 $$
 ;
 {% endmacro %}
+
+{% macro create_sp_grant_share_permissions_string() %}
+create or replace procedure datashare.sp_grant_share_permissions(db string)
+returns table (sql string)
+LANGUAGE SQL
+execute as caller
+as
+$$
+DECLARE
+  results resultset;
+BEGIN
+  results := (call datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
+  RETURN table(results);
+END;
+$$
+;
+{% endmacro %}
