@@ -82,7 +82,7 @@ DECLARE
     AND TABLE_CATALOG {{"" if target.database.upper().endswith("_DEV") else "NOT" }} LIKE '%_DEV';
 BEGIN
     create or replace temporary table results as
-    SELECT ''::string AS db
+    SELECT ''::STRING AS db
     FROM dual
     LIMIT 0;
     FOR cur_row IN cur DO
