@@ -6,6 +6,7 @@
 
         {% endif %}
         CREATE SCHEMA IF NOT EXISTS datashare;
+        {{ create_sp_grant_share_permissions_string_timestamp_string() }}
         {{ create_sp_grant_share_permissions_string_timestamp() }}
         {{ create_sp_grant_share_permissions_timestamp() }}
         {{ create_sp_grant_share_permissions() }}

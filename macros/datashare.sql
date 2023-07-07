@@ -1,12 +1,12 @@
-{% macro create_sp_grant_share_permissions_string_timestamp() %}
-CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ)
+{% macro create_sp_grant_share_permissions_string_timestamp_string() %}
+CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ, SHARE_SUFFIX string)
 RETURNS TABLE (SQL STRING)
 LANGUAGE SQL
 EXECUTE AS CALLER
 AS
 $$
 DECLARE
-  share_name VARCHAR DEFAULT :db || '_FLIPSIDE_AF';
+  share_name VARCHAR DEFAULT :db || :share_suffix;
   ddl_views VARCHAR DEFAULT :db || '._datashare._create_gold';
   target_schema VARCHAR DEFAULT :db || '.information_schema.schemata';
   all_grants VARCHAR DEFAULT '';
@@ -67,6 +67,23 @@ $$
 ;
 {% endmacro %}
 
+{% macro create_sp_grant_share_permissions_string_timestamp() %}
+CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ)
+RETURNS TABLE (SQL STRING)
+LANGUAGE SQL
+EXECUTE AS CALLER
+AS
+$$
+DECLARE
+  results RESULTSET;
+BEGIN
+  results := (CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ,'_FLIPSIDE_AF') );
+  RETURN TABLE(results);
+END;
+$$
+;
+{% endmacro %}
+
 {% macro create_sp_grant_share_permissions_timestamp() %}
 CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(updated_since TIMESTAMP_NTZ)
 RETURNS TABLE (TABLE_CATALOG STRING)
@@ -75,11 +92,15 @@ AS
 $$
 DECLARE
     cur CURSOR FOR SELECT
-        table_catalog
+        table_catalog,
+        share_suffix
     FROM snowflake.account_usage.tables
+    CROSS JOIN (SELECT 'FLIPSIDE_AF' AS share_suffix UNION ALL SELECT 'FLIPSIDE_AF_PAID'UNION ALL SELECT 'FLIPSIDE_AF_TRIAL')
     WHERE table_name = '_CREATE_GOLD'
     and table_schema = '_DATASHARE'
-    AND TABLE_CATALOG {{"" if target.database.upper().endswith("_DEV") else "NOT" }} LIKE '%_DEV';
+    AND TABLE_CATALOG {{"" if target.database.upper().endswith("_DEV") else "NOT" }} LIKE '%_DEV'
+    AND TABLE_CATALOG NOT LIKE '%_DEV'
+    GROUP BY 1,2;
 BEGIN
     create or replace temporary table results as
     SELECT ''::STRING AS db
@@ -87,7 +108,8 @@ BEGIN
     LIMIT 0;
     FOR cur_row IN cur DO
         LET db VARCHAR := cur_row.table_catalog;
-        CALL datashare.sp_grant_share_permissions(:db, :updated_since);
+        LET suffix VARCHAR := cur_row.share_suffix;
+        CALL datashare.sp_grant_share_permissions(:db, :updated_since, :suffix);
         LET cnt VARCHAR := (SELECT COUNT(*) FROM TABLE(result_scan(last_query_id())));
         IF (cnt > 0) THEN
             INSERT INTO RESULTS (db) VALUES (:db);
