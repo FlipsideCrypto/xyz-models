@@ -3,10 +3,10 @@ run-name: dbt_run_dev_refresh
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   # Runs "at 9:00 UTC" (see https://crontab.guru)
-  #   - cron: '0 9 * * *'
-    
+  schedule:
+    # Runs "At minute 10 UTC" (see https://crontab.guru)
+    - cron: 10 * * * *
+
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
   DBT_PROFILES_DIR: "${{ vars.DBT_PROFILES_DIR }}"
@@ -31,4 +31,4 @@ jobs:
         dbt run-operation run_sp_create_prod_clone
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
-    secrets: inherit 
+    secrets: inherit
