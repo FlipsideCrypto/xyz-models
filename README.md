@@ -36,10 +36,8 @@ dbt run-operation call_sp_grant_share_permissions
 dbt run-operation call_sp_grant_share_permissions --args '{args: $$BSC$$}'
 # Applies grants to all databases that have been deployed within the last hour
 dbt run-operation call_sp_grant_share_permissions --args "{args: sysdate() - interval '1 hour'}"
-# Applies grants to a database that have been deployed within the last hour with the default suffix _FLIPSIDE_AF
+# Applies grants to a database that have been deployed within the last hour with the default suffixes
 dbt run-operation call_sp_grant_share_permissions --args '{args: "$$BSC$$, sysdate() - interval $$1 hour$$"}'
-# Applies grants to a database that have been deployed within the last hour with the suffix _SOME_CUSTOM_SUFFIX
-dbt run-operation call_sp_grant_share_permissions --args '{args: "$$BSC$$, sysdate() - interval $$1 hour$$", $$_SOME_CUSTOM_SUFFIX$$}'
 ```
 
 ## Resources:
