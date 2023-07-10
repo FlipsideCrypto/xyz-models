@@ -28,7 +28,7 @@ jobs:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
       dbt_command: >
-        dbt run-operation run_sp_create_prod_clone
+        dbt run-operation call_sp_grant_share_permissions --args "{args: sysdate() - interval '1 hour'}"
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit
