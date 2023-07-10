@@ -1,12 +1,11 @@
-{% macro create_sp_grant_share_permissions_string_timestamp_string() %}
-CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ, share_suffix string)
+{% macro create_sp_grant_share_permissions_string_timestamp() %}
+CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ)
 RETURNS TABLE (SQL STRING)
 LANGUAGE SQL
 EXECUTE AS CALLER
 AS
 $$
 DECLARE
-  share_name VARCHAR DEFAULT :db || :share_suffix;
   ddl_views VARCHAR DEFAULT :db || '._datashare._create_gold';
   target_schema VARCHAR DEFAULT :db || '.information_schema.schemata';
   all_grants VARCHAR DEFAULT '';
@@ -39,19 +38,24 @@ BEGIN
         LIMIT
             1
     )
+    ,add_suffix as (
     SELECT concat_ws(' ',
-        'CREATE SHARE IF NOT EXISTS', :share_name, ';\n',
-        'GRANT USAGE ON DATABASE',:db, 'TO SHARE', :share_name, ';\n',
+        'CREATE SHARE IF NOT EXISTS', :db || suffix, ';\n',
+        'GRANT USAGE ON DATABASE',:db, 'TO SHARE', :db || suffix, ';\n',
         replace(
             replace(
                 s.ddl,
                 '{DB}',
                 :db),
             '{SHARE}',
-            :share_name)
+            :db || suffix)
         ) AS permissions
-     INTO :all_grants
-    FROM schema_grants s;
+    FROM schema_grants s
+    CROSS JOIN (SELECT suffix from datashare.share_suffix where is_active = true)
+    )
+    SELECT listagg(permissions,'\n') as all_permissions
+            INTO :all_grants
+            FROM add_suffix;
 
     IF (all_grants IS NOT NULL) THEN
       EXECUTE IMMEDIATE 'BEGIN\n' || :all_grants || 'END\n';
@@ -75,15 +79,12 @@ AS
 $$
 DECLARE
     cur CURSOR FOR SELECT
-        table_catalog,
-        suffix
+        table_catalog
     FROM snowflake.account_usage.tables
-    CROSS JOIN (SELECT suffix from datashare.share_suffix where is_active = true)
     WHERE table_name = '_CREATE_GOLD'
     and table_schema = '_DATASHARE'
     AND TABLE_CATALOG {{"" if target.database.upper().endswith("_DEV") else "NOT" }} LIKE '%_DEV'
-    AND TABLE_CATALOG NOT LIKE '%_DEV'
-    GROUP BY 1,2;
+    AND TABLE_CATALOG NOT LIKE '%_DEV';
 BEGIN
     create or replace temporary table results as
     SELECT ''::STRING AS db
@@ -91,8 +92,7 @@ BEGIN
     LIMIT 0;
     FOR cur_row IN cur DO
         LET db VARCHAR := cur_row.table_catalog;
-        LET suffix VARCHAR := cur_row.suffix;
-        CALL datashare.sp_grant_share_permissions(:db, :updated_since, :suffix);
+        CALL datashare.sp_grant_share_permissions(:db, :updated_since);
         LET cnt VARCHAR := (SELECT COUNT(*) FROM TABLE(result_scan(last_query_id())));
         IF (cnt > 0) THEN
             INSERT INTO RESULTS (db) VALUES (:db);
@@ -115,7 +115,7 @@ $$
 DECLARE
   results RESULTSET;
 BEGIN
-  results := (CALL datashare.sp_grant_share_permissions('2000-01-01'::TIMESTAMP_NTZ) );
+  results := (CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
   RETURN TABLE(results);
 END;
 $$
@@ -124,28 +124,16 @@ $$
 
 {% macro create_sp_grant_share_permissions_string() %}
 CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING)
-RETURNS TABLE (TABLE_CATALOG STRING)
+RETURNS TABLE (SQL STRING)
 LANGUAGE SQL
+EXECUTE AS CALLER
 AS
 $$
 DECLARE
-    cur CURSOR FOR SELECT suffix from datashare.share_suffix 
-    WHERE is_active = true;
+  results RESULTSET;
 BEGIN
-    create or replace temporary table results as
-    SELECT ''::STRING AS db
-    FROM dual
-    LIMIT 0;
-    FOR cur_row IN cur DO
-        LET suffix VARCHAR := cur_row.suffix;
-        CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ, :suffix);
-        LET cnt VARCHAR := (SELECT COUNT(*) FROM TABLE(result_scan(last_query_id())));
-        IF (cnt > 0) THEN
-            INSERT INTO RESULTS (db) VALUES (:db||:suffix);
-        END IF;
-    END FOR;
-    LET rs RESULTSET := (SELECT * FROM results ORDER BY db);
-    RETURN TABLE(rs);
+  results := (CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
+  RETURN TABLE(results);
 END;
 $$
 ;
