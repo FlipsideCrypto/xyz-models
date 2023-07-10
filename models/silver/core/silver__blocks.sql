@@ -30,8 +30,8 @@ blocks AS (
         DATA :result :chainwork :: STRING AS chainwork,
         DATA :result :difficulty :: FLOAT AS difficulty,
         DATA :result :hash :: STRING AS block_hash,
-        DATA :result :mediantime :: STRING AS mediantime_epoch,
-        DATA :result :mediantime :: timestamp_ntz AS mediantime,
+        {# DATA :result :mediantime :: STRING AS mediantime_epoch, #}
+        DATA :result :mediantime :: timestamp_ntz AS median_time,
         DATA :result :merkleroot :: STRING AS merkle_root,
         DATA :result :nTx :: NUMBER AS tx_count,
         DATA :result :nextblockhash :: STRING AS next_block_hash,
@@ -39,18 +39,20 @@ blocks AS (
         DATA :result :previousblockhash :: STRING AS previous_block_hash,
         DATA :result :strippedsize :: NUMBER AS stripped_size,
         DATA :result :size :: NUMBER AS SIZE,
-        DATA :result :time :: STRING AS block_timestamp_epoch,
+        {# DATA :result :time :: STRING AS block_timestamp_epoch, #}
         DATA :result :time :: timestamp_ntz AS block_timestamp,
         DATA :result :tx :: ARRAY AS tx,
         DATA :result :version :: STRING AS version,
-        DATA :result :versionHex :: STRING AS version_hex,
+        {# DATA :result :versionHex :: STRING AS version_hex, #}
         DATA :result :weight :: STRING AS weight,
         DATA: error :: STRING AS error,
         _partition_by_block_id,
-        _inserted_timestamp
+        _inserted_timestamp,
+        DATA
     FROM
         bronze_blocks
 )
+{# TODO - properly format hexidecimal data #}
 SELECT
     *
 FROM
