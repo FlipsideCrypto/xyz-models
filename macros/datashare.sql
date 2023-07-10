@@ -114,7 +114,7 @@ $$
 DECLARE
   results RESULTSET;
 BEGIN
-  results := (CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
+  results := (CALL datashare.sp_grant_share_permissions('2000-01-01'::TIMESTAMP_NTZ) );
   RETURN TABLE(results);
 END;
 $$
