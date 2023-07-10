@@ -1,5 +1,5 @@
-name: dbt_run_dev_refresh
-run-name: dbt_run_dev_refresh
+name: dbt_run_datashares
+run-name: dbt_run_datashares
 
 on:
   workflow_dispatch:
