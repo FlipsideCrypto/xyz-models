@@ -8,14 +8,35 @@
     tags = ['core']
 ) }}
 
+
 WITH base AS (
     SELECT
         block_number,
         DATA,
         _inserted_timestamp
     FROM
-    {{ ref('bronze__streamline_tx_receipts') }}
+    
+{% if is_incremental() %}
+{{ ref('bronze__streamline_receipts') }}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ this }}
+    )
+    AND IS_OBJECT(
+        DATA
+    )
+{% else %}
+    {{ ref('bronze__streamline_FR_receipts') }}
+WHERE
+    IS_OBJECT(
+        DATA
+    )
+{% endif %}
 ),
+
 FINAL AS (
     SELECT
         block_number,
