@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: silver__outputs
+    description: |-
+      Parsed output data from the `outputs` field in the transaction body.
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - relationships:
+              to: ref('silver__transactions')
+              field: BLOCK_NUMBER
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_TIMESTAMP
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_HASH
+
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        tests:
+          - relationships:
+              to: ref('silver__transactions')
+              field: TX_ID
+
+      - name: OUTPUT_DATA
+        description: "{{ doc('output_data') }}"
+        tests:
+          - relationships:
+              to: ref('silver__transactions')
+              field: OUTPUTS
+
+      - name: INDEX
+        description: "{{ doc('index_output') }}"
+
+      - name: PUBKEY_SCRIPT_ADDRESS
+        description: "{{ doc('address') }}"
+
+      - name: PUBKEY_SCRIPT_ASM
+        description: "{{ doc('pubkey_script_asm') }}"
+      
+      - name: PUBKEY_SCRIPT_DESC
+        description: "{{ doc('pubkey_script_desc') }}"
+
+      - name: PUBKEY_SCRIPT_HEX
+        description: "{{ doc('pubkey_script_hex') }}"
+
+      - name: PUBKEY_SCRIPT_TYPE
+        description: "{{ doc('pubkey_script_type') }}"
+
+      - name: VALUE
+        description: "{{ doc('value') }}"
+
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP

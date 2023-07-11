@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: silver__transactions
+    description: |-
+      Raw Bitcoin transactions.
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+
+      - name: INDEX
+        description: "{{ doc('index_tx') }}"
+
+      - name: TX_HASH
+        description: "{{ doc('tx_hash') }}"
+
+      - name: HEX
+        description: "{{ doc('hex') }}"
+      
+      - name: LOCK_TIME
+        description: "{{ doc('lock_time') }}"
+      
+      - name: SIZE
+        description: "{{ doc('size') }}"
+
+      - name: VERSION
+        description: "{{ doc('version') }}"
+
+      - name: INPUTS
+        description: "{{ doc('inputs') }}"
+      
+      - name: INPUT_COUNT
+        description: "{{ doc('input_count') }}"
+
+      - name: OUTPUTS
+        description: "{{ doc('outputs') }}"
+
+      - name: OUTPUT_COUNT
+        description: "{{ doc('output_count') }}"
+
+      - name: VIRTUAL_SIZE
+        description: "{{ doc('virtual_size') }}"
+
+      - name: WEIGHT
+        description: "{{ doc('weight_tx') }}"
+
+      - name: FEE
+        description: "{{ doc('fee') }}"
+
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP

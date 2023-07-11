@@ -3,15 +3,15 @@
     unique_key = 'block_number',
     cluster_by = ["_inserted_timestamp::DATE", "block_number"]
 ) }}
--- depends on {{ref('bronze__streamline_blocks')}}
+
 WITH bronze_blocks AS (
 
     SELECT
         *
     FROM
+        {{ ref('bronze__blocks') }}
 
 {% if is_incremental() %}
-{{ ref('bronze__streamline_blocks') }}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -19,11 +19,9 @@ WHERE
         FROM
             {{ this }}
     )
-{% else %}
-    {{ ref('bronze__streamline_FR_blocks') }}
 {% endif %}
 ),
-final AS (
+FINAL AS (
     SELECT
         block_number,
         DATA :result :bits :: STRING AS bits,
@@ -52,4 +50,4 @@ final AS (
 SELECT
     *
 FROM
-    final
+    FINAL
