@@ -4,6 +4,10 @@ models:
   - name: silver__blocks
     description: |-
       Raw Bitcoin blocks.
+    tests:
+      - sequence_gaps:
+          column_name: block_number
+          where: BLOCK_TIMESTAMP::DATE < CURRENT_DATE
 
     columns:
       - name: BLOCK_NUMBER
