@@ -36,31 +36,79 @@ WHERE
     )
 {% endif %}
 ),
+outputs AS (
+    SELECT
+        *
+    FROM
+        {{ ref('silver__outputs') }}
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
 inputs AS (
     SELECT
         t.block_number,
         b.block_timestamp,
         b.block_hash,
         t.tx_id AS tx_id,
-        i.index AS INDEX,
         i.value :: variant AS input_data,
+        i.index AS INDEX,
         i.value :scriptSig :asm :: STRING AS script_sig_asm,
         i.value :scriptSig :hex :: STRING AS script_sig_hex,
         i.value :sequence :: NUMBER AS SEQUENCE,
         i.value :txid :: STRING AS spent_tx_id,
-        i.value :vout :: NUMBER AS output_index,
+        i.value :vout :: NUMBER AS spent_output_index,
         i.value :txinwitness :: ARRAY AS tx_in_witness,
         i.value :coinbase :: STRING AS coinbase,
         coinbase IS NOT NULL AS is_coinbase,
-        concat_ws('-', i.value :txid :: STRING, i.value :vout :: STRING) as prior_output_id,
         t._inserted_timestamp,
         t._partition_by_block_id
     FROM
         txs t
         LEFT JOIN blocks b USING (block_number),
         LATERAL FLATTEN(inputs) i
+),
+final AS (
+    SELECT
+        i.block_number,
+        i.block_timestamp,
+        i.block_hash,
+        i.tx_id,
+        i.input_data,
+        i.index,
+        i.is_coinbase,
+        i.coinbase,
+        i.script_sig_asm,
+        i.script_sig_hex,
+        i.sequence,
+        o.block_number AS spent_block_number,
+        i.spent_tx_id,
+        i.spent_output_index,
+        o.pubkey_script_asm,
+        o.pubkey_script_hex,
+        o.pubkey_script_address,
+        o.pubkey_script_type,
+        o.value,
+        i.tx_in_witness,
+        LEAST(
+            i._inserted_timestamp,
+            o._inserted_timestamp
+        ) AS _inserted_timestamp,
+        i._partition_by_block_id
+    FROM
+        inputs i
+        LEFT JOIN outputs o
+        ON i.spent_tx_id = o.tx_id
+        AND i.spent_output_index = o.index
 )
 SELECT
     *
 FROM
-    inputs
+    final

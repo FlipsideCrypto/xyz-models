@@ -23,7 +23,7 @@ WHERE
     {{ ref('bronze__streamline_FR_transactions') }}
 {% endif %}
 ),
-transactions AS (
+final AS (
     SELECT
         block_number,
         DATA :hash :: STRING AS tx_hash,
@@ -51,4 +51,4 @@ transactions AS (
 SELECT
     *
 FROM
-    transactions
+    final

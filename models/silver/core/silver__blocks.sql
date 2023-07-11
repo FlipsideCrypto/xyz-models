@@ -23,14 +23,13 @@ WHERE
     {{ ref('bronze__streamline_FR_blocks') }}
 {% endif %}
 ),
-blocks AS (
+final AS (
     SELECT
         block_number,
         DATA :result :bits :: STRING AS bits,
         DATA :result :chainwork :: STRING AS chainwork,
         DATA :result :difficulty :: FLOAT AS difficulty,
         DATA :result :hash :: STRING AS block_hash,
-        {# DATA :result :mediantime :: STRING AS mediantime_epoch, #}
         DATA :result :mediantime :: timestamp_ntz AS median_time,
         DATA :result :merkleroot :: STRING AS merkle_root,
         DATA :result :nTx :: NUMBER AS tx_count,
@@ -39,11 +38,9 @@ blocks AS (
         DATA :result :previousblockhash :: STRING AS previous_block_hash,
         DATA :result :strippedsize :: NUMBER AS stripped_size,
         DATA :result :size :: NUMBER AS SIZE,
-        {# DATA :result :time :: STRING AS block_timestamp_epoch, #}
         DATA :result :time :: timestamp_ntz AS block_timestamp,
         DATA :result :tx :: ARRAY AS tx,
         DATA :result :version :: STRING AS version,
-        {# DATA :result :versionHex :: STRING AS version_hex, #}
         DATA :result :weight :: STRING AS weight,
         DATA: error :: STRING AS error,
         _partition_by_block_id,
@@ -52,8 +49,7 @@ blocks AS (
     FROM
         bronze_blocks
 )
-{# TODO - properly format hexidecimal data #}
 SELECT
     *
 FROM
-    blocks
+    final

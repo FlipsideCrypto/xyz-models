@@ -21,8 +21,8 @@ models:
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
 
-      - name: MEDIANTIME
-        description: "{{ doc('mediantime') }}"
+      - name: MEDIAN_TIME
+        description: "{{ doc('median_time') }}"
 
       - name: MERKLE_ROOT
         description: "{{ doc('merkle_root') }}"
@@ -55,7 +55,7 @@ models:
         description: "{{ doc('version') }}"
 
       - name: WEIGHT
-        description: "{{ doc('weight') }}"
+        description: "{{ doc('weight_block') }}"
 
       - name: ERROR
         description: "{{ doc('error') }}"

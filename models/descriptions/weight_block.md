@@ -1,4 +1,4 @@
-{% docs weight %}
+{% docs weight_block %}
 
 The block weight as defined in BIP 141.
 

@@ -36,7 +36,7 @@ WHERE
     )
 {% endif %}
 ),
-outputs AS (
+final AS (
     SELECT
         t.block_number,
         b.block_timestamp,
@@ -44,13 +44,12 @@ outputs AS (
         t.tx_id AS tx_id,
         o.value :: variant AS output_data,
         o.value :n :: NUMBER AS INDEX,
-        o.value :scriptPubKey :address :: STRING AS address,
-        o.value :scriptPubKey :asm :: STRING AS asm,
-        o.value :scriptPubKey :desc :: STRING AS DESC,
-        o.value :scriptPubKey :hex :: STRING AS hex,
-        o.value :scriptPubKey :type :: STRING AS TYPE,
+        o.value :scriptPubKey :address :: STRING AS pubkey_script_address,
+        o.value :scriptPubKey :asm :: STRING AS pubkey_script_asm,
+        o.value :scriptPubKey :desc :: STRING AS pubkey_script_desc,
+        o.value :scriptPubKey :hex :: STRING AS pubkey_script_hex,
+        o.value :scriptPubKey :type :: STRING AS pubkey_script_type,
         o.value :value :: FLOAT AS VALUE,
-        concat_ws('-', t.tx_id, o.value :n :: STRING) AS output_id,
         t._inserted_timestamp,
         t._partition_by_block_id
     FROM
@@ -61,4 +60,4 @@ outputs AS (
 SELECT
     *
 FROM
-    outputs
+    final
