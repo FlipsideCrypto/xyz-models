@@ -57,7 +57,7 @@ BEGIN
             INTO :all_grants
             FROM add_suffix;
 
-    IF (all_grants IS NOT NULL) THEN
+    IF (len(all_grants) > 0) THEN
       EXECUTE IMMEDIATE 'BEGIN\n' || :all_grants || 'END\n';
     END IF;
     LET rs RESULTSET := (
