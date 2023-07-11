@@ -11,6 +11,11 @@ models:
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
+        tests:
+          - tx_gaps:
+              column_name: tx_id
+              column_block: block_number
+              column_tx_count: tx_count
 
       - name: INDEX
         description: "{{ doc('index_tx') }}"

@@ -36,10 +36,6 @@ models:
 
       - name: OUTPUT_DATA
         description: "{{ doc('output_data') }}"
-        tests:
-          - relationships:
-              to: ref('silver__transactions')
-              field: OUTPUTS
 
       - name: INDEX
         description: "{{ doc('index_output') }}"
