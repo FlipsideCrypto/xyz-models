@@ -4,8 +4,7 @@ run-name: dbt_run_dev_refresh
 on:
   workflow_dispatch:
   schedule:
-    # Runs "At minute 10 UTC" (see https://crontab.guru)
-    - cron: 10 * * * *
+    - cron: 10 5 * * *
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
