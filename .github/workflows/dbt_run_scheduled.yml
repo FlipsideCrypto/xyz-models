@@ -3,10 +3,9 @@ run-name: dbt_run_scheduled
 
 on:
   workflow_dispatch:
-  # schedule:
-    # TODO - enable once pipeline created
+  schedule:
     # Runs "every hour" (see https://crontab.guru)
-    # - cron: '0 */1 * * *'
+    - cron: '0 */1 * * *'
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
@@ -29,7 +28,7 @@ jobs:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
       dbt_command: >
-        dbt run
+        dbt run -s tag:core
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit 
