@@ -4,14 +4,45 @@ models:
   - name: silver__transactions
     description: |-
       Raw Bitcoin transactions.
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: block_timestamp
+          interval: 1
+      - dbt_utils.recency:
+          datepart: hour
+          field: _INSERTED_TIMESTAMP
+          interval: 24
 
     columns:
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_NUMBER
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_HASH
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
         tests:
+          - unique
+          - not_null
           - tx_gaps:
               column_name: tx_id
               column_block: block_number
@@ -19,42 +50,75 @@ models:
 
       - name: INDEX
         description: "{{ doc('index_tx') }}"
+        tests:
+          - not_null
 
       - name: TX_HASH
         description: "{{ doc('tx_hash') }}"
+        tests:
+          - unique
+          - not_null
 
       - name: HEX
         description: "{{ doc('hex') }}"
-      
+        tests:
+          - not_null
+
       - name: LOCK_TIME
         description: "{{ doc('lock_time') }}"
-      
+        tests:
+          - not_null
+
       - name: SIZE
         description: "{{ doc('size') }}"
+        tests:
+          - not_null
 
       - name: VERSION
         description: "{{ doc('version') }}"
-
+        tests:
+          - not_null
+          
       - name: INPUTS
         description: "{{ doc('inputs') }}"
-      
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: ARRAY
+
       - name: INPUT_COUNT
         description: "{{ doc('input_count') }}"
+        tests:
+          - not_null
 
       - name: OUTPUTS
         description: "{{ doc('outputs') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: ARRAY
 
       - name: OUTPUT_COUNT
         description: "{{ doc('output_count') }}"
+        tests:
+          - not_null
 
       - name: VIRTUAL_SIZE
         description: "{{ doc('virtual_size') }}"
+        tests:
+          - not_null
 
       - name: WEIGHT
         description: "{{ doc('weight_tx') }}"
+        tests:
+          - not_null
 
       - name: FEE
         description: "{{ doc('fee') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
 
       - name: _PARTITION_BY_BLOCK_ID
 

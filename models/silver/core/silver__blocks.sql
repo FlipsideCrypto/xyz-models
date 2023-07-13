@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'block_number',
-    cluster_by = ["_inserted_timestamp::DATE", "block_number"]
+    cluster_by = ["_inserted_timestamp::DATE", "block_number"],
+    tags = ["core"]
 ) }}
 
 WITH bronze_blocks AS (
@@ -43,7 +44,7 @@ FINAL AS (
         DATA: error :: STRING AS error,
         _partition_by_block_id,
         _inserted_timestamp,
-        DATA
+        DATA -- TODO del before prod
     FROM
         bronze_blocks
 )

@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "CONCAT_WS('-', tx_id, index)"
+    unique_key = 'output_id',
+    tags = ["core"]
 ) }}
 
 WITH txs AS (
@@ -20,27 +21,11 @@ WHERE
     )
 {% endif %}
 ),
-blocks AS (
-    SELECT
-        *
-    FROM
-        {{ ref('silver__blocks') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-{% endif %}
-),
-final AS (
+FINAL AS (
     SELECT
         t.block_number,
-        b.block_timestamp,
-        b.block_hash,
+        t.block_hash,
+        t.block_timestamp,
         t.tx_id AS tx_id,
         o.value :: variant AS output_data,
         o.value :n :: NUMBER AS INDEX,
@@ -51,13 +36,13 @@ final AS (
         o.value :scriptPubKey :type :: STRING AS pubkey_script_type,
         o.value :value :: FLOAT AS VALUE,
         t._inserted_timestamp,
-        t._partition_by_block_id
+        t._partition_by_block_id,
+        {{ dbt_utils.generate_surrogate_key(['t.tx_id', 'o.value :n :: NUMBER']) }} AS output_id
     FROM
-        txs t
-        LEFT JOIN blocks b USING (block_number),
+        txs t,
         LATERAL FLATTEN(outputs) o
 )
 SELECT
     *
 FROM
-    final
+    FINAL

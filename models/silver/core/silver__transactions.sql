@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'tx_hash',
-    cluster_by = ["_inserted_timestamp::DATE", "block_number"]
+    unique_key = 'tx_id',
+    cluster_by = ["_inserted_timestamp::DATE", "block_number"],
+    tags = ["core"]
 ) }}
 -- TODO add value(s) from agg I/O
 WITH bronze_transactions AS (
@@ -47,7 +48,9 @@ compute_tx_index AS (
 ),
 FINAL AS (
     SELECT
-        block_number,
+        t.block_number,
+        b.block_hash,
+        b.block_timestamp,
         tx_id,
         i.index,
         DATA :hash :: STRING AS tx_hash,
@@ -61,13 +64,14 @@ FINAL AS (
         ARRAY_SIZE(outputs) AS output_count,
         DATA :vsize :: STRING AS virtual_size,
         DATA :weight :: STRING AS weight,
-        DATA: fee :: FLOAT AS fee,
+        DATA: fee :: FLOAT AS fee, -- TODO set fee = 0 on coinbase tx
         _partition_by_block_id,
         _inserted_timestamp,
         DATA
     FROM
         bronze_transactions t
         LEFT JOIN compute_tx_index i USING (tx_id)
+        LEFT JOIN blocks b using (block_number)
 )
 SELECT
     *

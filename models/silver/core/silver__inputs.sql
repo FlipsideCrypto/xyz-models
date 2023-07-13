@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "CONCAT_WS('-', tx_id, index)"
+    unique_key = 'input_id',
+    tags = ["core"]
 ) }}
 
 WITH txs AS (
@@ -9,22 +10,6 @@ WITH txs AS (
         *
     FROM
         {{ ref('silver__transactions') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-{% endif %}
-),
-blocks AS (
-    SELECT
-        *
-    FROM
-        {{ ref('silver__blocks') }}
 
 {% if is_incremental() %}
 WHERE
@@ -55,8 +40,8 @@ WHERE
 inputs AS (
     SELECT
         t.block_number,
-        b.block_timestamp,
-        b.block_hash,
+        t.block_hash,
+        t.block_timestamp,
         t.tx_id AS tx_id,
         i.value :: variant AS input_data,
         i.index AS INDEX,
@@ -71,8 +56,7 @@ inputs AS (
         t._inserted_timestamp,
         t._partition_by_block_id
     FROM
-        txs t
-        LEFT JOIN blocks b USING (block_number),
+        txs t,
         LATERAL FLATTEN(inputs) i
 ),
 final AS (
@@ -90,7 +74,7 @@ final AS (
         i.sequence,
         o.block_number AS spent_block_number,
         i.spent_tx_id,
-        i.spent_output_index,
+        i.spent_output_index, -- TODO note will be null for coinbase
         o.pubkey_script_asm,
         o.pubkey_script_hex,
         o.pubkey_script_address,
@@ -101,7 +85,8 @@ final AS (
             i._inserted_timestamp,
             o._inserted_timestamp
         ) AS _inserted_timestamp,
-        i._partition_by_block_id
+        i._partition_by_block_id,
+        {{ dbt_utils.generate_surrogate_key(['i.tx_id', 'i.index']) }} as input_id
     FROM
         inputs i
         LEFT JOIN outputs o
