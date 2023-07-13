@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     cluster_by = ["_inserted_timestamp::DATE"],
-    unique_key="tx_id"
+    unique_key="tx_id",
+    tags = ["core"]
 ) }}
 -- depends_on: {{ ref('bronze__streamline_transactions') }}
 WITH streamline_transactions AS (

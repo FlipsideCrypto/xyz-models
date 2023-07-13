@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     cluster_by = ["_inserted_timestamp::DATE"],
-    unique_key = 'block_number'
+    unique_key = 'block_number',
+    tags = ["core"]
 ) }}
 -- depends on {{ref('bronze__streamline_blocks')}}
 WITH streamline_blocks AS (
