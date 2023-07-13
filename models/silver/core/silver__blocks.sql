@@ -43,8 +43,7 @@ FINAL AS (
         DATA :result :weight :: STRING AS weight,
         DATA: error :: STRING AS error,
         _partition_by_block_id,
-        _inserted_timestamp,
-        DATA -- TODO del before prod
+        _inserted_timestamp
     FROM
         bronze_blocks
 )

@@ -4,7 +4,7 @@
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
     tags = ["core"]
 ) }}
--- TODO add value(s) from agg I/O
+
 WITH bronze_transactions AS (
 
     SELECT
@@ -66,8 +66,7 @@ FINAL AS (
         DATA :weight :: STRING AS weight,
         DATA: fee :: FLOAT AS fee, -- TODO set fee = 0 on coinbase tx
         _partition_by_block_id,
-        _inserted_timestamp,
-        DATA
+        _inserted_timestamp
     FROM
         bronze_transactions t
         LEFT JOIN compute_tx_index i USING (tx_id)
