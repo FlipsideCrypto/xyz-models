@@ -64,7 +64,7 @@ FINAL AS (
         ARRAY_SIZE(outputs) AS output_count,
         DATA :vsize :: STRING AS virtual_size,
         DATA :weight :: STRING AS weight,
-        DATA: fee :: FLOAT AS fee, -- TODO set fee = 0 on coinbase tx
+        DATA: fee :: FLOAT AS fee,
         _partition_by_block_id,
         _inserted_timestamp
     FROM
