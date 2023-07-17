@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver__transactions_final
+  - name: core__fact_transactions
     description: |-
       Final Bitcoin transactions model with value and coinbase information added from inputs and outputs.
     tests:
