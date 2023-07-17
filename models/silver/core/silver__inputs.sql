@@ -1,7 +1,9 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'input_id',
-    tags = ["core"]
+    tags = ["core"],
+    cluster_by = ["_inserted_timestamp::DATE", "_partition_by_block_id"],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
 WITH txs AS (
@@ -26,16 +28,6 @@ outputs AS (
         *
     FROM
         {{ ref('silver__outputs') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-{% endif %}
 ),
 inputs AS (
     SELECT
@@ -59,7 +51,7 @@ inputs AS (
         txs t,
         LATERAL FLATTEN(inputs) i
 ),
-final AS (
+FINAL AS (
     SELECT
         i.block_number,
         i.block_timestamp,
@@ -74,19 +66,26 @@ final AS (
         i.sequence,
         o.block_number AS spent_block_number,
         i.spent_tx_id,
-        i.spent_output_index, -- TODO note will be null for coinbase
+        i.spent_output_index,
+        -- TODO note will be null for coinbase
         o.pubkey_script_asm,
         o.pubkey_script_hex,
         o.pubkey_script_address,
         o.pubkey_script_type,
         o.value,
         i.tx_in_witness,
-        LEAST(
-            i._inserted_timestamp,
-            o._inserted_timestamp
+        GREATEST(
+            COALESCE(
+                i._inserted_timestamp,
+                '1970-01-01' :: TIMESTAMP
+            ),
+            COALESCE(
+                o._inserted_timestamp,
+                '1970-01-01' :: TIMESTAMP
+            )
         ) AS _inserted_timestamp,
         i._partition_by_block_id,
-        {{ dbt_utils.generate_surrogate_key(['i.tx_id', 'i.index']) }} as input_id
+        {{ dbt_utils.generate_surrogate_key(['i.tx_id', 'i.index']) }} AS input_id
     FROM
         inputs i
         LEFT JOIN outputs o
@@ -96,4 +95,4 @@ final AS (
 SELECT
     *
 FROM
-    final
+    FINAL

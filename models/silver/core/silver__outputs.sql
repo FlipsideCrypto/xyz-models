@@ -1,7 +1,9 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'output_id',
-    tags = ["core"]
+    tags = ["core"],
+    cluster_by = ["_inserted_timestamp::DATE", "_partition_by_block_id"],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
 WITH txs AS (
