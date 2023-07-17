@@ -108,7 +108,7 @@ transactions_final AS (
         transactions t
         LEFT JOIN input_val i USING (tx_id)
         LEFT JOIN output_val o USING (tx_id)
-        LEFT JOIN inputs USING (tx_id) ii
+        LEFT JOIN inputs ii USING (tx_id)
 )
 SELECT
     *
