@@ -5,6 +5,9 @@ models:
     description: |-
       Final blocks model with block value and fees added from transactions and inputs.
     tests:
+      - sequence_gaps:
+          column_name: block_number
+          where: BLOCK_TIMESTAMP::DATE < CURRENT_DATE
       - dbt_utils.recency:
           datepart: day
           field: block_timestamp
@@ -92,6 +95,7 @@ models:
         description: "{{ doc('nonce') }}"
         tests:
           - not_null
+          - unique
 
       - name: PREVIOUS_BLOCK_HASH
         description: "{{ doc('previous_block_hash') }}"

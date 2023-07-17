@@ -78,6 +78,7 @@ models:
         description: "{{ doc('nonce') }}"
         tests:
           - not_null
+          - unique
 
       - name: PREVIOUS_BLOCK_HASH
         description: "{{ doc('previous_block_hash') }}"
