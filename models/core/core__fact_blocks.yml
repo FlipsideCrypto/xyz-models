@@ -1,0 +1,137 @@
+version: 2
+
+models:
+  - name: core__fact_blocks
+    description: |-
+      Final blocks model with block value and fees added from transactions and inputs.
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: block_timestamp
+          interval: 1
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: BITS
+        description: "{{ doc('bits') }}"
+        tests:
+          - not_null
+
+      - name: CHAINWORK
+        description: "{{ doc('chainwork') }}"
+        tests:
+          - not_null
+
+      - name: DIFFICULTY
+        description: "{{ doc('difficulty') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - unique
+          - not_null
+
+      - name: MEDIAN_TIME
+        description: "{{ doc('median_time') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: MERKLE_ROOT
+        description: "{{ doc('merkle_root') }}"
+        tests:
+          - not_null
+
+      - name: TX_COUNT
+        description: "{{ doc('tx_count') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: INPUT_VALUE
+        description: "{{ doc('input_value') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: OUTPUT_VALUE
+        description: "{{ doc('output_value') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: FEE
+        description: "{{ doc('fee') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+              
+      - name: NEXT_BLOCK_HASH
+        description: "{{ doc('next_block_hash') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: NONCE
+        description: "{{ doc('nonce') }}"
+        tests:
+          - not_null
+
+      - name: PREVIOUS_BLOCK_HASH
+        description: "{{ doc('previous_block_hash') }}"
+        tests:
+          - not_null
+          - unique
+          
+      - name: SIZE
+        description: "{{ doc('size') }}"
+        tests:
+          - not_null
+
+      - name: STRIPPED_SIZE
+        description: "{{ doc('stripped_size') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: TX
+        description: "{{ doc('tx') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: ARRAY
+
+      - name: VERSION
+        description: "{{ doc('version') }}"
+        tests:
+          - not_null
+
+      - name: WEIGHT
+        description: "{{ doc('weight_block') }}"
+        tests:
+          - not_null
+
+      - name: ERROR
+        description: "{{ doc('error') }}"

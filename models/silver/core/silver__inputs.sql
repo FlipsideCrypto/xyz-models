@@ -67,7 +67,6 @@ FINAL AS (
         o.block_number AS spent_block_number,
         i.spent_tx_id,
         i.spent_output_index,
-        -- TODO note will be null for coinbase
         o.pubkey_script_asm,
         o.pubkey_script_hex,
         o.pubkey_script_address,
