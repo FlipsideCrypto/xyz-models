@@ -90,4 +90,8 @@ FINAL AS (
 SELECT
     *
 FROM
-    FINAL
+    FINAL qualify ROW_NUMBER() over (
+        PARTITION BY tx_id
+        ORDER BY
+            _inserted_timestamp DESC
+    ) = 1

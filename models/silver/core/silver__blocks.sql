@@ -34,6 +34,7 @@ FINAL AS (
         DATA :result :merkleroot :: STRING AS merkle_root,
         DATA :result :nTx :: NUMBER AS tx_count,
         DATA :result :nextblockhash :: STRING AS next_block_hash,
+        DATA :result :nextblockhash IS NOT NULL AS is_pending,
         DATA :result :nonce :: NUMBER AS nonce,
         DATA :result :previousblockhash :: STRING AS previous_block_hash,
         DATA :result :strippedsize :: NUMBER AS stripped_size,
@@ -51,4 +52,9 @@ FINAL AS (
 SELECT
     *
 FROM
-    FINAL
+    FINAL qualify ROW_NUMBER() over (
+        PARTITION BY block_number
+        ORDER BY
+            _inserted_timestamp DESC,
+            is_pending ASC
+    ) = 1
