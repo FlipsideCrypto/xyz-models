@@ -75,6 +75,16 @@ output_val AS (
     GROUP BY
         1
 ),
+coinbase AS (
+    SELECT
+        tx_id,
+        is_coinbase,
+        coinbase
+    FROM
+        inputs
+    WHERE
+        is_coinbase
+),
 transactions_final AS (
     SELECT
         block_number,
@@ -87,7 +97,8 @@ transactions_final AS (
         lock_time,
         SIZE,
         version,
-        i.is_coinbase,
+        C.is_coinbase,
+        C.coinbase,
         inputs,
         input_count,
         i.input_value,
@@ -107,6 +118,7 @@ transactions_final AS (
         transactions t
         LEFT JOIN input_val i USING (tx_id)
         LEFT JOIN output_val o USING (tx_id)
+        LEFT JOIN coinbase C USING (tx_id)
 )
 SELECT
     *
