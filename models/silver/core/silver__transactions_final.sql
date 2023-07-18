@@ -37,6 +37,12 @@ WHERE
         FROM
             {{ this }}
     )
+    OR _partition_by_block_id IN (
+        SELECT
+            DISTINCT _partition_by_block_id
+        FROM
+            transactions
+    )
 {% endif %}
 ),
 outputs AS (
@@ -52,6 +58,12 @@ WHERE
             MAX(_inserted_timestamp) _inserted_timestamp
         FROM
             {{ this }}
+    )
+    OR _partition_by_block_id IN (
+        SELECT
+            DISTINCT _partition_by_block_id
+        FROM
+            transactions
     )
 {% endif %}
 ),
