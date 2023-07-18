@@ -1,11 +1,13 @@
 {{ config(
-    materialized = 'view'
+    materialized = 'view',
+    tags = ['core']
 ) }}
 
 WITH inputs AS (
 
     SELECT
         * exclude (
+            input_data,
             _partition_by_block_id,
             _inserted_timestamp
         )

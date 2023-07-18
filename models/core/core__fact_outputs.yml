@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver__outputs
+  - name: core__fact_outputs
     description: |-
       Parsed output data from the `outputs` field in the transaction body.
     tests:
@@ -9,27 +9,17 @@ models:
           datepart: day
           field: block_timestamp
           interval: 1
-      - dbt_utils.recency:
-          datepart: hour
-          field: _INSERTED_TIMESTAMP
-          interval: 24
 
     columns:
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__blocks')
-              field: BLOCK_NUMBER
 
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__blocks')
-              field: BLOCK_HASH
               
       - name: BLOCK_TIMESTAMP
         description: "{{ doc('block_timestamp') }}"
@@ -42,15 +32,6 @@ models:
         description: "{{ doc('tx_id') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__transactions')
-              field: TX_ID
-
-      - name: OUTPUT_DATA
-        description: "{{ doc('output_data') }}"
-        tests:
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: VARIANT
 
       - name: INDEX
         description: "{{ doc('index_output') }}"
@@ -89,10 +70,6 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
-
-      - name: _PARTITION_BY_BLOCK_ID
-
-      - name: _INSERTED_TIMESTAMP
 
       - name: OUTPUT_ID
         description: "{{ doc('output_id') }}"
