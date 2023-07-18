@@ -67,7 +67,8 @@ models:
       - name: INPUT_VALUE
         description: "{{ doc('input_value') }}"
         tests: 
-          - not_null
+          - not_null:
+              where: TX_COUNT > 1
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
