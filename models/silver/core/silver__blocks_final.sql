@@ -61,19 +61,20 @@ tx_value AS (
         block_number,
         SUM(input_value) AS total_input_value,
         SUM(output_value) AS total_output_value,
-        SUM(fee) AS fees 
+        SUM(fee) AS fees
     FROM
         transactions_final
     GROUP BY
         1
 ),
-coinbase as (
-    select
+coinbase AS (
+    SELECT
         block_number,
         coinbase,
         output_value
-    from transactions_final
-    where
+    FROM
+        transactions_final
+    WHERE
         is_coinbase
 ),
 blocks_final AS (
@@ -87,8 +88,8 @@ blocks_final AS (
         merkle_root,
         tx_count,
         v.fees,
-        c.output_value as coinbase_value,
-        c.output_value - v.fees as block_reward,
+        C.output_value AS coinbase_value,
+        C.output_value - v.fees AS block_reward,
         v.total_input_value,
         v.total_output_value,
         next_block_hash,
@@ -106,7 +107,7 @@ blocks_final AS (
     FROM
         blocks b
         LEFT JOIN tx_value v USING (block_number)
-        left join coinbase c using (block_number)
+        LEFT JOIN coinbase C USING (block_number)
 )
 SELECT
     *

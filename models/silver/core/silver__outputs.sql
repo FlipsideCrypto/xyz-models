@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'output_id',
     tags = ["core"],
-    cluster_by = ["tx_id", "index"],
+    cluster_by = ["_partition_by_block_id", "tx_id"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 

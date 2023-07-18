@@ -64,7 +64,28 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: NUMBER
 
-      - name: INPUT_VALUE
+      - name: FEES
+        description: "{{ doc('fee') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: COINBASE_VALUE
+        description: "{{ doc('coinbase_value') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: BLOCK_REWARD
+        description: "{{ doc('block_reward') }}"
+        tests: 
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: TOTAL_INPUT_VALUE
         description: "{{ doc('input_value') }}"
         tests: 
           - not_null:
@@ -72,15 +93,8 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
-      - name: OUTPUT_VALUE
+      - name: TOTAL_OUTPUT_VALUE
         description: "{{ doc('output_value') }}"
-        tests: 
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
-
-      - name: FEE
-        description: "{{ doc('fee') }}"
         tests: 
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:

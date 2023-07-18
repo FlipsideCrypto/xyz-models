@@ -88,14 +88,12 @@ input_val AS (
     SELECT
         block_number,
         tx_id,
-        is_coinbase,
         SUM(VALUE) AS input_value
     FROM
         inputs
     GROUP BY
         1,
-        2,
-        3
+        2
 ),
 output_val AS (
     SELECT
