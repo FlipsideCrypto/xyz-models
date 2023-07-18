@@ -9,10 +9,6 @@ models:
           datepart: day
           field: block_timestamp
           interval: 1
-      - dbt_utils.recency:
-          datepart: hour
-          field: _INSERTED_TIMESTAMP
-          interval: 24
 
     columns:
       - name: BLOCK_NUMBER

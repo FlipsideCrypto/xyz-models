@@ -37,6 +37,12 @@ WHERE
         FROM
             {{ this }}
     )
+    OR _partition_by_block_id IN (
+        SELECT
+            DISTINCT _partition_by_block_id
+        FROM
+            bronze_transactions
+    )
 {% endif %}
 ),
 compute_tx_index AS (
@@ -71,7 +77,7 @@ FINAL AS (
     FROM
         bronze_transactions t
         LEFT JOIN compute_tx_index i USING (tx_id)
-        LEFT JOIN blocks b using (block_number)
+        LEFT JOIN blocks b USING (block_number)
 )
 SELECT
     *
