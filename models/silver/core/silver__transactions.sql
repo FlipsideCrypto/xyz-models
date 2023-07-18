@@ -27,39 +27,33 @@ blocks AS (
     SELECT
         *
     FROM
-        {{ ref('silver__blocks') }}
+        {{ ref('silver__transaction_index') }}
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-    OR _partition_by_block_id IN (
+    _partition_by_block_id IN (
         SELECT
             DISTINCT _partition_by_block_id
         FROM
             bronze_transactions
     )
+    AND block_number IN (
+        SELECT
+            DISTINCT block_number
+        FROM
+            bronze_transactions
+    )
 {% endif %}
-),
-compute_tx_index AS (
-    SELECT
-        INDEX,
-        VALUE AS tx_id
-    FROM
-        blocks,
-        LATERAL FLATTEN(tx)
 ),
 FINAL AS (
     SELECT
         t.block_number,
         b.block_hash,
         b.block_timestamp,
-        tx_id,
-        i.index,
+        t.tx_id,
+        b.index,
+        DATA: vin [0] : coinbase is not null as is_coinbase,
+        DATA: vin [0] : coinbase :: STRING AS coinbase,
         DATA :hash :: STRING AS tx_hash,
         DATA :hex :: STRING AS hex,
         DATA :locktime :: STRING AS lock_time,
@@ -72,12 +66,14 @@ FINAL AS (
         DATA :vsize :: STRING AS virtual_size,
         DATA :weight :: STRING AS weight,
         DATA: fee :: FLOAT AS fee,
-        _partition_by_block_id,
-        _inserted_timestamp
+        t._partition_by_block_id,
+        t._inserted_timestamp
     FROM
         bronze_transactions t
-        LEFT JOIN compute_tx_index i USING (tx_id)
-        LEFT JOIN blocks b USING (block_number)
+        LEFT JOIN blocks b USING (
+            block_number,
+            tx_id
+        )
 )
 SELECT
     *

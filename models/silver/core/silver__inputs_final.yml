@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: core__fact_inputs
+  - name: silver__inputs_final
     description: |-
       Parsed output data from the `inputs` field in the transaction body, with spent tx output and block data appended.
     tests:
@@ -9,12 +9,19 @@ models:
           datepart: day
           field: block_timestamp
           interval: 1
+      - dbt_utils.recency:
+          datepart: hour
+          field: _INSERTED_TIMESTAMP
+          interval: 24
 
     columns:
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
           - not_null
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_NUMBER
 
       - name: BLOCK_TIMESTAMP
         description: "{{ doc('block_timestamp') }}"
@@ -27,11 +34,23 @@ models:
         description: "{{ doc('block_hash') }}"
         tests:
           - not_null
+          - relationships:
+              to: ref('silver__blocks')
+              field: BLOCK_HASH
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
         tests:
           - not_null
+          - relationships:
+              to: ref('silver__transactions')
+              field: TX_ID
+
+      - name: INPUT_DATA
+        description: "{{ doc('input_data') }}"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: VARIANT
 
       - name: INDEX
         description: "{{ doc('index_output') }}"
@@ -110,6 +129,12 @@ models:
           - not_null:
               where: not IS_COINBASE
 
+      - name: PUBKEY_SCRIPT_DESC
+        description: "{{ doc('pubkey_script_desc') }}"
+        tests:
+          - not_null:
+              where: not IS_COINBASE
+
       - name: VALUE
         description: "{{ doc('value') }}"
         tests:
@@ -123,6 +148,10 @@ models:
         tests:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: ARRAY
+
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP
 
       - name: INPUT_ID
         description: "{{ doc('input_id') }}"

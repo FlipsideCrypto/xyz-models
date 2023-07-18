@@ -28,7 +28,7 @@ inputs AS (
     SELECT
         *
     FROM
-        {{ ref('silver__inputs') }}
+        {{ ref('silver__inputs_final') }}
 
 {% if is_incremental() %}
 WHERE
@@ -38,11 +38,19 @@ WHERE
         FROM
             {{ this }}
     )
-    OR _partition_by_block_id IN (
-        SELECT
-            DISTINCT _partition_by_block_id
-        FROM
-            transactions
+    OR (
+        _partition_by_block_id IN (
+            SELECT
+                DISTINCT _partition_by_block_id
+            FROM
+                blocks
+        )
+        AND block_number IN (
+            SELECT
+                DISTINCT block_number
+            FROM
+                blocks
+        )
     )
 {% endif %}
 ),
@@ -60,18 +68,26 @@ WHERE
         FROM
             {{ this }}
     )
-    OR _partition_by_block_id IN (
-        SELECT
-            DISTINCT _partition_by_block_id
-        FROM
-            transactions
+    OR (
+        _partition_by_block_id IN (
+            SELECT
+                DISTINCT _partition_by_block_id
+            FROM
+                blocks
+        )
+        AND block_number IN (
+            SELECT
+                DISTINCT block_number
+            FROM
+                blocks
+        )
     )
 {% endif %}
 ),
 input_val AS (
     SELECT
+        block_number,
         tx_id,
-        is_coinbase,
         SUM(VALUE) AS input_value
     FROM
         inputs
@@ -81,26 +97,18 @@ input_val AS (
 ),
 output_val AS (
     SELECT
+        block_number,
         tx_id,
         SUM(VALUE) AS output_value
     FROM
         outputs
     GROUP BY
-        1
-),
-coinbase AS (
-    SELECT
-        tx_id,
-        is_coinbase,
-        coinbase
-    FROM
-        inputs
-    WHERE
-        is_coinbase
+        1,
+        2
 ),
 transactions_final AS (
     SELECT
-        block_number,
+        t.block_number,
         block_hash,
         block_timestamp,
         t.tx_id,
@@ -110,11 +118,8 @@ transactions_final AS (
         lock_time,
         SIZE,
         version,
-        COALESCE(
-            C.is_coinbase,
-            FALSE
-        ) AS is_coinbase,
-        C.coinbase,
+        is_coinbase,
+        coinbase,
         inputs,
         input_count,
         i.input_value,
@@ -132,9 +137,8 @@ transactions_final AS (
         _inserted_timestamp
     FROM
         transactions t
-        LEFT JOIN input_val i USING (tx_id)
-        LEFT JOIN output_val o USING (tx_id)
-        LEFT JOIN coinbase C USING (tx_id)
+        LEFT JOIN input_val i USING (block_number, tx_id)
+        LEFT JOIN output_val o USING (block_number, tx_id)
 )
 SELECT
     *

@@ -3,7 +3,7 @@ version: 2
 models:
   - name: core__fact_blocks
     description: |-
-      Final blocks model with block value and fees added from transactions and inputs.
+      Bitcoin blocks with associated header metadata.
     tests:
       - sequence_gaps:
           column_name: block_number
@@ -64,27 +64,6 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: NUMBER
 
-      - name: INPUT_VALUE
-        description: "{{ doc('input_value') }}"
-        tests: 
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
-
-      - name: OUTPUT_VALUE
-        description: "{{ doc('output_value') }}"
-        tests: 
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
-
-      - name: FEE
-        description: "{{ doc('fee') }}"
-        tests: 
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
-              
       - name: NEXT_BLOCK_HASH
         description: "{{ doc('next_block_hash') }}"
         tests:

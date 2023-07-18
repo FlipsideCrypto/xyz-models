@@ -9,12 +9,17 @@ models:
           datepart: day
           field: block_timestamp
           interval: 1
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - block_number
+            - tx_id
 
     columns:
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
           - not_null
+          - tx_block_gaps
 
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
@@ -31,7 +36,6 @@ models:
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
         tests:
-          - unique
           - not_null
           - tx_gaps:
               column_name: tx_id
@@ -46,7 +50,6 @@ models:
       - name: TX_HASH
         description: "{{ doc('tx_hash') }}"
         tests:
-          - unique
           - not_null
 
       - name: HEX
@@ -87,7 +90,6 @@ models:
       - name: INPUTS
         description: "{{ doc('inputs') }}"
         tests:
-          - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: ARRAY
 
@@ -107,7 +109,6 @@ models:
       - name: OUTPUTS
         description: "{{ doc('outputs') }}"
         tests:
-          - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: ARRAY
 

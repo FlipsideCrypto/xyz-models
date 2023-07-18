@@ -8,7 +8,7 @@ WITH blocks AS (
     SELECT
         *
     FROM
-        {{ ref('silver__blocks_final') }}
+        {{ ref('silver__blocks') }}
 )
 SELECT
     * exclude (

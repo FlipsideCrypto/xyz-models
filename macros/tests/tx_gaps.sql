@@ -1,3 +1,6 @@
+-- tests whether the number of transactions in the model matches the number of transactions in the block header
+-- excludes last hour to avoid a false alert if the test runs while transactions is processing and not finalized
+
 {% test tx_gaps(
     model,
     column_name,
@@ -7,9 +10,12 @@
 WITH block_base AS (
     SELECT
         {{ column_block }},
-        {{ column_tx_count }}
+        {{ column_tx_count }},
+        _inserted_timestamp
     FROM
         {{ ref('silver__blocks') }}
+    WHERE
+        _inserted_timestamp <= CURRENT_TIMESTAMP - INTERVAL '2 hours'
 ),
 model_name AS (
     SELECT
@@ -33,7 +39,4 @@ FROM
     ON block_base.{{ column_block }} = model_name.{{ column_block }}
 WHERE
     {{ column_tx_count }} <> model_tx_count
-    -- TODO, meant to only test blocks we have as the block gap test will alert on missing blocks
-    -- delete this when we have all blocks
-    OR model_block_number IS NULL 
 {% endtest %}
