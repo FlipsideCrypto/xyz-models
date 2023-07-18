@@ -66,7 +66,7 @@ FINAL AS (
         t.block_number,
         b.block_hash,
         b.block_timestamp,
-        tx_id,
+        t.tx_id,
         i.index,
         DATA :hash :: STRING AS tx_hash,
         DATA :hex :: STRING AS hex,
