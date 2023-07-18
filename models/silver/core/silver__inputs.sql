@@ -42,7 +42,7 @@ inputs AS (
         t.is_coinbase,
         t._inserted_timestamp,
         t._partition_by_block_id,
-        {{ dbt_utils.generate_surrogate_key(['i.block_number', 'i.tx_id', 'i.index']) }} AS input_id
+        {{ dbt_utils.generate_surrogate_key(['t.block_number', 't.tx_id', 'i.index']) }} AS input_id
     FROM
         txs t,
         LATERAL FLATTEN(inputs) i
