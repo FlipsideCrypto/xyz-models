@@ -2,7 +2,8 @@
     materialized = 'incremental',
     unique_key = 'tx_id',
     incremental_strategy = 'delete+insert',
-    cluster_by = ["_partition_by_block_id", "tx_id"]
+    cluster_by = ["_partition_by_block_id", "tx_id"],
+    tags = ["core"]
 ) }}
 
 WITH blocks AS (
@@ -27,7 +28,7 @@ FINAL AS (
         block_number,
         block_hash,
         block_timestamp,
-        VALUE::STRING AS tx_id,
+        VALUE :: STRING AS tx_id,
         INDEX,
         _inserted_timestamp,
         _partition_by_block_id

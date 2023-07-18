@@ -88,6 +88,7 @@ blocks_final AS (
         merkle_root,
         tx_count,
         v.fees,
+        C.coinbase,
         C.output_value AS coinbase_value,
         C.output_value - v.fees AS block_reward,
         v.total_input_value,
