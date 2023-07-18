@@ -13,6 +13,10 @@ models:
           datepart: hour
           field: _INSERTED_TIMESTAMP
           interval: 24
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - block_number
+            - tx_id
 
     columns:
       - name: BLOCK_NUMBER
@@ -41,7 +45,6 @@ models:
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
         tests:
-          - unique
           - not_null
           - tx_gaps:
               column_name: tx_id
@@ -56,7 +59,6 @@ models:
       - name: TX_HASH
         description: "{{ doc('tx_hash') }}"
         tests:
-          - unique
           - not_null
 
       - name: HEX

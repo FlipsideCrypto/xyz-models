@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
     cluster_by = ["block_number", "block_timestamp::DATE"],
-    tags = ["core"],
+    tags = ["core", "ez"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
@@ -56,11 +56,7 @@ WHERE
 ),
 tx_value AS (
     SELECT
-        -- TODO maybe add total_ prefix for these
-        -- i/o value useful? easy enough for an analyst to calculate
         block_number,
-        SUM(input_value) AS total_input_value,
-        SUM(output_value) AS total_output_value,
         SUM(fee) AS fees
     FROM
         transactions_final
@@ -79,32 +75,15 @@ coinbase AS (
 ),
 blocks_final AS (
     SELECT
+        block_timestamp,
         b.block_number,
-        bits,
-        chainwork,
-        difficulty,
-        block_hash,
-        median_time,
-        merkle_root,
-        tx_count,
+        b.block_hash,
+        C.output_value AS total_reward,
+        C.output_value - v.fees AS block_reward,
         v.fees,
         C.coinbase,
-        C.output_value AS coinbase_value,
-        C.output_value - v.fees AS block_reward,
-        v.total_input_value,
-        v.total_output_value,
-        next_block_hash,
-        nonce,
-        previous_block_hash,
-        stripped_size,
-        SIZE,
-        block_timestamp,
-        tx,
-        version,
-        weight,
-        error,
-        _partition_by_block_id,
-        _inserted_timestamp
+        b._partition_by_block_id,
+        b._inserted_timestamp
     FROM
         blocks b
         LEFT JOIN tx_value v USING (block_number)

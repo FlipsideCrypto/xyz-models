@@ -9,6 +9,10 @@ models:
           datepart: day
           field: _inserted_timestamp
           interval: 1
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - block_number
+            - tx_id
 
     columns:
       - name: BLOCK_NUMBER
@@ -20,7 +24,6 @@ models:
       - name: TX_ID
         tests:
           - not_null
-          - unique
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: VARCHAR
 
