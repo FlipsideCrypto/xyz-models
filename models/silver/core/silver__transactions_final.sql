@@ -97,7 +97,10 @@ transactions_final AS (
         lock_time,
         SIZE,
         version,
-        C.is_coinbase,
+        COALESCE(
+            C.is_coinbase,
+            FALSE
+        ) AS is_coinbase,
         C.coinbase,
         inputs,
         input_count,
