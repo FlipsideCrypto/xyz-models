@@ -2,7 +2,7 @@
     materialized = 'incremental',
     cluster_by = ["_inserted_timestamp::DATE"],
     unique_key = 'block_number',
-    tags = ["core"]
+    tags = ["load"]
 ) }}
 -- depends on {{ref('bronze__streamline_blocks')}}
 WITH streamline_blocks AS (
