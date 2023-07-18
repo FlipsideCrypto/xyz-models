@@ -52,9 +52,4 @@ FINAL AS (
 SELECT
     *
 FROM
-    FINAL qualify ROW_NUMBER() over (
-        PARTITION BY block_number
-        ORDER BY
-            _inserted_timestamp DESC,
-            is_pending ASC
-    ) = 1
+    FINAL

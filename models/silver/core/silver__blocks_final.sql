@@ -56,14 +56,25 @@ WHERE
 ),
 tx_value AS (
     SELECT
+        -- TODO maybe add total_ prefix for these
+        -- i/o value useful? easy enough for an analyst to calculate
         block_number,
-        SUM(input_value) AS input_value,
-        SUM(output_value) AS output_value,
-        SUM(fee) AS fee
+        SUM(input_value) AS total_input_value,
+        SUM(output_value) AS total_output_value,
+        SUM(fee) AS fees 
     FROM
         transactions_final
     GROUP BY
         1
+),
+coinbase as (
+    select
+        block_number,
+        coinbase,
+        output_value
+    from transactions_final
+    where
+        is_coinbase
 ),
 blocks_final AS (
     SELECT
@@ -75,9 +86,11 @@ blocks_final AS (
         median_time,
         merkle_root,
         tx_count,
-        v.input_value,
-        v.output_value,
-        v.fee,
+        v.fees,
+        c.output_value as coinbase_value,
+        c.output_value - v.fees as block_reward,
+        v.total_input_value,
+        v.total_output_value,
         next_block_hash,
         nonce,
         previous_block_hash,
@@ -93,6 +106,7 @@ blocks_final AS (
     FROM
         blocks b
         LEFT JOIN tx_value v USING (block_number)
+        left join coinbase c using (block_number)
 )
 SELECT
     *

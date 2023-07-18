@@ -27,39 +27,23 @@ blocks AS (
     SELECT
         *
     FROM
-        {{ ref('silver__blocks') }}
+        {{ ref('silver__transaction_index') }}
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    _partition_by_block_id IN (
         SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
+            DISTINCT _partition_by_block_id
         FROM
-            {{ this }}
+            bronze_transactions
     )
-    OR (
-        _partition_by_block_id IN (
-            SELECT
-                DISTINCT _partition_by_block_id
-            FROM
-                bronze_transactions
-        )
-        AND block_number IN (
-            SELECT
-                DISTINCT block_number
-            FROM
-                bronze_transactions
-        )
+    AND block_number IN (
+        SELECT
+            DISTINCT block_number
+        FROM
+            bronze_transactions
     )
 {% endif %}
-),
-compute_tx_index AS (
-    SELECT
-        INDEX,
-        VALUE AS tx_id
-    FROM
-        blocks,
-        LATERAL FLATTEN(tx)
 ),
 FINAL AS (
     SELECT
@@ -67,7 +51,7 @@ FINAL AS (
         b.block_hash,
         b.block_timestamp,
         t.tx_id,
-        i.index,
+        .index,
         DATA :hash :: STRING AS tx_hash,
         DATA :hex :: STRING AS hex,
         DATA :locktime :: STRING AS lock_time,
@@ -84,14 +68,9 @@ FINAL AS (
         _inserted_timestamp
     FROM
         bronze_transactions t
-        LEFT JOIN compute_tx_index i USING (tx_id)
-        LEFT JOIN blocks b USING (block_number)
+        LEFT JOIN blocks b USING (block_number, tx_id)
 )
 SELECT
     *
 FROM
-    FINAL qualify ROW_NUMBER() over (
-        PARTITION BY tx_id
-        ORDER BY
-            _inserted_timestamp DESC
-    ) = 1
+    FINAL

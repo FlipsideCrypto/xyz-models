@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: silver__transaction_index
+    description: |-
+      Helper model to determine transaction index from its position in the block. This model is factored out into a separate table to improve performance of the `silver__transactions` model.
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: _inserted_timestamp
+          interval: 1
+
+    columns:
+      - name: BLOCK_NUMBER
+
+      - name: BLOCK_HASH
+
+      - name: BLOCK_TIMESTAMP
+
+      - name: TX_ID
+        tests:
+          - not_null
+          - unique
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: VARCHAR
+
+      - name: INDEX
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: _INSERTED_TIMESTAMP
+
+      - name: _PARTITION_BY_BLOCK_ID

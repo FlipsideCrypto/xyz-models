@@ -1,6 +1,6 @@
 {% docs fee %}
 
 The transaction fee.
-TODO - be explicit about units.
+At the block level, this is the total sum of transaction fees paid by all transactions in the block.
 
 {% enddocs %}
