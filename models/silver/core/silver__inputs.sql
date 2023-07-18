@@ -1,5 +1,6 @@
 {{ config(
     materialized = 'incremental',
+    incremental_strategy = 'delete+insert',
     unique_key = 'input_id',
     tags = ["core"],
     cluster_by = ["_inserted_timestamp::DATE", "_partition_by_block_id"],

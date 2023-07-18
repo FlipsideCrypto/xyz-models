@@ -88,7 +88,6 @@ transactions_final AS (
         SIZE,
         version,
         i.is_coinbase,
-        ii.coinbase,
         inputs,
         input_count,
         i.input_value,
@@ -108,7 +107,6 @@ transactions_final AS (
         transactions t
         LEFT JOIN input_val i USING (tx_id)
         LEFT JOIN output_val o USING (tx_id)
-        LEFT JOIN inputs ii USING (tx_id)
 )
 SELECT
     *
