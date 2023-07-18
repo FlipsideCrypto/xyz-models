@@ -86,6 +86,7 @@ WHERE
 ),
 input_val AS (
     SELECT
+        block_number,
         tx_id,
         is_coinbase,
         SUM(VALUE) AS input_value
@@ -93,19 +94,23 @@ input_val AS (
         inputs
     GROUP BY
         1,
-        2
+        2,
+        3
 ),
 output_val AS (
     SELECT
+        block_number,
         tx_id,
         SUM(VALUE) AS output_value
     FROM
         outputs
     GROUP BY
-        1
+        1,
+        2
 ),
 coinbase AS (
     SELECT
+        block_number,
         tx_id,
         is_coinbase,
         coinbase
@@ -116,7 +121,7 @@ coinbase AS (
 ),
 transactions_final AS (
     SELECT
-        block_number,
+        t.block_number,
         block_hash,
         block_timestamp,
         t.tx_id,
@@ -148,9 +153,9 @@ transactions_final AS (
         _inserted_timestamp
     FROM
         transactions t
-        LEFT JOIN input_val i USING (tx_id)
-        LEFT JOIN output_val o USING (tx_id)
-        LEFT JOIN coinbase C USING (tx_id)
+        LEFT JOIN input_val i USING (block_number, tx_id)
+        LEFT JOIN output_val o USING (block_number, tx_id)
+        LEFT JOIN coinbase C USING (block_number, tx_id)
 )
 SELECT
     *

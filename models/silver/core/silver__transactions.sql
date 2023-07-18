@@ -51,7 +51,7 @@ FINAL AS (
         b.block_hash,
         b.block_timestamp,
         t.tx_id,
-        .index,
+        b.index,
         DATA :hash :: STRING AS tx_hash,
         DATA :hex :: STRING AS hex,
         DATA :locktime :: STRING AS lock_time,
@@ -64,11 +64,14 @@ FINAL AS (
         DATA :vsize :: STRING AS virtual_size,
         DATA :weight :: STRING AS weight,
         DATA: fee :: FLOAT AS fee,
-        _partition_by_block_id,
-        _inserted_timestamp
+        t._partition_by_block_id,
+        t._inserted_timestamp
     FROM
         bronze_transactions t
-        LEFT JOIN blocks b USING (block_number, tx_id)
+        LEFT JOIN blocks b USING (
+            block_number,
+            tx_id
+        )
 )
 SELECT
     *
