@@ -106,17 +106,6 @@ output_val AS (
         1,
         2
 ),
-coinbase AS (
-    SELECT
-        block_number,
-        tx_id,
-        is_coinbase,
-        coinbase
-    FROM
-        inputs
-    WHERE
-        is_coinbase
-),
 transactions_final AS (
     SELECT
         t.block_number,
@@ -129,11 +118,8 @@ transactions_final AS (
         lock_time,
         SIZE,
         version,
-        COALESCE(
-            C.is_coinbase,
-            FALSE
-        ) AS is_coinbase,
-        C.coinbase,
+        is_coinbase,
+        coinbase,
         inputs,
         input_count,
         i.input_value,
@@ -153,7 +139,6 @@ transactions_final AS (
         transactions t
         LEFT JOIN input_val i USING (block_number, tx_id)
         LEFT JOIN output_val o USING (block_number, tx_id)
-        LEFT JOIN coinbase C USING (block_number, tx_id)
 )
 SELECT
     *

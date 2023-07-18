@@ -52,6 +52,8 @@ FINAL AS (
         b.block_timestamp,
         t.tx_id,
         b.index,
+        DATA: vin [0] : coinbase is not null as is_coinbase,
+        DATA: vin [0] : coinbase :: STRING AS coinbase,
         DATA :hash :: STRING AS tx_hash,
         DATA :hex :: STRING AS hex,
         DATA :locktime :: STRING AS lock_time,

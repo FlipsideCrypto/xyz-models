@@ -3,7 +3,7 @@ version: 2
 models:
   - name: core__fact_blocks
     description: |-
-      Bitcoin blocks with additional metrics.
+      Bitcoin blocks with associated header metadata.
     tests:
       - sequence_gaps:
           column_name: block_number
