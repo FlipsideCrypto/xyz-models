@@ -5,7 +5,7 @@
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
     tags = ["core"]
 ) }}
--- todo point core view to this table
+
 WITH bronze_blocks AS (
 
     SELECT

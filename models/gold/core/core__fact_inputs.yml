@@ -110,6 +110,12 @@ models:
           - not_null:
               where: not IS_COINBASE
 
+      - name: PUBKEY_SCRIPT_DESC
+        description: "{{ doc('pubkey_script_desc') }}"
+        tests:
+          - not_null:
+              where: not IS_COINBASE
+
       - name: VALUE
         description: "{{ doc('value') }}"
         tests:

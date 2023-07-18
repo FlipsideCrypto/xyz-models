@@ -40,7 +40,7 @@ FINAL AS (
         o.value :value :: FLOAT AS VALUE,
         t._inserted_timestamp,
         t._partition_by_block_id,
-        {{ dbt_utils.generate_surrogate_key(['t.tx_id', 'o.value :n :: NUMBER']) }} AS output_id
+        {{ dbt_utils.generate_surrogate_key(['t.block_number', 't.tx_id', 'o.value :n :: NUMBER']) }} AS output_id
     FROM
         txs t,
         LATERAL FLATTEN(outputs) o

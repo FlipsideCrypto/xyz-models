@@ -28,7 +28,7 @@ inputs AS (
     SELECT
         *
     FROM
-        {{ ref('silver__inputs') }}
+        {{ ref('silver__inputs_final') }}
 
 {% if is_incremental() %}
 WHERE
