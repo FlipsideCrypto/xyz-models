@@ -14,6 +14,13 @@ models:
           interval: 1
 
     columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
@@ -21,6 +28,38 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: NUMBER
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - unique
+          - not_null
+
+      - name: MEDIAN_TIME
+        description: "{{ doc('median_time') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: TX_COUNT
+        description: "{{ doc('tx_count') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: NEXT_BLOCK_HASH
+        description: "{{ doc('next_block_hash') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: PREVIOUS_BLOCK_HASH
+        description: "{{ doc('previous_block_hash') }}"
+        tests:
+          - not_null
+          - unique
 
       - name: BITS
         description: "{{ doc('bits') }}"
@@ -39,48 +78,16 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
-      - name: BLOCK_HASH
-        description: "{{ doc('block_hash') }}"
-        tests:
-          - unique
-          - not_null
-
-      - name: MEDIAN_TIME
-        description: "{{ doc('median_time') }}"
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: TIMESTAMP_NTZ
-
       - name: MERKLE_ROOT
         description: "{{ doc('merkle_root') }}"
         tests:
           - not_null
-
-      - name: TX_COUNT
-        description: "{{ doc('tx_count') }}"
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: NUMBER
-
-      - name: NEXT_BLOCK_HASH
-        description: "{{ doc('next_block_hash') }}"
-        tests:
-          - not_null
-          - unique
 
       - name: NONCE
         description: "{{ doc('nonce') }}"
         tests:
           - not_null
 
-      - name: PREVIOUS_BLOCK_HASH
-        description: "{{ doc('previous_block_hash') }}"
-        tests:
-          - not_null
-          - unique
-          
       - name: SIZE
         description: "{{ doc('size') }}"
         tests:
@@ -91,14 +98,7 @@ models:
         tests:
           - not_null
 
-      - name: BLOCK_TIMESTAMP
-        description: "{{ doc('block_timestamp') }}"
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: TIMESTAMP_NTZ
-
-      - name: TX
+      - name: TXS
         description: "{{ doc('tx') }}"
         tests:
           - not_null

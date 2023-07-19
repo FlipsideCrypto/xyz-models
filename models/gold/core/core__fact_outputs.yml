@@ -11,6 +11,13 @@ models:
           interval: 1
 
     columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
@@ -20,13 +27,6 @@ models:
         description: "{{ doc('block_hash') }}"
         tests:
           - not_null
-              
-      - name: BLOCK_TIMESTAMP
-        description: "{{ doc('block_timestamp') }}"
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: TIMESTAMP_NTZ
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
@@ -38,19 +38,8 @@ models:
         tests:
           - not_null
 
-      - name: PUBKEY_SCRIPT_ADDRESS
-        description: "{{ doc('address') }}"
-        tests:
-          - not_null:
-              where: PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
-
       - name: PUBKEY_SCRIPT_ASM
         description: "{{ doc('pubkey_script_asm') }}"
-        tests:
-          - not_null
-
-      - name: PUBKEY_SCRIPT_DESC
-        description: "{{ doc('pubkey_script_desc') }}"
         tests:
           - not_null
 
@@ -59,8 +48,19 @@ models:
         tests:
           - not_null
 
+      - name: PUBKEY_SCRIPT_ADDRESS
+        description: "{{ doc('address') }}"
+        tests:
+          - not_null:
+              where: PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
+
       - name: PUBKEY_SCRIPT_TYPE
         description: "{{ doc('pubkey_script_type') }}"
+        tests:
+          - not_null
+
+      - name: PUBKEY_SCRIPT_DESC
+        description: "{{ doc('pubkey_script_desc') }}"
         tests:
           - not_null
 

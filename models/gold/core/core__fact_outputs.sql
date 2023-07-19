@@ -6,11 +6,18 @@
 WITH outputs AS (
 
     SELECT
-        * exclude (
-            output_data,
-            _partition_by_block_id,
-            _inserted_timestamp
-        )
+        block_timestamp,
+        block_number,
+        block_hash,
+        tx_id,
+        INDEX,
+        pubkey_script_asm,
+        pubkey_script_hex,
+        pubkey_script_address,
+        pubkey_script_type,
+        pubkey_script_desc,
+        VALUE,
+        output_id
     FROM
         {{ ref('silver__outputs') }}
 )

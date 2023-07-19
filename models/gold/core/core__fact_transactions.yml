@@ -15,6 +15,13 @@ models:
             - tx_id
 
     columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
         tests:
@@ -25,13 +32,6 @@ models:
         description: "{{ doc('block_hash') }}"
         tests:
           - not_null
-
-      - name: BLOCK_TIMESTAMP
-        description: "{{ doc('block_timestamp') }}"
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: TIMESTAMP_NTZ
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
@@ -57,20 +57,13 @@ models:
         tests:
           - not_null
 
-      - name: LOCK_TIME
-        description: "{{ doc('lock_time') }}"
+      - name: FEE
+        description: "{{ doc('fee') }}"
         tests:
-          - not_null
-
-      - name: SIZE
-        description: "{{ doc('size') }}"
-        tests:
-          - not_null
-
-      - name: VERSION
-        description: "{{ doc('version') }}"
-        tests:
-          - not_null
+          - not_null:
+              where: not IS_COINBASE
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
 
       - name: IS_COINBASE
         description: "{{ doc('is_coinbase') }}"
@@ -124,6 +117,11 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
+      - name: SIZE
+        description: "{{ doc('size') }}"
+        tests:
+          - not_null
+
       - name: VIRTUAL_SIZE
         description: "{{ doc('virtual_size') }}"
         tests:
@@ -134,14 +132,12 @@ models:
         tests:
           - not_null
 
-      - name: FEE
-        description: "{{ doc('fee') }}"
+      - name: LOCK_TIME
+        description: "{{ doc('lock_time') }}"
         tests:
-          - not_null:
-              where: not IS_COINBASE
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
+          - not_null
 
-      - name: _PARTITION_BY_BLOCK_ID
-
-      - name: _INSERTED_TIMESTAMP
+      - name: VERSION
+        description: "{{ doc('version') }}"
+        tests:
+          - not_null
