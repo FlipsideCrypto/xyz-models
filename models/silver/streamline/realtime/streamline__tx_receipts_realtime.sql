@@ -15,14 +15,14 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
     SELECT
         MAX(block_number) - 10000 AS block_number --aprox 3 days
     FROM
-        {{ ref("bronze__streamline_FR_transactions") }}
+        {{ ref("streamline__complete_transactions") }}
     {% endif %}),
     tbl AS (
         SELECT
             block_number,
-            data:hash::STRING AS tx_hash
+            tx_hash
         FROM
-            {{ ref("bronze__streamline_FR_transactions") }}
+            {{ ref("streamline__complete_transactions") }}
         WHERE
             (
                 block_number >= (

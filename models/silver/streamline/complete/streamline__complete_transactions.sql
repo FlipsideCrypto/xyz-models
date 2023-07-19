@@ -9,6 +9,7 @@
 SELECT
     id,
     block_number,
+    data:hash::STRING AS tx_hash,
     _inserted_timestamp
 FROM
 
