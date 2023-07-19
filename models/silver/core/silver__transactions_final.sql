@@ -43,13 +43,13 @@ WHERE
             SELECT
                 DISTINCT _partition_by_block_id
             FROM
-                blocks
+                transactions
         )
         AND block_number IN (
             SELECT
                 DISTINCT block_number
             FROM
-                blocks
+                transactions
         )
     )
 {% endif %}
@@ -73,13 +73,13 @@ WHERE
             SELECT
                 DISTINCT _partition_by_block_id
             FROM
-                blocks
+                transactions
         )
         AND block_number IN (
             SELECT
                 DISTINCT block_number
             FROM
-                blocks
+                transactions
         )
     )
 {% endif %}

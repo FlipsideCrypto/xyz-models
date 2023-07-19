@@ -12,7 +12,7 @@ WITH inputs AS (
             _inserted_timestamp
         )
     FROM
-        {{ ref('silver__inputs') }}
+        {{ ref('silver__inputs_final') }}
 )
 SELECT
     *
