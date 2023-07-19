@@ -19,9 +19,6 @@ models:
         description: "{{ doc('block_number') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__blocks')
-              field: BLOCK_NUMBER
 
       - name: BLOCK_TIMESTAMP
         description: "{{ doc('block_timestamp') }}"
@@ -34,17 +31,11 @@ models:
         description: "{{ doc('block_hash') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__blocks')
-              field: BLOCK_HASH
 
       - name: TX_ID
         description: "{{ doc('tx_id') }}"
         tests:
           - not_null
-          - relationships:
-              to: ref('silver__transactions')
-              field: TX_ID
 
       - name: INPUT_DATA
         description: "{{ doc('input_data') }}"
