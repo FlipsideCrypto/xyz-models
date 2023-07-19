@@ -45,12 +45,6 @@ WHERE
             FROM
                 inputs
         )
-        AND block_number IN (
-            SELECT
-                DISTINCT block_number
-            FROM
-                inputs
-        )
     )
 {% endif %}
 ),
