@@ -13,7 +13,7 @@ WITH inputs AS (
         index,
         is_coinbase,
         coinbase,
-        script_sig_asm
+        script_sig_asm,
         script_sig_hex,
         sequence,
         spent_block_number,
