@@ -4,7 +4,8 @@
     unique_key = 'block_number',
     cluster_by = ["block_number", "block_timestamp::DATE"],
     tags = ["core", "ez"],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    enabled = False
 ) }}
 
 WITH blocks AS (
@@ -63,6 +64,7 @@ tx_value AS (
     GROUP BY
         1
 ),
+-- TODO - i can pull output value out in coinbase transactions and avoid the join, here
 coinbase AS (
     SELECT
         block_number,
