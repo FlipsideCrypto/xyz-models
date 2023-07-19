@@ -20,14 +20,16 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Core Tables (`bitcoin`.`CORE`.`<table_name>`)
 
 **Dimension Tables:**
-
+ - None (yet_)
 
 **Fact Tables:**
-
-
+- [fact_blocks](#!/model/model.bitcoin.core__fact_blocks)
+- [fact_transactions](#!/model/model.bitcoin.core__fact_transactions)
+- [fact_inputs](#!/model/model.bitcoin.core__fact_inputs)
+- [fact_outputs](#!/model/model.bitcoin.core__fact_outputs)
 
 **Convenience Tables:**
-
+ - None (yet)
 
 
 
