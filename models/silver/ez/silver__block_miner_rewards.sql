@@ -4,8 +4,7 @@
     unique_key = 'block_number',
     cluster_by = ["block_number", "block_timestamp::DATE"],
     tags = ["core", "ez"],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
-    enabled = False
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
 WITH blocks AS (
