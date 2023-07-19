@@ -40,7 +40,7 @@ SELECT
     *
 FROM
     FINAL qualify ROW_NUMBER() over (
-        PARTITION BY tx_id
+        PARTITION BY tx_id, block_number
         ORDER BY
             _inserted_timestamp DESC
     ) = 1
