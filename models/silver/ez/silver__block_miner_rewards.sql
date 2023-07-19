@@ -25,11 +25,11 @@ WHERE
     )
 {% endif %}
 ),
-transactions_final AS (
+transactions AS (
     SELECT
         *
     FROM
-        {{ ref('silver__transactions_final') }}
+        {{ ref('silver__transactions') }}
 
 {% if is_incremental() %}
 WHERE
@@ -60,18 +60,17 @@ tx_value AS (
         block_number,
         SUM(fee) AS fees
     FROM
-        transactions_final
+        transactions
     GROUP BY
         1
 ),
--- TODO - i can pull output value out in coinbase transactions and avoid the join, here
 coinbase AS (
     SELECT
         block_number,
         coinbase,
-        output_value
+        coinbase_value
     FROM
-        transactions_final
+        transactions
     WHERE
         is_coinbase
 ),
@@ -80,8 +79,8 @@ blocks_final AS (
         block_timestamp,
         b.block_number,
         b.block_hash,
-        C.output_value AS total_reward,
-        C.output_value - v.fees AS block_reward,
+        C.coinbase_value AS total_reward,
+        C.coinbase_value - v.fees AS block_reward,
         v.fees,
         C.coinbase,
         b._partition_by_block_id,
