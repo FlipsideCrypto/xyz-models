@@ -1,6 +1,5 @@
 {% docs address %}
 
-A Bitcoin address.
-TODO - clarify definition based on model.
+A Bitcoin address associated with the output.
 
 {% enddocs %}
