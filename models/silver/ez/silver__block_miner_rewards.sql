@@ -38,20 +38,6 @@ WHERE
         FROM
             {{ this }}
     )
-    OR (
-        _partition_by_block_id IN (
-            SELECT
-                DISTINCT _partition_by_block_id
-            FROM
-                blocks
-        )
-        AND block_number IN (
-            SELECT
-                DISTINCT block_number
-            FROM
-                blocks
-        )
-    )
 {% endif %}
 ),
 tx_value AS (
