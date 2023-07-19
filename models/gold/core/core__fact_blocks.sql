@@ -20,10 +20,10 @@ WITH blocks AS (
         nonce,
         size,
         stripped_size,
-        tx as txs,
         version,
         weight,
-        error
+        error,
+        tx as txs
     FROM
         {{ ref('silver__blocks') }}
 )
