@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'view',
-    tags = ['core', 'ez']
+    tags = ['core', 'ez'],
+    enabled = False
 ) }}
 
 WITH blocks AS (
