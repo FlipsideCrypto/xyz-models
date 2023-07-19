@@ -18,12 +18,12 @@ WITH blocks AS (
         difficulty,
         merkle_root,
         nonce,
-        size,
+        SIZE,
         stripped_size,
         version,
         weight,
         error,
-        tx as txs
+        tx AS txs
     FROM
         {{ ref('silver__blocks') }}
 )
