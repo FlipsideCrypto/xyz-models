@@ -29,24 +29,6 @@ outputs AS (
         *
     FROM
         {{ ref('silver__outputs') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-    OR (
-        _partition_by_block_id IN (
-            SELECT
-                DISTINCT _partition_by_block_id
-            FROM
-                inputs
-        )
-    )
-{% endif %}
 ),
 FINAL AS (
     SELECT
