@@ -38,20 +38,6 @@ WHERE
         FROM
             {{ this }}
     )
-    OR (
-        _partition_by_block_id IN (
-            SELECT
-                DISTINCT _partition_by_block_id
-            FROM
-                transactions
-        )
-        AND block_number IN (
-            SELECT
-                DISTINCT block_number
-            FROM
-                transactions
-        )
-    )
 {% endif %}
 ),
 outputs AS (
@@ -67,20 +53,6 @@ WHERE
             MAX(_inserted_timestamp) _inserted_timestamp
         FROM
             {{ this }}
-    )
-    OR (
-        _partition_by_block_id IN (
-            SELECT
-                DISTINCT _partition_by_block_id
-            FROM
-                transactions
-        )
-        AND block_number IN (
-            SELECT
-                DISTINCT block_number
-            FROM
-                transactions
-        )
     )
 {% endif %}
 ),
@@ -137,8 +109,14 @@ transactions_final AS (
         _inserted_timestamp
     FROM
         transactions t
-        LEFT JOIN input_val i USING (block_number, tx_id)
-        LEFT JOIN output_val o USING (block_number, tx_id)
+        LEFT JOIN input_val i USING (
+            block_number,
+            tx_id
+        )
+        LEFT JOIN output_val o USING (
+            block_number,
+            tx_id
+        )
 )
 SELECT
     *
