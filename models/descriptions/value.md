@@ -1,6 +1,5 @@
 {% docs value %}
 
-The value in BTC.
-TODO - be explicit about units.
+The value, expressed in Bitcoin.
 
 {% enddocs %}

@@ -11,17 +11,17 @@ models:
           interval: 1
 
     columns:
-      - name: BLOCK_NUMBER
-        description: "{{ doc('block_number') }}"
-        tests:
-          - not_null
-
       - name: BLOCK_TIMESTAMP
         description: "{{ doc('block_timestamp') }}"
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: TIMESTAMP_NTZ
+
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
 
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
