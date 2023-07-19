@@ -43,13 +43,13 @@ WHERE
             SELECT
                 DISTINCT _partition_by_block_id
             FROM
-                txs
+                inputs
         )
         AND block_number IN (
             SELECT
                 DISTINCT block_number
             FROM
-                txs
+                inputs
         )
     )
 {% endif %}
