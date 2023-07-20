@@ -1,7 +1,13 @@
 {{ config(
     materialized = 'view',
-    tags = ['core', 'ez'],
-    enabled = False
+    meta={
+        'database_tags':{
+            'table': {
+                'PURPOSE': 'BITCOIN, MINING'
+            }
+        }
+    },
+    tags = ['core', 'ez']
 ) }}
 
 WITH blocks AS (

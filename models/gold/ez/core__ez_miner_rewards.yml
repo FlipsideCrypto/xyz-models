@@ -9,6 +9,9 @@ models:
           datepart: day
           field: block_timestamp
           interval: 1
+      - sequence_gaps:
+          column_name: block_number
+          where: BLOCK_TIMESTAMP::DATE < CURRENT_DATE
 
     columns:
       - name: BLOCK_TIMESTAMP
