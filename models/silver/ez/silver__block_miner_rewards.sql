@@ -43,7 +43,7 @@ WHERE
 tx_value AS (
     SELECT
         block_number,
-        SUM(fee) AS fees
+        SUM(COALESCE(fee, 0)) AS fees
     FROM
         transactions
     GROUP BY
