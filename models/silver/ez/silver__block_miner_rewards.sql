@@ -32,11 +32,11 @@ transactions AS (
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    block_number IN (
         SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
+            DISTINCT block_number
         FROM
-            {{ this }}
+            blocks
     )
 {% endif %}
 ),
