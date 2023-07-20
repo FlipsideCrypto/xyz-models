@@ -17,6 +17,8 @@ models:
     columns:
       - name: BLOCK_NUMBER
         description: "{{ doc('block_number') }}"
+        tests:
+          - tx_block_gaps
 
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
