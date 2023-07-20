@@ -31,13 +31,7 @@ blocks AS (
 
 {% if is_incremental() %}
 WHERE
-    _partition_by_block_id IN (
-        SELECT
-            DISTINCT _partition_by_block_id
-        FROM
-            bronze_transactions
-    )
-    AND block_number IN (
+    block_number IN (
         SELECT
             DISTINCT block_number
         FROM

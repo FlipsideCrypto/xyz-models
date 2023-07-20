@@ -23,6 +23,7 @@ models:
         description: "{{ doc('block_number') }}"
         tests:
           - not_null
+          - tx_block_gaps
 
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
