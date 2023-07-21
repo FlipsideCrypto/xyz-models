@@ -29,9 +29,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_outputs](#!/model/model.bitcoin.core__fact_outputs)
 
 **Convenience Tables:**
- - None (yet)
-
-
+ - [ez_miner_rewards](#!/model/model.bitcoin.core__ez_miner_rewards)
 
 ## **Data Model Overview**
 
