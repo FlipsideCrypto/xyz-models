@@ -23,13 +23,13 @@ There is more information on how to use dbt docs in the last section of this doc
  - None (yet_)
 
 **Fact Tables:**
-- [fact_blocks](#!/model/model.bitcoin.core__fact_blocks)
-- [fact_transactions](#!/model/model.bitcoin.core__fact_transactions)
-- [fact_inputs](#!/model/model.bitcoin.core__fact_inputs)
-- [fact_outputs](#!/model/model.bitcoin.core__fact_outputs)
+- [fact_blocks](#!/model/model.bitcoin_models.core__fact_blocks)
+- [fact_transactions](#!/model/model.bitcoin_models.core__fact_transactions)
+- [fact_inputs](#!/model/model.bitcoin_models.core__fact_inputs)
+- [fact_outputs](#!/model/model.bitcoin_models.core__fact_outputs)
 
 **Convenience Tables:**
- - [ez_miner_rewards](#!/model/model.bitcoin.core__ez_miner_rewards)
+ - [ez_miner_rewards](#!/model/model.bitcoin_models.core__ez_miner_rewards)
 
 ## **Data Model Overview**
 
