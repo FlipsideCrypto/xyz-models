@@ -53,7 +53,7 @@ SELECT
     block_hash AS params
 FROM
     tbl
-UNION ALL
+UNION
 SELECT
     block_number,
     'getblock' AS method,
