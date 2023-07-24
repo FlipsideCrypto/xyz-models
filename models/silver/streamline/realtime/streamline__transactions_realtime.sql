@@ -19,7 +19,7 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
     tbl AS (
         SELECT
             block_number,
-            data:result::STRING AS block_hash
+            DATA :result :: STRING AS block_hash
         FROM
             {{ ref("bronze__streamline_blocks_hash") }}
         WHERE
@@ -57,3 +57,14 @@ SELECT
     ) AS params
 FROM
     tbl
+UNION ALL
+SELECT
+    block_number,
+    'getblock' AS method,
+    CONCAT(
+        block_hash,
+        '_-_',
+        '2'
+    ) AS params
+FROM
+    {{ ref('_pending_blocks') }}
