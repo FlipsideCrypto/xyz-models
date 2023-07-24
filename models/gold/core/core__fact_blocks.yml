@@ -53,6 +53,7 @@ models:
         description: "{{ doc('next_block_hash') }}"
         tests:
           - unique
+          - not_null
 
       - name: PREVIOUS_BLOCK_HASH
         description: "{{ doc('previous_block_hash') }}"
