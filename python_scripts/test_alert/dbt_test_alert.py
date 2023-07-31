@@ -14,7 +14,10 @@ def log_test_result():
         run = json.load(f)
 
     logs = []
-    messages = {"fail": [], "warn": []}
+    messages = {
+        "fail": [],
+        "warn": []
+    }
     test_count = 0
     warn_count = 0
     fail_count = 0
@@ -39,7 +42,7 @@ def log_test_result():
         "test_count": test_count,
         "warn_count": warn_count,
         "fail_count": fail_count,
-        "elapsed_time": str(datetime.timedelta(seconds=run["elapsed_time"])),
+        "elapsed_time": str(datetime.timedelta(seconds=run["elapsed_time"]))
     }
 
     return dbt_test_result
@@ -55,42 +58,41 @@ def create_message(**kwargs):
                     {
                         "title": "Total Tests Run",
                         "value": kwargs["test_count"],
-                        "short": True,
+                        "short": True
                     },
                     {
                         "title": "Total Time Elapsed",
                         "value": kwargs["elapsed_time"],
-                        "short": True,
+                        "short": True
                     },
                     {
                         "title": "Number of Unsuccessful Tests",
                         "value": f"Fail: {kwargs['fail_count']}, Warn: {kwargs['warn_count']}",
-                        "short": True,
+                        "short": True
                     },
                     {
                         "title": "Failed Tests:",
-                        "value": "\n".join(kwargs["messages"]["fail"])
-                        if len(kwargs["messages"]["fail"]) > 0
-                        else "None :)",
-                        "short": False,
-                    },
-                ],
-                "actions": [
-                    {
-                        "type": "button",
-                        "text": "View the full run results",
-                        "style": "primary",
-                        "url": "https://github.com/FlipsideCrypto/bitcoin-models/actions/",
-                        "confirm": {
-                            "title": "I haven't figured this part out yet",
-                            "text": "I'm not sure how to get the run id from the workflow run, see all tests by clicking Ok",
-                            "ok_text": "Ok",
-                            "dismiss_text": "Dismiss",
-                        },
+                        "value": "\n".join(kwargs["messages"]["fail"]) if len(kwargs["messages"]["fail"]) > 0 else "None :)",
+                        "short": False
                     }
                 ],
+                "actions": [
+
+                    {
+                        "type": "button",
+                        "text": "View Warnings",
+                        "style": "primary",
+                        "url": "https://github.com/FlipsideCrypto/near-models/actions/workflows/dbt_test.yml",
+                        "confirm": {
+                            "title": f"{kwargs['warn_count']} Warnings",
+                            "text": "\n".join(kwargs["messages"]["warn"]) if len(kwargs["messages"]["warn"]) > 0 else "None :)",
+                            "ok_text": "Continue to GHA",
+                            "dismiss_text": "Dismiss"
+                        }
+                    }
+                ]
             }
-        ],
+        ]
     }
 
     return messageBody
@@ -109,16 +111,17 @@ def send_alert(webhook_url):
         test_count=data["test_count"],
         messages=data["messages"],
         elapsed_time=data["elapsed_time"],
-        color="#f44336" if data["fail_count"] > 0 else "#4CAF50",
+        color="#f44336" if data["fail_count"] > 0 else "#4CAF50"
     )
 
     x = requests.post(url, json=send_message)
 
     # test config to continue on error in workflow, so we want to exit with a non-zero code if there are any failures
-    if data["fail_count"] > 0:
+    if data['fail_count'] > 0:
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+
     webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
     send_alert(webhook_url)
