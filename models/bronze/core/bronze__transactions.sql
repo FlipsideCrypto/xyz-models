@@ -1,8 +1,9 @@
 {{ config(
     materialized = 'incremental',
     cluster_by = ["_inserted_timestamp::DATE"],
-    unique_key="tx_id",
-    tags = ["load"]
+    unique_key = "tx_id",
+    tags = ["load"],
+    incremental_strategy = 'delete+insert'
 ) }}
 -- depends_on: {{ ref('bronze__streamline_transactions') }}
 WITH streamline_transactions AS (
@@ -40,7 +41,8 @@ SELECT
     *
 FROM
     FINAL qualify ROW_NUMBER() over (
-        PARTITION BY tx_id, block_number
+        PARTITION BY tx_id,
+        block_number
         ORDER BY
             _inserted_timestamp DESC
     ) = 1
