@@ -68,3 +68,14 @@ SELECT
     ) AS params
 FROM
     {{ ref('_pending_blocks') }}
+UNION
+SELECT
+    block_number,
+    'getblock' AS method,
+    CONCAT(
+        block_hash,
+        '_-_',
+        '2'
+    ) AS params
+FROM
+    {{ ref('_missing_transactions') }}
