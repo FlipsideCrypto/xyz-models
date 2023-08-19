@@ -35,7 +35,8 @@ transactions AS (
         1
 )
 SELECT
-    b.block_number
+    b.block_number,
+    b.block_hash
 FROM
     blocks b
     LEFT JOIN transactions t USING (block_number)
