@@ -12,7 +12,7 @@ WITH pending_blocks AS (
     WHERE
         _inserted_timestamp >= DATEADD(
             'day',
-            -14,
+            -90,
             CURRENT_DATE
         )
         AND is_pending
