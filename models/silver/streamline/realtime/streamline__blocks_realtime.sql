@@ -45,7 +45,11 @@ WITH last_3_days AS ({% if var('STREAMLINE_RUN_HISTORY') %}
                             last_3_days
                     )
                     AND block_number IS NOT NULL
-            )
+            ) qualify ROW_NUMBER() over (
+                PARTITION BY block_number
+                ORDER BY
+                    _inserted_timestamp DESC
+            ) = 1
     )
 SELECT
     block_number,
