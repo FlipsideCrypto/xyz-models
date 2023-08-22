@@ -19,6 +19,7 @@ sources:
       - name: tendermint_blocks
       - name: tendermint_transactions
       - name: tendermint_validators
+      - name: tendermint_blockchain
       - name: address_labels
   - name: bronze 
     database: evmos
