@@ -23,4 +23,4 @@ SELECT
     near_receipt_hash,
     near_transaction_hash
 FROM
-    {{ ref('silver__receipts') }}
+    {{ target.database }}.silver.receipts_copy
