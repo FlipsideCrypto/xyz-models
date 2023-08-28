@@ -51,7 +51,7 @@ AND (
                     )
             )
     ) {% if var('OBSERV_FULL_TEST') %}
-        OR block_number >= 7601063
+        OR block_number >= 0
     {% endif %}
 )
 {% endif %}
