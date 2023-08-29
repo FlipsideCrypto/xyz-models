@@ -47,6 +47,7 @@ vars:
   UPDATE_UDFS_AND_SPS: False
   UPDATE_SNOWFLAKE_TAGS: True
   WAIT: 0
+  OBSERV_FULL_TEST: False
 
 tests:
   +store_failures: true # all tests
