@@ -24,8 +24,50 @@ jobs:
   called_workflow_template:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
-      dbt_command: >
-        dbt run -s ./models --exclude models/streamline*
+      dbt_command: |
+        dbt run -s ./models --exclude models/streamline*;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
+        dbt run -m models/bronze/bronze_api/bronze_api__get_blockchain_api.sql;
+        dbt run -m models/silver/silver__blockchain.sql;
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit 

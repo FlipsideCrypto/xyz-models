@@ -76,7 +76,7 @@ GROUP BY
 )
 )
 WHERE
-    groupID_out < 6
+    groupID_out < 11
 ),
 calls AS (
     SELECT
@@ -95,7 +95,14 @@ calls AS (
 SELECT
     call,
     ethereum.streamline.udf_json_rpc_call(
-        'https://flipside-01.mainnet.evmos.bdnodes.net',{},
+        (
+            SELECT
+                url || auth
+            FROM
+                evmos._internal.api_keys
+            WHERE
+                provider = 'bdnodes'
+        ),{},
         call
     ) AS DATA,
     SYSDATE() AS _inserted_timestamp

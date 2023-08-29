@@ -32,3 +32,8 @@ sources:
     schema: silver
     tables: 
       - name: asset_metadata
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'EVMOS' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence
