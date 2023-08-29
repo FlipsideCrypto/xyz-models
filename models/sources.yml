@@ -16,3 +16,9 @@ sources:
       - name: blocks_hash
       - name: blocks
       - name: transactions
+
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'BITCOIN' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence

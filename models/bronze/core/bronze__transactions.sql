@@ -40,7 +40,12 @@ FINAL AS (
 SELECT
     *
 FROM
-    FINAL qualify ROW_NUMBER() over (
+    FINAL
+WHERE
+    TYPEOF(
+        DATA :: variant
+    ) != 'ARRAY' 
+qualify ROW_NUMBER() over (
         PARTITION BY tx_id,
         block_number
         ORDER BY
