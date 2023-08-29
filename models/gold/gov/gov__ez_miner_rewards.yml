@@ -2,8 +2,8 @@ version: 2
 
 models:
   - name: gov__ez_miner_rewards
-    description: |-
-      Deprecating soon: This is a notice that we're replacing this table with **BITCOIN.GOV.EZ_MINER_REWARDS** Please migrate queries to the new table by **9/14/23**. There will be no column changes or any other changes of any kind.
+      Computes the block reward and total fees per block.
+
     tests:
       - dbt_utils.recency:
           datepart: day
