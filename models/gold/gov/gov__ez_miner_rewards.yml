@@ -2,6 +2,7 @@ version: 2
 
 models:
   - name: gov__ez_miner_rewards
+    description: |-
       Computes the block reward and total fees per block.
 
     tests:
