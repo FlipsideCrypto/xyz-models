@@ -1,9 +1,9 @@
 version: 2
 
 models:
-  - name: core__ez_miner_rewards
-    description: |-
+  - name: gov__ez_miner_rewards
       Computes the block reward and total fees per block.
+
     tests:
       - dbt_utils.recency:
           datepart: day
