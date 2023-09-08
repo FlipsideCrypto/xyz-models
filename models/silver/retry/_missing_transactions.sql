@@ -42,3 +42,4 @@ FROM
     LEFT JOIN transactions t USING (block_number)
 WHERE
     b.tx_count != t.tx_count
+    OR t.tx_count IS NULL
