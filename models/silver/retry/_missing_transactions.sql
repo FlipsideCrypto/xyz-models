@@ -1,5 +1,5 @@
 {{ config(
-    materialized = 'view'
+    materialized = 'ephermeral'
 ) }}
 
 WITH blocks AS (
