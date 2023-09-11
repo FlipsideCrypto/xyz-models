@@ -22,6 +22,18 @@ WHERE
         FROM
             {{ this }}
     )
+    OR block_number IN (
+        SELECT
+            block_number
+        FROM
+            {{ this }}
+        WHERE
+            (
+                total_reward IS NULL
+                OR block_reward IS NULL
+                OR fees IS NULL
+            )
+    )
 {% endif %}
 ),
 transactions AS (

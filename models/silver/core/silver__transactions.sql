@@ -5,7 +5,7 @@
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
     tags = ["core"]
 ) }}
-
+-- depends_on: {{ ref('silver__blocks') }}
 WITH bronze_transactions AS (
 
     SELECT
