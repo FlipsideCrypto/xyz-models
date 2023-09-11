@@ -20,16 +20,12 @@ WHERE
             MAX(_inserted_timestamp) _inserted_timestamp
         FROM
             {{ this }}
-    ) 
-    -- add lookback for late blocks where the hash failed to join inƒ
-    OR tx_id IN (
+    )
+    AND block_number <= (
         SELECT
-            tx_id
+            MAX(block_number)
         FROM
-            {{ this }}
-        WHERE
-            _inserted_timestamp >= CURRENT_TIMESTAMP - INTERVAL '72 hours'
-            AND block_hash IS NULL
+            {{ ref('silver__blocks') }}
     )
 {% endif %}
 ),

@@ -22,7 +22,6 @@ WHERE
         FROM
             {{ this }}
     )
-    OR block_hash IS NULL
 {% endif %}
 ),
 FINAL AS (

@@ -22,7 +22,6 @@ WHERE
         FROM
             {{ this }}
     )
-    OR fees IS NULL
 {% endif %}
 ),
 transactions AS (
