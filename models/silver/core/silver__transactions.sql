@@ -5,7 +5,7 @@
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
     tags = ["core"]
 ) }}
-
+-- depends_on: {{ ref('silver__blocks') }}
 WITH bronze_transactions AS (
 
     SELECT
@@ -20,6 +20,12 @@ WHERE
             MAX(_inserted_timestamp) _inserted_timestamp
         FROM
             {{ this }}
+    )
+    AND block_number <= (
+        SELECT
+            MAX(block_number)
+        FROM
+            {{ ref('silver__blocks') }}
     )
 {% endif %}
 ),
