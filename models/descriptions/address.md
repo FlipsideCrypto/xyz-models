@@ -1,5 +1,5 @@
 {% docs address %}
 
-A Bitcoin address associated with the output.
+A Bitcoin address associated with the transaction, output, label, etc.
 
 {% enddocs %}

@@ -1,0 +1,25 @@
+version: 2
+models:
+  - name: core__dim_labels
+    description: This table contains labels for addresses on the Bitcoin blockchain.
+    columns:
+      - name: BLOCKCHAIN
+        description: '{{ doc("blockchain") }}'
+
+      - name: CREATOR
+        description: '{{ doc("creator") }}'
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+
+      - name: ADDRESS_NAME
+        description: '{{ doc("address_name") }}'
+
+      - name: LABEL_TYPE
+        description: '{{ doc("label_type") }}'
+
+      - name: LABEL_SUBTYPE
+        description: '{{ doc("label_subtype") }}'
+        
+      - name: LABEL
+        description: '{{ doc("label") }}'
