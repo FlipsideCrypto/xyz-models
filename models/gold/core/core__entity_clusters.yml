@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: entity_clusters
+  - name: core__entity_clusters
     description: Common Spend Entity Clusters for BTC addresses
 
     config:

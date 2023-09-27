@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: entity_cluster_btc
+  - name: silver__entity_cluster_btc
     description: Common Spend Entity Clusters for BTC addresses
 
     config:
