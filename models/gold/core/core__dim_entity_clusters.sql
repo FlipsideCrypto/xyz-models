@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'view',
-  tags = ['snowflake', 'bitcoin', 'labels', 'cluster'],
+  tags = ['entity_cluster', 'core']
 ) }}
 
 SELECT

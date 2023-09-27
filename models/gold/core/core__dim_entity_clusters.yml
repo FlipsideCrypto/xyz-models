@@ -1,12 +1,8 @@
 version: 2
 
 models:
-  - name: core__entity_clusters
+  - name: core__dim_entity_clusters
     description: Common Spend Entity Clusters for BTC addresses
-
-    config:
-      materialized: table
-      tags: ['python', 'btc', 'cluster', 'label']
 
     columns:
       - name: address
