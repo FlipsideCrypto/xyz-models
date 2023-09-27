@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: entity_clusters
+    description: Common Spend Entity Clusters for BTC addresses
+
+    config:
+      materialized: table
+      tags: ['python', 'btc', 'cluster', 'label']
+
+    columns:
+      - name: address
+        description: Address that the label is for. This is the field that should be used to join other tables with labels. 
+        tests:
+          - unique
+          - not_null
+      - name: address_group
+        description: An arbitrary group number that identifies addresses within the same group. Group number can change, avoid referencing a specific group number.  
+        tests:
+          - unique
+          - not_null
+      - name: project_name
+        description: A label for each group. Only available if an address within a group is labeled. 
+        tests:
+          - unique
+          - not_null
+      - name: _inserted_timestamp
+        description: Data insert date. 
+        tests:
+          - unique
+          - not_null
