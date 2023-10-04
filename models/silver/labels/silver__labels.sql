@@ -16,15 +16,16 @@ SELECT
     project_name
 FROM
     {{ ref('bronze__labels') }}
+WHERE
+    insert_date >= '2023-10-04'
 
 {% if is_incremental() %}
-WHERE
-    insert_date >= (
-        SELECT
-            MAX(
-                insert_date
-            )
-        FROM
-            {{ this }}
-    )
+AND insert_date >= (
+    SELECT
+        MAX(
+            insert_date
+        )
+    FROM
+        {{ this }}
+)
 {% endif %}
