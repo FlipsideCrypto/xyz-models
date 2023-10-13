@@ -66,14 +66,6 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: VARCHAR
 
-      - name: COINBASE_VALUE
-        description: "{{ doc('coinbase_value') }}"
-        tests:
-          - not_null:
-              where: IS_COINBASE
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: FLOAT
-
       - name: TX_HASH
         description: "{{ doc('tx_hash') }}"
         tests:
@@ -117,6 +109,14 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: ARRAY
+
+      - name: OUTPUT_VALUE
+        description: "{{ doc('output_value') }}"
+        tests:
+          - not_null:
+              where: IS_COINBASE
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
 
       - name: OUTPUT_COUNT
         description: "{{ doc('output_count') }}"

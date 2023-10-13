@@ -53,7 +53,7 @@ coinbase AS (
     SELECT
         block_number,
         coinbase,
-        coinbase_value
+        output_value AS coinbase_value
     FROM
         transactions
     WHERE
