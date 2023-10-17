@@ -2,7 +2,11 @@
 CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(db STRING, updated_since TIMESTAMP_NTZ)
 RETURNS TABLE (SQL STRING)
 LANGUAGE SQL
+{% if target.database == 'ADMIN_DEV' %}
 EXECUTE AS CALLER
+{% else %}
+EXECUTE AS OWNER
+{% endif %}
 AS
 $$
 DECLARE
@@ -10,6 +14,10 @@ DECLARE
   target_schema VARCHAR DEFAULT :db || '.information_schema.schemata';
   all_grants VARCHAR DEFAULT '';
 BEGIN
+    IF (DB = 'UTILS') THEN 
+        ddl_views := :db || '._datashare._create_udfs';
+    END IF;
+
     WITH target_schema AS (
         SELECT
             array_agg(schema_name) AS schema_name
@@ -51,7 +59,7 @@ BEGIN
             :db || suffix)
         ) AS permissions
     FROM schema_grants s
-    CROSS JOIN (SELECT suffix from datashare.share_suffix where is_active = true)
+    CROSS JOIN (SELECT suffix from {{ target.database }}.datashare.share_suffix where is_active = true)
     )
     SELECT listagg(permissions,'\n') as all_permissions
             INTO :all_grants
@@ -75,13 +83,18 @@ $$
 CREATE OR REPLACE PROCEDURE datashare.sp_grant_share_permissions(updated_since TIMESTAMP_NTZ)
 RETURNS TABLE (TABLE_CATALOG STRING)
 LANGUAGE SQL
+{% if target.database == 'ADMIN_DEV' %}
+EXECUTE AS CALLER
+{% else %}
+EXECUTE AS OWNER
+{% endif %}
 AS
 $$
 DECLARE
     cur CURSOR FOR SELECT
         table_catalog
     FROM snowflake.account_usage.tables
-    WHERE table_name = '_CREATE_GOLD'
+    WHERE table_name in ('_CREATE_GOLD','_CREATE_UDFS')
     and table_schema = '_DATASHARE'
     AND TABLE_CATALOG NOT LIKE '%_DEV';
 BEGIN
@@ -91,7 +104,7 @@ BEGIN
     LIMIT 0;
     FOR cur_row IN cur DO
         LET db VARCHAR := cur_row.table_catalog;
-        CALL datashare.sp_grant_share_permissions(:db, :updated_since);
+        CALL {{ target.database }}.datashare.sp_grant_share_permissions(:db, :updated_since);
         LET cnt VARCHAR := (SELECT COUNT(*) FROM TABLE(result_scan(last_query_id())));
         IF (cnt > 0) THEN
             INSERT INTO RESULTS (db) VALUES (:db);
@@ -114,7 +127,7 @@ $$
 DECLARE
   results RESULTSET;
 BEGIN
-  results := (CALL datashare.sp_grant_share_permissions('2000-01-01'::TIMESTAMP_NTZ) );
+  results := (CALL {{ target.database }}.datashare.sp_grant_share_permissions('2000-01-01'::TIMESTAMP_NTZ) );
   RETURN TABLE(results);
 END;
 $$
@@ -131,7 +144,7 @@ $$
 DECLARE
   results RESULTSET;
 BEGIN
-  results := (CALL datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
+  results := (CALL {{ target.database }}.datashare.sp_grant_share_permissions(:db, '2000-01-01'::TIMESTAMP_NTZ) );
   RETURN TABLE(results);
 END;
 $$
