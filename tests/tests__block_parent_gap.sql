@@ -15,7 +15,7 @@ WITH silver_blocks AS (
         block_number ASC
     ) AS prior_hash,
     _partition_by_block_id,
-    CURRENT_TIMESTAMP AS _test_timestamp
+    SYSDATE() AS _test_timestamp
   FROM
     {{ ref('silver__blocks') }}
   WHERE
