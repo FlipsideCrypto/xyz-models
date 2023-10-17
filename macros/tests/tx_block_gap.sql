@@ -13,4 +13,6 @@ FROM
     t
     ON b.{{ column_name }} = t.{{ column_name }}
 WHERE
-    block_number_t IS NULL {% endtest %}
+    _inserted_timestamp <= SYSDATE() - INTERVAL '2 hours'
+    AND block_number_t IS NULL 
+{% endtest %}

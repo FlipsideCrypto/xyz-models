@@ -15,7 +15,7 @@ WITH block_base AS (
     FROM
         {{ ref('silver__blocks') }}
     WHERE
-        _inserted_timestamp <= CURRENT_TIMESTAMP - INTERVAL '2 hours'
+        _inserted_timestamp <= SYSDATE() - INTERVAL '2 hours'
 ),
 model_name AS (
     SELECT
