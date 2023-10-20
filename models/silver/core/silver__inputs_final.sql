@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
+    incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
     unique_key = 'input_id',
     cluster_by = ["block_number", "tx_id"],
     tags = ["core"],

@@ -3,7 +3,8 @@
     cluster_by = ["_inserted_timestamp::DATE"],
     unique_key = "tx_id",
     tags = ["load"],
-    incremental_strategy = 'delete+insert'
+    incremental_strategy = 'delete+insert',
+    incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
 ) }}
 -- depends_on: {{ ref('bronze__streamline_transactions') }}
 WITH streamline_transactions AS (
