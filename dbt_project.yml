@@ -1,14 +1,14 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "xyz_models"
+name: "aptos_models"
 version: "1.0.0"
 config-version: 2
 
 require-dbt-version: ">=1.4.0"
 
 # This setting configures which "profile" dbt uses for this project.
-profile: "xyz"
+profile: "aptos"
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -41,7 +41,11 @@ models:
 
 vars:
   "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
+  OBSERV_FULL_TEST: FALSE
+  UPDATE_SNOWFLAKE_TAGS: TRUE
+  STREAMLINE_INVOKE_STREAMS: False
+  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
+  UPDATE_UDFS_AND_SPS: False
 
 tests:
   +store_failures: true # all tests
@@ -52,3 +56,14 @@ on-run-start:
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'
+
+dispatch:
+  - macro_namespace: dbt
+    search_order:
+      - sei-models
+      - dbt_snowflake_query_tags
+      - dbt
+
+query-comment:
+  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  append: true # Snowflake removes prefixed comments.
