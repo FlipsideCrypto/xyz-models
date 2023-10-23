@@ -1,9 +1,9 @@
 {% docs __overview__ %}
 
-# Welcome to the Flipside Crypto xyz Models Documentation
+# Welcome to the Flipside Crypto aptos Models Documentation
 
 ## **What does this documentation cover?**
-The documentation included here details the design of the xyz
+The documentation included here details the design of the aptos
  tables and views available via [Flipside Crypto.](https://flipsidecrypto.xyz/) For more information on how these models are built, please see [the github repository.](https://github.com/flipsideCrypto/xyz-models/)
 
 ## **How do I use these docs?**
@@ -17,7 +17,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Click on the links below to jump to the documentation for each schema.**
 
-### Core Tables (`xyz`.`CORE`.`<table_name>`)
+### Core Tables (`aptos`.`CORE`.`<table_name>`)
 
 **Dimension Tables:**
 
@@ -33,7 +33,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 ## **Data Model Overview**
 
-The xyz
+The aptos
  models are built a few different ways, but the core fact tables are built using three layers of sql models: **bronze, silver, and gold (or core).**
 
 - Bronze: Data is loaded in from the source as a view
@@ -68,7 +68,7 @@ Note that you can also right-click on models to interactively filter and explore
 - [Flipside](https://flipsidecrypto.xyz/)
 - [Velocity](https://app.flipsidecrypto.com/velocity?nav=Discover)
 - [Tutorials](https://docs.flipsidecrypto.com/our-data/tutorials)
-- [Github](https://github.com/FlipsideCrypto/xyz-models)
+- [Github](https://github.com/FlipsideCrypto/aptos-models)
 - [What is dbt?](https://docs.getdbt.com/docs/introduction)
 
 {% enddocs %}
