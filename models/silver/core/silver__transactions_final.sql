@@ -41,22 +41,6 @@ WHERE
     )
 {% endif %}
 ),
-outputs AS (
-    SELECT
-        *
-    FROM
-        {{ ref('silver__outputs') }}
-
-{% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
-        FROM
-            {{ this }}
-    )
-{% endif %}
-),
 input_val AS (
     SELECT
         block_number,
@@ -64,17 +48,6 @@ input_val AS (
         SUM(VALUE) AS input_value
     FROM
         inputs
-    GROUP BY
-        1,
-        2
-),
-output_val AS (
-    SELECT
-        block_number,
-        tx_id,
-        SUM(VALUE) AS output_value
-    FROM
-        outputs
     GROUP BY
         1,
         2
@@ -98,7 +71,7 @@ transactions_final AS (
         i.input_value,
         outputs,
         output_count,
-        o.output_value,
+        output_value,
         virtual_size,
         weight,
         IFF(
@@ -111,10 +84,6 @@ transactions_final AS (
     FROM
         transactions t
         LEFT JOIN input_val i USING (
-            block_number,
-            tx_id
-        )
-        LEFT JOIN output_val o USING (
             block_number,
             tx_id
         )
