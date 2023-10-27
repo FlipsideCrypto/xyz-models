@@ -38,6 +38,36 @@ jobs:
          dbt run-operation load_blocks_txs_lq;
          dbt run-operation load_blocks_txs_lq;
          dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
+         dbt run-operation load_blocks_txs_lq;
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit 
