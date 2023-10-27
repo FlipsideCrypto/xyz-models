@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = ['block_number','tx_hash','change_index'],
     incremental_strategy = 'merge',
-    cluster_by = ['_inserted_timestamp::DATE', 'block_timestamp::DATE' ]
+    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE']
 ) }}
 
 SELECT
@@ -15,7 +15,7 @@ SELECT
     b.value :type :: STRING AS change_type,
     b.value :address :: STRING AS address,
     b.value :handle :: STRING AS handle,
-    b.value :data: type :: STRING AS inner_change_type,
+    b.value :data: TYPE :: STRING AS inner_change_type,
     b.value :key :: STRING AS key,
     b.value :value :: STRING AS VALUE,
     b.value :state_key_hash :: STRING AS state_key_hash,
@@ -24,6 +24,14 @@ FROM
     {{ ref(
         'silver__transactions'
     ) }} A,
-    LATERAL FLATTEN (
-        changes
-    ) b
+    LATERAL FLATTEN (changes) b
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    )
+{% endif %}

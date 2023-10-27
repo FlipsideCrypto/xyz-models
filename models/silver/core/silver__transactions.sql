@@ -2,7 +2,7 @@
   materialized = 'incremental',
   unique_key = "tx_hash",
   incremental_strategy = 'merge',
-  cluster_by = ['_inserted_timestamp::DATE', 'block_timestamp::DATE' ]
+   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','TYPE']
 ) }}
 
 SELECT
@@ -33,10 +33,15 @@ SELECT
     b.value :state_change_hash :: STRING AS state_change_hash,
     b.value :state_checkpoint_hash :: STRING AS state_checkpoint_hash, --only type state_checkpoint_transaction (sch) is not null
     b.value :success :: BOOLEAN AS success,
-    -- b.value :timestamp :: bigint AS TIMESTAMP, -- same as block_timestamp
+    b.value :timestamp :: bigint AS TIMESTAMP, -- same as block_timestamp
     b.value :version :: INT AS version,
-    -- b.value :vm_status :: STRING AS vm_status, --same as succeeded
-    _inserted_timestamp
+    b.value :vm_status :: STRING AS vm_status, --same as succeeded
+     {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash']
+    ) }} AS _id,
+    _inserted_timestamp,
+    SYSDATE() AS _md,
+    '{{ invocation_id }}' AS invocation_id
 FROM
     {{ source(
       'aptos_bronze',
