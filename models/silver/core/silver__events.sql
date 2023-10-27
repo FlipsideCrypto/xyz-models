@@ -11,7 +11,8 @@ SELECT
     A.block_timestamp,
     A.tx_hash,
     version,
-    A.type AS tx_type,
+    success,
+    A.tx_type,
     b.index AS event_index,
     b.value :type :: STRING AS event_type,
     SPLIT_PART(

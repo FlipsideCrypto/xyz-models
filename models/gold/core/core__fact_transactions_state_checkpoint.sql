@@ -8,7 +8,7 @@ SELECT
     version,
     tx_hash,
     success,
-    TYPE,
+    tx_type,
     vm_status,
     state_checkpoint_hash,
     accumulator_root_hash,
@@ -23,6 +23,6 @@ FROM
     ) }}
 WHERE
     LEFT(
-        TYPE,
+        tx_type,
         5
     ) = 'state'

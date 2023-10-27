@@ -2,7 +2,7 @@
   materialized = 'incremental',
   unique_key = "tx_hash",
   incremental_strategy = 'merge',
-   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','TYPE']
+   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','tx_type']
 ) }}
 
 SELECT
@@ -11,7 +11,7 @@ SELECT
       DATA :data :block_timestamp :: STRING
     ) AS block_timestamp,
     b.value :hash :: STRING AS tx_hash,
-    b.value :type :: STRING AS TYPE,
+    b.value :type :: STRING AS tx_type,
     -- DATA :data :block_height :: INT AS block_height,
     b.value :accumulator_root_hash :: STRING AS accumulator_root_hash,
     b.value :changes AS changes,

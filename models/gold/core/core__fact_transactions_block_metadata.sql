@@ -8,7 +8,7 @@ SELECT
     version,
     tx_hash,
     success,
-    TYPE,
+    tx_type,
     epoch,
     events,
     changes,
@@ -31,6 +31,6 @@ FROM
     ) }}
 WHERE
     LEFT(
-        TYPE,
+        tx_type,
         5
     ) = 'block'
