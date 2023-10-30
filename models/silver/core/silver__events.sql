@@ -3,7 +3,7 @@
     unique_key = ['tx_hash','event_index'],
     incremental_strategy = 'merge',
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, event_type,address,module,resource);"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, event_type,event_address,event_module,event_resource);"
 ) }}
 
 SELECT
@@ -19,17 +19,17 @@ SELECT
         event_type,
         '::',
         1
-    ) :: STRING AS address,
+    ) :: STRING AS event_address,
     SPLIT_PART(
         event_type,
         '::',
         2
-    ) :: STRING AS module,
+    ) :: STRING AS event_module,
     SPLIT_PART(
         event_type,
         '::',
         3
-    ) :: STRING AS RESOURCE,
+    ) :: STRING AS event_resource,
     b.value :data AS event_data,
     -- b.value :guid :: STRING AS event_guid, -- extract into account_address + creation_number
     b.value :guid :account_address :: STRING AS account_address,

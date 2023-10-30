@@ -8,7 +8,7 @@ SELECT
     version,
     tx_hash,
     success,
-    TYPE,
+    tx_TYPE,
     sender,
     signature,
     payload,
