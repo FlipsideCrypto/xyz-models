@@ -37,10 +37,11 @@ SELECT
     b.value :state_key_hash :: STRING AS state_key_hash,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','change_index']
-    ) }} AS _id,
+    ) }} AS changes_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     _inserted_timestamp,
-    SYSDATE() AS _md,
-    '{{ invocation_id }}' AS invocation_id
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref(
         'silver__transactions'

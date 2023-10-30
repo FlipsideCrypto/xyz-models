@@ -19,10 +19,11 @@ SELECT
     last_version - first_version + 1 AS tx_count_from_versions,
     {{ dbt_utils.generate_surrogate_key(
         ['block_number']
-    ) }} AS _id,
+    ) }} AS blocks_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     _inserted_timestamp,
-    SYSDATE() AS _md,
-    '{{ invocation_id }}' AS invocation_id
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ source(
         'aptos_bronze',

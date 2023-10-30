@@ -37,10 +37,11 @@ SELECT
     b.value :sequence_number :: bigint AS sequence_number,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
-    ) }} AS _id,
+    ) }} AS events_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     _inserted_timestamp,
-    SYSDATE() AS _md,
-    '{{ invocation_id }}' AS invocation_id
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref(
         'silver__transactions'

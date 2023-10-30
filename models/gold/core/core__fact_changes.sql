@@ -19,10 +19,9 @@ SELECT
     key,
     VALUE,
     state_key_hash,
-    _ID,
-    _INSERTED_TIMESTAMP,
-    _MD,
-    invocation_id
+    changes_id AS fact_changes_id,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     {{ ref(
         'silver__changes'

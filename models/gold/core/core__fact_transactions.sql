@@ -22,10 +22,9 @@ SELECT
     state_change_hash,
     accumulator_root_hash,
     event_root_hash,
-    _ID,
-    _INSERTED_TIMESTAMP,
-    _MD,
-    invocation_id
+    transactions_id AS fact_transactions_id,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     {{ ref(
         'silver__transactions'

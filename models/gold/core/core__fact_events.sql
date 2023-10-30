@@ -18,10 +18,9 @@ SELECT
     account_address,
     creation_number,
     sequence_number,
-    _ID,
-    _INSERTED_TIMESTAMP,
-    _MD,
-    invocation_id
+    events_id AS fact_events_id,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     {{ ref(
         'silver__events'

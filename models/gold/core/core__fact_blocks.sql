@@ -9,10 +9,9 @@ SELECT
     first_version,
     last_version,
     tx_count_from_versions AS tx_count,
-    _ID,
-    _INSERTED_TIMESTAMP,
-    _MD,
-    invocation_id
+    blocks_id AS fact_blocks_id,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     {{ ref(
         'silver__blocks'
