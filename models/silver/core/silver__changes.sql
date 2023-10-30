@@ -11,6 +11,8 @@ SELECT
     A.block_number,
     A.block_timestamp,
     A.tx_hash,
+    version,
+    success,
     A.tx_type,
     b.index AS change_index,
     b.value :data :data AS change_data,
