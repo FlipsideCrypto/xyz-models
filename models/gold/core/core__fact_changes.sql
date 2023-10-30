@@ -5,7 +5,9 @@
 SELECT
     block_number,
     block_timestamp,
+    version,
     tx_hash,
+    success,
     tx_type,
     change_index,
     change_data,

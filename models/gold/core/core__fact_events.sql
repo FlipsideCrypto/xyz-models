@@ -8,7 +8,7 @@ SELECT
     version,
     tx_hash,
     success,
-    tx_TYPE,
+    tx_type,
     event_index,
     event_type,
     event_address,

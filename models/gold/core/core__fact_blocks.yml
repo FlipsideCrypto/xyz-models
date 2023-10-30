@@ -1,0 +1,6 @@
+version: 2
+models:
+  - name: core__fact_blocks
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: FACT_BLOCKS_ID
