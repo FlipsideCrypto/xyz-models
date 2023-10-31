@@ -23,3 +23,9 @@ sources:
     schema: silver
     tables:
       - name: number_sequence
+
+  - name: bitcoin_bronze
+    database: bitcoin
+    schema: bronze
+    tables:
+      - name: entity_clusters

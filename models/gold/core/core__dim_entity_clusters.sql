@@ -8,4 +8,4 @@ SELECT
   address_group,
   project_name
 FROM
-  {{ ref('silver__entity_cluster_btc') }}
+  {{ ref('silver__full_entity_clusters') }}
