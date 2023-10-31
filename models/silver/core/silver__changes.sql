@@ -30,17 +30,7 @@ SELECT
         '::',
         2
     ) :: STRING AS change_module,
-    SUBSTRING(
-        inner_change_type,
-        CHARINDEX(
-            '::',
-            inner_change_type,
-            CHARINDEX(
-                '::',
-                inner_change_type
-            ) + 1
-        ) + 2
-    ) AS change_resource,
+    SUBSTRING(inner_change_type, len(change_address) + len(change_module) + 5) AS change_resource,
     b.value :key :: STRING AS key,
     b.value :value :: STRING AS VALUE,
     b.value :state_key_hash :: STRING AS state_key_hash,
