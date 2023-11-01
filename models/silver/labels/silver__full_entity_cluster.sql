@@ -6,6 +6,10 @@
   post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
+
+{% if is_incremental() %}
+
+{% else %}
 SELECT
     address,
     group_id as address_group,
@@ -14,3 +18,4 @@ SELECT
 FROM
     {{ source("bitcoin_bronze", "entity_clusters") }}
 
+{% endif %}

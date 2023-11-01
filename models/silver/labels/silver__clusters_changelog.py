@@ -10,7 +10,8 @@ def model(dbt, session):
         materialized="table",
         packages=["networkx"],
         unique_key="ADDRESS",
-        tags=['entity_cluster']
+        tags=['entity_cluster'],
+        enabled=False
     )
 
     # final_btc_clusters = dbt.source("bitcoin_bronze", "entity_clusters")
