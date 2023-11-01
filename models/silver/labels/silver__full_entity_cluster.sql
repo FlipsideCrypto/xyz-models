@@ -6,16 +6,23 @@
   post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
+SELECT
+  address,
+  group_id AS address_group,
+  project_name,
+  _inserted_timestamp
+FROM
+  {{ source(
+    "bitcoin_bronze",
+    "entity_clusters"
+  ) }}
 
 {% if is_incremental() %}
-
-{% else %}
-SELECT
-    address,
-    group_id as address_group,
-    project_name,
-    _inserted_timestamp
-FROM
-    {{ source("bitcoin_bronze", "entity_clusters") }}
-
+WHERE
+  _inserted_timestamp > (
+    SELECT
+      MAX(_inserted_timestamp)
+    FROM
+      {{ this }}
+  )
 {% endif %}
