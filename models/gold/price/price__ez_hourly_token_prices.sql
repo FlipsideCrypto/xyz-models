@@ -5,7 +5,7 @@
 
 SELECT
     HOUR,
-    price,
+    CLOSE AS price,
     provider
 FROM
     {{ ref('silver__price_all_providers_hourly') }}

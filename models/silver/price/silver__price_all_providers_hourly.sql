@@ -9,7 +9,10 @@ WITH coinmarketcap AS (
 
     SELECT
         recorded_hour AS HOUR,
-        CLOSE AS price,
+        OPEN,
+        high,
+        low,
+        CLOSE,
         provider,
         _inserted_timestamp
     FROM
@@ -28,7 +31,10 @@ WHERE
 coingecko AS (
     SELECT
         recorded_hour AS HOUR,
-        CLOSE AS price,
+        OPEN,
+        high,
+        low,
+        CLOSE,
         provider,
         _inserted_timestamp
     FROM
@@ -47,7 +53,10 @@ WHERE
 coinpaprika AS (
     SELECT
         recorded_hour AS HOUR,
-        CLOSE AS price,
+        OPEN,
+        high,
+        low,
+        CLOSE,
         provider,
         _inserted_timestamp
     FROM
@@ -84,7 +93,10 @@ SELECT
         ['hour', 'provider']
     ) }} AS id,
     HOUR,
-    price,
+    OPEN,
+    high,
+    low,
+    CLOSE,
     provider,
     CASE
         WHEN provider = 'coingecko' THEN 1
