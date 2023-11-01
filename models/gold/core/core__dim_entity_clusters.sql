@@ -5,7 +5,7 @@
 
 SELECT
   address,
-  group_id,
+  address_group,
   project_name
 FROM
   {{ ref('silver__full_entity_cluster') }}

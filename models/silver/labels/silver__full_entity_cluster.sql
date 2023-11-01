@@ -8,7 +8,7 @@
 
 SELECT
     address,
-    group_id,
+    group_id as address_group,
     project_name,
     _inserted_timestamp
 FROM

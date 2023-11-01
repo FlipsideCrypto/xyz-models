@@ -10,7 +10,7 @@ models:
         tests:
           - unique
           - not_null
-      - name: group_id
+      - name: address_group
         description: An arbitrary group number that identifies addresses within the same group. Group number can change, avoid referencing a specific group number.  
         tests:
           - not_null
