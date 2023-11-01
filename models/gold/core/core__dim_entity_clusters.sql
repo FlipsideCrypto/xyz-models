@@ -8,4 +8,4 @@ SELECT
   group_id,
   project_name
 FROM
-  {{ ref('silver__full_entity_clusters') }}
+  {{ ref('silver__full_entity_cluster') }}

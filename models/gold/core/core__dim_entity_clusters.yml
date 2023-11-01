@@ -10,11 +10,9 @@ models:
         tests:
           - unique
           - not_null
-      - name: address_group
+      - name: group_id
         description: An arbitrary group number that identifies addresses within the same group. Group number can change, avoid referencing a specific group number.  
         tests:
           - not_null
       - name: project_name
         description: A label for each group. Only available if an address within a group is labeled. 
-        tests:
-          - not_null

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver__full_entity_clusters
+  - name: silver__clusters_changelog
     description: Common Spend Entity Clusters for BTC addresses
 
     columns:

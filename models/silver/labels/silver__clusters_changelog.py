@@ -13,6 +13,6 @@ def model(dbt, session):
         tags=['entity_cluster']
     )
 
-    final_btc_clusters = dbt.source("bitcoin_bronze", "entity_clusters")
+    # final_btc_clusters = dbt.source("bitcoin_bronze", "entity_clusters")
 
-    return final_btc_clusters
+    return ''

@@ -1,0 +1,23 @@
+version: 2
+models:
+  - name: silver__full_entity_cluster
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - address
+
+    columns:
+      - name: ADDRESS
+        tests:
+          - not_null
+              
+      - name: group_id
+        tests:
+          - not_null
+
+      - name: project_name
+
+      - name: _inserted_timestamp
+        tests:
+          - not_null
+
