@@ -2,3 +2,18 @@ version: 2
 models:
   - name: price__fact_hourly_token_prices
     description: A comprehensive fact table holding provider and hourly token prices for Bitcoin.
+
+    columns:
+      - name: HOUR
+        description: "{{ doc('hour') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: PRICE
+        description: "{{ doc('price') }}"
+        tests:
+          - not_null
+
+      - name: PROVIDER
+        description: "{{ doc('provider') }}"

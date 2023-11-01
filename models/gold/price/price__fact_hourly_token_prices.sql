@@ -6,39 +6,24 @@
 WITH coinmarketcap AS (
 
     SELECT
-        recorded_hour,
-        OPEN,
-        high,
-        low,
-        CLOSE,
-        volume,
-        market_cap,
+        recorded_hour as hour,
+        CLOSE as price,
         provider
     FROM
         {{ ref('silver__price_coinmarketcap_hourly') }}
 ),
 coingecko AS (
     SELECT
-        recorded_hour,
-        OPEN,
-        high,
-        low,
-        CLOSE,
-        NULL AS volume,
-        NULL AS market_cap,
+        recorded_hour as hour,
+        CLOSE as price,
         provider
     FROM
         {{ ref('silver__price_coingecko_hourly') }}
 ),
 coinpaprika AS (
     SELECT
-        recorded_hour,
-        OPEN,
-        high,
-        low,
-        CLOSE,
-        NULL AS volume,
-        NULL AS market_cap,
+        recorded_hour as hour,
+        CLOSE as price,
         provider
     FROM
         {{ ref('silver__price_coinpaprika_hourly') }}
