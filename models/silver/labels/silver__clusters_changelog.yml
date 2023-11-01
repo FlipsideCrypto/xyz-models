@@ -16,8 +16,6 @@ models:
           - not_null
       - name: project_name
         description: A label for each group. Only available if an address within a group is labeled. 
-        tests:
-          - not_null
       - name: _inserted_timestamp
         description: Data insert date. 
         tests:
