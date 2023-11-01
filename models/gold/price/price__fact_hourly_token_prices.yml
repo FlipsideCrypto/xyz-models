@@ -1,0 +1,4 @@
+version: 2
+models:
+  - name: price__fact_hourly_token_prices
+    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin.

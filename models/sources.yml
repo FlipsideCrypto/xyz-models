@@ -23,3 +23,11 @@ sources:
     schema: silver
     tables:
       - name: number_sequence
+      - name: hourly_prices_coin_market_cap
+      - name: hourly_prices_coin_gecko
+
+  - name: streamline_crosschain
+    database: streamline
+    schema: crosschain
+    tables:
+      - name: coin_paprika_btc
