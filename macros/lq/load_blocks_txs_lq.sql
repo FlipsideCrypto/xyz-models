@@ -36,12 +36,12 @@ INSERT INTO
                 ORDER BY
                     1 DESC
                 LIMIT
-                    100
+                    75
             )
     ), results AS (
         SELECT
             block_height,
-            ethereum.streamline.udf_api(
+            live.udf_api(
                 'GET',
                 calls,
                 OBJECT_CONSTRUCT(
