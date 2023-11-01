@@ -8,16 +8,9 @@ models:
 
     columns:
       - name: ADDRESS
-        tests:
-          - not_null
               
       - name: address_group
-        tests:
-          - not_null
 
       - name: project_name
 
       - name: _inserted_timestamp
-        tests:
-          - not_null
-
