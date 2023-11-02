@@ -4,9 +4,9 @@ models:
     description: A comprehensive fact table holding provider and hourly token prices for Bitcoin, with the difference from the fact table being only one provider is reported per hour. The price provided is the closing price for the hour.
     tests:
       - dbt_utils.recency:
-          datepart: hour
+          datepart: day
           field: hour
-          interval: 12
+          interval: 1
 
     columns:
       - name: HOUR

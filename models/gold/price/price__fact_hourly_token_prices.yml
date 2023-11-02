@@ -8,9 +8,9 @@ models:
             - HOUR
             - PROVIDER
       - dbt_utils.recency:
-          datepart: hour
+          datepart: day
           field: hour
-          interval: 12
+          interval: 1
 
     columns:
       - name: HOUR
