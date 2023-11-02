@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: silver__price_coinpaprika_hourly
+    description: Hourly historical prices provided by Coinpaprika. OHLC are calculated based on a data pull with 5 minute resolution.
+
+    columns:
+      - name: recorded_hour
+        description: "{{ doc('hour') }}"
+        tests:
+          - unique
+          - not_null
+
+      - name: OPEN
+        description: "{{ doc('open') }}"
+        tests:
+          - not_null
+
+      - name: HIGH
+        description: "{{ doc('high') }}"
+        tests:
+          - not_null
+      
+      - name: LOW
+        description: "{{ doc('low') }}"
+        tests:
+          - not_null
+        
+      - name: CLOSE
+        description: "{{ doc('close') }}"
+        tests:
+          - not_null
+      
+      - name: _inserted_timestamp
+
+      - name: provider
+        description: "{{ doc('provider') }}"
+        tests:
+          - not_null
