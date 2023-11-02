@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = 'recorded_hour',
     cluster_by = ['recorded_hour ::DATE'],
-    tags = ['prices']
+    tags = ['prices', 'core']
 ) }}
 
 WITH prices AS (

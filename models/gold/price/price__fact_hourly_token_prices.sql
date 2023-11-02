@@ -1,11 +1,14 @@
 {{ config(
     materialized = 'view',
-    tags = ['core', 'prices']
+    tags = ['prices', 'core']
 ) }}
 
 SELECT
-    HOUR,
-    CLOSE AS price,
+    hour,
+    open,
+    high,
+    low,
+    close,
     provider
 FROM
     {{ ref('silver__price_all_providers_hourly') }}

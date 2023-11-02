@@ -3,7 +3,7 @@
     unique_key = 'recorded_hour',
     incremental_strategy='delete+insert',
     cluster_by = ['recorded_hour ::DATE'],
-    tags = ['prices']
+    tags = ['prices', 'core']
 ) }}
 
 WITH prices AS (
@@ -33,6 +33,7 @@ prices_hourly AS (
             'hour',
             TIMESTAMP
         ) :: timestamp_ntz AS recorded_hour,
+        TIMESTAMP,
         price_usd
     FROM
         prices
@@ -49,17 +50,17 @@ aggregated AS (
 ),
 windowed AS (
     SELECT
-        recorded_hour,
+        DISTINCT recorded_hour,
         FIRST_VALUE(price_usd) over (
             PARTITION BY recorded_hour
             ORDER BY
-                recorded_hour ASC rows BETWEEN unbounded preceding
+                TIMESTAMP ASC rows BETWEEN unbounded preceding
                 AND unbounded following
         ) AS OPEN,
         LAST_VALUE(price_usd) over (
             PARTITION BY recorded_hour
             ORDER BY
-                recorded_hour ASC rows BETWEEN unbounded preceding
+                TIMESTAMP ASC rows BETWEEN unbounded preceding
                 AND unbounded following
         ) AS CLOSE
     FROM

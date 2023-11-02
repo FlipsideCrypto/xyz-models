@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: price__ez_hourly_token_prices
-    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin, with the difference from the fact table being only one provider is reported per hour.
+    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin, with the difference from the fact table being only one provider is reported per hour. The price provided is the closing price for the hour.
 
     columns:
       - name: HOUR

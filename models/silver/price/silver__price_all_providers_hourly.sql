@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = 'id',
     cluster_by = ['hour::DATE'],
-    tags = ['core', 'prices']
+    tags = ['prices', 'core']
 ) }}
 
 WITH coinmarketcap AS (

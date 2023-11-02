@@ -1,17 +1,13 @@
 version: 2
 models:
-  - name: price__fact_hourly_token_prices
-    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - HOUR
-            - PROVIDER
+  - name: silver__price_coingecko_hourly
+    description: Hourly historical prices provided by Coingecko.
 
     columns:
-      - name: HOUR
+      - name: recorded_hour
         description: "{{ doc('hour') }}"
         tests:
+          - unique
           - not_null
 
       - name: OPEN
@@ -23,16 +19,20 @@ models:
         description: "{{ doc('high') }}"
         tests:
           - not_null
-
+      
       - name: LOW
         description: "{{ doc('low') }}"
         tests:
           - not_null
-
+        
       - name: CLOSE
         description: "{{ doc('close') }}"
         tests:
           - not_null
 
-      - name: PROVIDER
+      - name: _inserted_timestamp
+
+      - name: provider
         description: "{{ doc('provider') }}"
+        tests:
+          - not_null
