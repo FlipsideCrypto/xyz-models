@@ -28,8 +28,16 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_inputs](#!/model/model.bitcoin_models.core__fact_inputs)
 - [fact_outputs](#!/model/model.bitcoin_models.core__fact_outputs)
 
-**Convenience Tables:**
- - [ez_miner_rewards](#!/model/model.bitcoin_models.core__ez_miner_rewards)
+**Dimensional Tables:**
+ - [dim_entity_clusters](#!/model/model.bitcoin_models.core__dim_entity_clusters)
+ - [dim_labels](#!/model/model.bitcoin_models.core__dim_labels)
+
+### Governance Schema
+- [ez_miner_rewards](#!/model/model.bitcoin_models.gov__ez_miner_rewards)
+
+### Price Schema
+- [fact_hourly_token_prices](#!/model/model.bitcoin_models.price__fact_hourly_token_prices)
+- [ez_hourly_token_prices](#!/model/model.bitcoin_models.price__ez_hourly_token_prices)
 
 ## **Data Model Overview**
 

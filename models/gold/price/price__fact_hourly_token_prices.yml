@@ -7,6 +7,10 @@ models:
           combination_of_columns:
             - HOUR
             - PROVIDER
+      - dbt_utils.recency:
+          datepart: hour
+          field: hour
+          interval: 12
 
     columns:
       - name: HOUR
