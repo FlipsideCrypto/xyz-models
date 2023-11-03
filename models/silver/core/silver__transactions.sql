@@ -3,7 +3,8 @@
   unique_key = "tx_hash",
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
-   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','tx_type']
+  cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','tx_type'],
+  tags = ['core']
 ) }}
 
 SELECT
@@ -12,6 +13,8 @@ SELECT
       DATA :data :block_timestamp :: STRING
     ) AS block_timestamp,
     b.value :hash :: STRING AS tx_hash,
+    b.value :version :: INT AS version,
+    b.value :success :: BOOLEAN AS success,
     b.value :type :: STRING AS tx_type,
     -- DATA :data :block_height :: INT AS block_height,
     b.value :accumulator_root_hash :: STRING AS accumulator_root_hash,
@@ -32,10 +35,8 @@ SELECT
     b.value :sender :: STRING AS sender, --only ut
     b.value :signature :: STRING AS signature, --only ut
     b.value :state_change_hash :: STRING AS state_change_hash,
-    b.value :state_checkpoint_hash :: STRING AS state_checkpoint_hash, --only type state_checkpoint_transaction (sch) is not null
-    b.value :success :: BOOLEAN AS success,
-    b.value :timestamp :: bigint AS TIMESTAMP, -- same as block_timestamp
-    b.value :version :: INT AS version,
+    b.value :state_checkpoint_hash :: STRING AS state_checkpoint_hash, --only type state_checkpoint_transaction (sch) is not null    
+    b.value :timestamp :: bigint AS TIMESTAMP, -- same as block_timestamp    
     b.value :vm_status :: STRING AS vm_status, --same as succeeded
      {{ dbt_utils.generate_surrogate_key(
         ['tx_hash']

@@ -1,6 +1,26 @@
 version: 2
 models:
   - name: core__fact_blocks
-    tests:
-      - dbt_constraints.primary_key:
-          column_name: FACT_BLOCKS_ID
+    description: '{{ doc("core__fact_blocks") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: BLOCK_HASH
+        description: '{{ doc("block_hash") }}'   
+      - name: FIRST_VERSION
+        description: '{{ doc("first_version") }}'   
+      - name: LAST_VERSION
+        description: '{{ doc("last_version") }}'   
+      - name: TX_COUNT
+        description: '{{ doc("tx_count") }}'   
+      - name: FACT_BLOCKS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'  
+
+

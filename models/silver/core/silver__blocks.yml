@@ -1,0 +1,50 @@
+version: 2
+models:
+  - name: silver__blocks
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: BLOCKS_ID
+
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+      - name: BLOCK_TIMESTAMP_NUM
+        tests:
+          - not_null
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+      - name: BLOCK_HASH
+        tests:
+          - not_null 
+      - name: FIRST_VERSION
+        tests:
+          - not_null
+      - name: LAST_VERSION
+        tests:
+          - not_null
+      - name: TX_COUNT_FROM_TRANSACTIONS_ARRAY
+        tests:
+          - not_null
+      - name: TX_COUNT_FROM_VERSIONS
+        tests:
+          - not_null
+      - name: BLOCKS_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - name: not_null_silver__blocks_INSERTED_TIMESTAMP_
+            test_name: not_null
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__blocks_INVOCATION_ID
+            test_name: not_null
