@@ -3,9 +3,9 @@ run-name: dbt_run_scheduled
 
 on:
   workflow_dispatch:
-  schedule:
-    # Runs 8 minutes after each dbt job kicks off (which is set to 15 min interval) (see https://crontab.guru)
-    - cron: '8,23,38,53 * * * *'
+  # schedule:
+  #   # Runs 8 minutes after each dbt job kicks off (which is set to 15 min interval) (see https://crontab.guru)
+  #   - cron: '8,23,38,53 * * * *'
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
@@ -28,7 +28,7 @@ jobs:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
       dbt_command: >
-        dbt run -s tag:load tag:core
+        dbt run -s "bitcoin_models,tag:load" "bitcoin_models,tag:core"
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit 

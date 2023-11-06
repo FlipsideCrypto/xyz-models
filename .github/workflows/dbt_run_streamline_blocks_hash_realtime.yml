@@ -3,9 +3,9 @@ run-name: dbt_run_streamline_blocks_hash_realtime
 
 on:
   workflow_dispatch:
-  schedule:
-    # Runs "every 10 mins" (see https://crontab.guru)
-    - cron: '*/10 * * * *'
+  # schedule:
+  #   # Runs "every 10 mins" (see https://crontab.guru)
+  #   - cron: '*/10 * * * *'
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"

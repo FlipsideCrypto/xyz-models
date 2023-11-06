@@ -36,3 +36,8 @@ sources:
     schema: bronze
     tables:
       - name: entity_clusters
+  - name: github_actions
+    database: bitcoin
+    schema: github_actions
+    tables:
+      - name: workflows
