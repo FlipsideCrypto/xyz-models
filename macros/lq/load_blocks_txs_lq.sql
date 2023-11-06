@@ -20,7 +20,7 @@ INSERT INTO
     ),
     calls AS (
         SELECT
-            'https://twilight-silent-gas.aptos-mainnet.quiknode.pro/f64d711fb5881ce64cf18a31f796885050178031/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
+            'https://twilight-silent-gas.aptos-mainnet.quiknode.pro/key/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
             block_height
         FROM
             (
