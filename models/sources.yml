@@ -48,3 +48,8 @@ sources:
     schema: core
     tables:
       - name: fact_inputs
+  - name: github_actions
+    database: bitcoin
+    schema: github_actions
+    tables:
+      - name: workflows
