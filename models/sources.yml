@@ -24,25 +24,16 @@ sources:
       - name: number_sequence
       - name: hourly_prices_coin_market_cap
       - name: hourly_prices_coin_gecko
-
   - name: streamline_crosschain
     database: streamline
     schema: crosschain
     tables:
       - name: coin_paprika_btc
-
   - name: bitcoin_bronze
     database: bitcoin
     schema: bronze
     tables:
       - name: entity_clusters
-  
-  - name: bitcoin_silver
-    database: bitcoin
-    schema: silver
-    tables:
-      - name: clusters_changelog
-
   - name: bitcoin_core
     database: bitcoin
     schema: core
@@ -53,15 +44,3 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
-  
-  - name: bitcoin_silver
-    database: bitcoin
-    schema: silver
-    tables:
-      - name: clusters_changelog
-
-  - name: bitcoin_core
-    database: bitcoin
-    schema: core
-    tables:
-      - name: fact_inputs
