@@ -53,3 +53,15 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  
+  - name: bitcoin_silver
+    database: bitcoin
+    schema: silver
+    tables:
+      - name: clusters_changelog
+
+  - name: bitcoin_core
+    database: bitcoin
+    schema: core
+    tables:
+      - name: fact_inputs
