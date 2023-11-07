@@ -1,8 +1,10 @@
 version: 2
-
 models:
-  - name: silver__clusters_changelog
-    description: Common Spend Entity Clusters for BTC addresses
+  - name: silver__clusters_changelog_store
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - address
 
     columns:
       - name: clusters
@@ -15,3 +17,5 @@ models:
         description: An arbitrary group number that identifies addresses within the same group. This is the new group number that we will be changing the addresses to. 
         tests:
           - not_null
+      - name: _inserted_date
+        description: Date of changelog run 
