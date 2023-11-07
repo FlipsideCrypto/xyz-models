@@ -1,0 +1,62 @@
+version: 2
+models:
+  - name: silver__changes
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: CHANGES_ID
+          
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: VERSION
+        tests:
+          - not_null
+      - name: SUCCESS
+        tests:
+          - not_null
+      - name: TX_TYPE
+        tests:
+          - not_null
+      - name: CHANGE_INDEX
+        tests:
+          - not_null
+      - name: CHANGE_DATA
+      - name: CHANGE_TYPE
+        tests:
+          - not_null
+      - name: ADDRESS
+      - name: HANDLE
+      - name: INNER_CHANGE_TYPE      
+      - name: CHANGE_ADDRESS
+      - name: CHANGE_MODULE
+      - name: CHANGE_RESOURCE
+      - name: KEY
+      - name: VALUE
+      - name: STATE_KEY_HASH
+        tests:
+          - not_null
+      - name: CHANGES_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - name: not_null_silver__changes_INSERTED_TIMESTAMP_
+            test_name: not_null
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__changes_INVOCATION_ID
+            test_name: not_null

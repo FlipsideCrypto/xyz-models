@@ -1,0 +1,79 @@
+version: 2
+models:
+  - name: silver__transactions
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: TRANSACTIONS_ID
+
+
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: VERSION
+        tests:
+          - not_null
+      - name: SUCCESS
+        tests:
+          - not_null
+      - name: TX_TYPE
+        tests:
+          - not_null
+      - name: ACCUMULATOR_ROOT_HASH
+        tests:
+          - not_null
+      - name: CHANGES
+      - name: EPOCH
+      - name: EVENT_ROOT_HASH
+        tests:
+          - not_null
+      - name: EVENTS
+      - name: EXPIRATION_TIMESTAMP_SECS   
+      - name: FAILED_PROPOSER_INDICES
+      - name: GAS_UNIT_PRICE
+      - name: GAS_USED
+        tests:
+          - not_null
+      - name: ID
+      - name: MAX_GAS_AMOUNT    
+      - name: PAYLOAD
+      - name: PREVIOUS_BLOCK_VOTES_BITVEC
+      - name: PROPOSER
+      - name: ROUND
+      - name: SENDER
+      - name: SIGNATURE
+      - name: STATE_CHANGE_HASH
+        tests:
+          - not_null
+      - name: STATE_CHECKPOINT_HASH
+      - name: TIMESTAMP
+        tests:
+          - not_null
+      - name: VM_STATUS 
+        tests:
+          - not_null
+      - name: TRANSACTIONS_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - name: not_null_silver__transactions_INSERTED_TIMESTAMP_
+            test_name: not_null
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__transactions_INVOCATION_ID
+            test_name: not_null
+      

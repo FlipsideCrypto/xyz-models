@@ -3,15 +3,18 @@
     unique_key = "block_number",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE']
+    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+    tags = ['core']
 ) }}
 
 SELECT
     block_height AS block_number,
     DATA :data :block_hash :: STRING AS block_hash,
     -- DATA :data :block_height :: INT AS block_height,
-    DATA :data :block_timestamp :: STRING AS block_timestamp_num,
-    TO_TIMESTAMP(block_timestamp_num) AS block_timestamp,
+    DATA :data :block_timestamp :: bigint AS block_timestamp_num,
+    TO_TIMESTAMP(
+        block_timestamp_num :: STRING
+    ) AS block_timestamp,
     DATA :data :first_version :: bigint AS first_version,
     DATA :data :last_version :: bigint AS last_version,
     ARRAY_SIZE(

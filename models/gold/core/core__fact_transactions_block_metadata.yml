@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: core__fact_transactions_block_metadata
+    description: '{{ doc("core__fact_transactions_block_metadata") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: TX_TYPE
+        description: '{{ doc("tx_type") }}'   
+      - name: EPOCH
+        description: '{{ doc("epoch") }}'   
+      - name: EVENTS
+        description: '{{ doc("events") }}'  
+      - name: CHANGES
+        description: '{{ doc("changes") }}'   
+      - name: FAILED_PROPOSER_INDICES
+      - name: ID
+      - name: PREVIOUS_BLOCK_VOTES_BITVEC
+      - name: PROPOSER
+        description: '{{ doc("proposer") }}'   
+      - name: ROUND
+        description: '{{ doc("round") }}'  
+      - name: VM_STATUS 
+        description: '{{ doc("vm_status") }}'   
+      - name: STATE_CHANGE_HASH
+      - name: ACCUMULATOR_ROOT_HASH
+        description: '{{ doc("accumulator_root_hash") }}'  
+      - name: EVENT_ROOT_HASH
+        description: '{{ doc("event_root_hash") }}' 
+      - name: FACT_TRANSACTIONS_BLOCK_METADATA_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   
