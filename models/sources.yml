@@ -8,9 +8,13 @@ sources:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
-sources:
   - name: aptos_bronze
     database: aptos
     schema: bronze
     tables:
       - name: lq_blocks_txs
+  - name: github_actions
+    database: aptos
+    schema: github_actions
+    tables:
+      - name: workflows

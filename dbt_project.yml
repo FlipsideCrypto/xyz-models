@@ -46,6 +46,7 @@ vars:
   STREAMLINE_INVOKE_STREAMS: False
   STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
   UPDATE_UDFS_AND_SPS: False
+  START_GHA_TASKS: False
 
 tests:
   +store_failures: true # all tests
@@ -60,7 +61,7 @@ on-run-end:
 dispatch:
   - macro_namespace: dbt
     search_order:
-      - sei-models
+      - aptos-models
       - dbt_snowflake_query_tags
       - dbt
 
