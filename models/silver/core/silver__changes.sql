@@ -15,6 +15,7 @@ SELECT
     version,
     success,
     A.tx_type,
+    A.payload_function,
     b.index AS change_index,
     b.value :data :data AS change_data,
     b.value :type :: STRING AS change_type,

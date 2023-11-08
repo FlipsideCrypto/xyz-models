@@ -22,6 +22,8 @@ models:
         description: '{{ doc("signature") }}'   
       - name: PAYLOAD
         description: '{{ doc("payload") }}'  
+      - name: PAYLOAD_FUNCTION
+        description: '{{ doc("payload_function") }}' 
       - name: CHANGES
         description: '{{ doc("changes") }}'   
       - name: EVENTS

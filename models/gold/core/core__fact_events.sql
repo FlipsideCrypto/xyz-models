@@ -10,6 +10,7 @@ SELECT
     tx_hash,
     success,
     tx_type,
+    payload_function,
     event_index,
     event_type,
     event_address,

@@ -15,6 +15,7 @@ SELECT
     version,
     success,
     A.tx_type,
+    A.payload_function,
     b.index AS event_index,
     b.value :type :: STRING AS event_type,
     SPLIT_PART(

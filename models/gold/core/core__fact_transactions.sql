@@ -13,6 +13,7 @@ SELECT
     sender,
     signature,
     payload,
+    payload_function,
     changes,
     events,
     gas_unit_price,

@@ -29,6 +29,7 @@ SELECT
     b.value :id :: STRING AS id, -- only bmt
     b.value :max_gas_amount :: bigint AS max_gas_amount, -- only ut
     b.value :payload AS payload, -- only ut
+    b.value :payload:function::STRING AS payload_function, -- only ut
     b.value :previous_block_votes_bitvec AS previous_block_votes_bitvec, --only bmt
     b.value :proposer :: STRING AS proposer, --only bmt
     b.value :round :: INT AS ROUND, --only bmt

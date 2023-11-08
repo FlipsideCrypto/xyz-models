@@ -10,6 +10,7 @@ SELECT
     tx_hash,
     success,
     tx_type,
+    payload_function,
     change_index,
     change_data,
     change_type,

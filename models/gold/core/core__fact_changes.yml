@@ -15,7 +15,9 @@ models:
       - name: SUCCESS
         description: '{{ doc("success") }}'   
       - name: TX_TYPE
-        description: '{{ doc("tx_type") }}'   
+        description: '{{ doc("tx_type") }}'  
+      - name: PAYLOAD_FUNCTION
+        description: '{{ doc("payload_function") }}' 
       - name: CHANGE_INDEX
         description: '{{ doc("change_index") }}'  
       - name: CHANGE_DATA
