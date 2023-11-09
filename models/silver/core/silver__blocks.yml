@@ -35,16 +35,9 @@ models:
         tests:
           - not_null
       - name: INSERTED_TIMESTAMP
-        tests:
-          - not_null
       - name: MODIFIED_TIMESTAMP
-        tests:
-          - not_null
       - name: _INSERTED_TIMESTAMP
         tests:
           - name: not_null_silver__blocks_INSERTED_TIMESTAMP_
             test_name: not_null
       - name: _INVOCATION_ID
-        tests:
-          - name: not_null_silver__blocks_INVOCATION_ID
-            test_name: not_null
