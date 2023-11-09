@@ -13,7 +13,7 @@ WITH prices AS (
     FROM
         {{ ref('price__fact_hourly_token_prices') }}
     {% if not var('FULL_TEST', False) %}
-    WHERE hour >= SYSDATE() - interval '3 days'
+    WHERE hour >= SYSDATE() - interval '24 hours'
     {% endif %}
 )
 SELECT
