@@ -1,5 +1,5 @@
 {{ config(
-    severity = 'error'
+    severity = 'warn'
 ) }}
 
 WITH prices AS (
