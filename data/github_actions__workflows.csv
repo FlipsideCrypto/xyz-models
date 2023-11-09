@@ -1,2 +1,2 @@
 workflow_name,workflow_schedule
-dbt_run_coininfo_backfill,"17 * * * *"
+dbt_run_backfill_generic,"17 * * * *"
