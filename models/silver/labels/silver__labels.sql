@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'address',
-    tags = ['core']
+    tags = ["core", "scheduled_non_core"]
 ) }}
 
 SELECT

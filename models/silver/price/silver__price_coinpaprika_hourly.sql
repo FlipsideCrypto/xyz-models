@@ -3,7 +3,7 @@
     unique_key = 'recorded_hour',
     incremental_strategy='delete+insert',
     cluster_by = ['recorded_hour ::DATE'],
-    tags = ['prices', 'core']
+    tags = ["prices", "core", "scheduled_non_core"]
 ) }}
 
 WITH prices AS (

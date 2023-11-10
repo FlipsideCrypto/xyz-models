@@ -4,7 +4,7 @@
     incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
     unique_key = 'tx_id',
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
-    tags = ["core"]
+    tags = ["core", "scheduled_core"]
 ) }}
 -- depends_on: {{ ref('silver__blocks') }}
 WITH bronze_transactions AS (

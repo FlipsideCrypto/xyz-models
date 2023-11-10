@@ -3,7 +3,7 @@
     unique_key = 'tx_id',
     incremental_strategy = 'delete+insert',
     cluster_by = ["_partition_by_block_id", "tx_id"],
-    tags = ["core"]
+    tags = ["core", "scheduled_core"]
 ) }}
 
 WITH blocks AS (
