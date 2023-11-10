@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
     cluster_by = ["block_number", "block_timestamp::DATE"],
-    tags = ["core", "ez"],
+    tags = ["core", "ez", "scheduled_non_core" ],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 

@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
     unique_key = 'input_id',
-    tags = ["core"],
+    tags = ["core", "scheduled_core"],
     cluster_by = ["_inserted_timestamp"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
