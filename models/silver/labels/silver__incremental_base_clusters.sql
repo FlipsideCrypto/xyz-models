@@ -15,12 +15,9 @@ WHERE
     SELECT
       pubkey_script_address
     FROM
-      {{ source(
-      "bitcoin_core",
-      "fact_inputs"
-    ) }}
+      {{ ref('silver__inputs_final') }}
     WHERE
-      block_timestamp > (
+      _inserted_timestamp > (
         SELECT
           MAX(_inserted_timestamp)
         FROM

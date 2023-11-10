@@ -3,27 +3,13 @@
     unique_key = "address",
     incremental_strategy = 'delete+insert',
     tags = ['snowflake', 'cluster', 'labels', 'entity_cluster'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    full_refresh = False
 ) }}
--- We do not want to full refresh this model
--- to full-refresh either include the variable allow_full_refresh: True to command or comment out below code
--- DO NOT FORMAT will break the full refresh code if formatted copy from below
--- {% if execute %}
---   {% if flags.FULL_REFRESH and var('allow_full_refresh', False) != True %}
---       {{ exceptions.raise_compiler_error("Full refresh is not allowed for this model unless the argument \"- -vars 'allow_full_refresh: True'\" is included in the dbt run command.") }}
---   {% endif %}
--- {% endif %}
-{% if execute %}
-    {% if flags.full_refresh and var(
-            'allow_full_refresh',
-            False
-        ) != True %}
-        {{ exceptions.raise_compiler_error("Full refresh is not allowed for this model unless the argument \"- -vars 'allow_full_refresh: True'\" is included in the dbt run command.") }}
-    {% endif %}
-{% endif %}
 
 {% if is_incremental() %}
 WITH merges AS (
+
     SELECT
         s1.value :: STRING AS address_group_old,
         "new_cluster_id" AS address_group_new
