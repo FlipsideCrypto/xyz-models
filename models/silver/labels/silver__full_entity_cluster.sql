@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "address",
+    unique_key = "full_entity_cluster_id",
     incremental_strategy = 'delete+insert',
     tags = ['snowflake', 'cluster', 'labels', 'entity_cluster'],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
@@ -105,7 +105,13 @@ SELECT
     DISTINCT A.address,
     A.address_group,
     b.project_name,
-    CURRENT_TIMESTAMP AS _inserted_timestamp
+    CURRENT_TIMESTAMP AS _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+            ['address']
+        ) }} AS full_entity_cluster_id,
+    CURRENT_TIMESTAMP AS modified_timestamp,
+    '{{ invocation_id }}' AS invocation_id
+
 FROM
     base A
     LEFT JOIN labs b

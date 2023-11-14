@@ -6,6 +6,9 @@
 SELECT
   address,
   address_group,
-  project_name
+  project_name,
+  _inserted_timestamp,
+  modified_timestamp,
+  full_entity_cluster_id as dim_entity_clusters_id
 FROM
   {{ ref('silver__full_entity_cluster') }}

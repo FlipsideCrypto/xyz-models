@@ -17,14 +17,23 @@ WHERE
     FROM
       {{ ref('silver__inputs_final') }}
     WHERE
-      _inserted_timestamp > (
-        SELECT
-          MAX(_inserted_timestamp)
-        FROM
-          {{ ref(
-            "silver__full_entity_cluster"
-          ) }}
-      )
+    _inserted_timestamp between (
+      SELECT
+        MAX(_inserted_timestamp)
+      FROM
+        {{ ref(
+          "silver__full_entity_cluster"
+        ) }}
+    )
+    and 
+    (
+      SELECT
+        DATEADD(HOUR, 12, MAX(_inserted_timestamp))
+      FROM
+        {{ ref(
+          "silver__full_entity_cluster"
+        ) }}
+    )
   )
 GROUP BY
   address_group

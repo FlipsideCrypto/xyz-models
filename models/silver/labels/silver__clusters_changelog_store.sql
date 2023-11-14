@@ -12,7 +12,7 @@ SELECT
     "addresses" AS addresses,
     "type" AS change_type,
     "new_cluster_id" AS new_cluster_id,
-    CURRENT_TIMESTAMP :: DATE AS _INSERTED_DATE
+    CURRENT_TIMESTAMP AS _INSERTED_DATE
 FROM
     {{ ref(
         "silver__clusters_changelog"
