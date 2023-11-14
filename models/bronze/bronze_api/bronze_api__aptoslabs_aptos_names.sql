@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    full_refresh = false
+    full_refresh = false,
+    tags = ['noncore']
 ) }}
 
 {% if is_incremental() %}
@@ -43,7 +44,6 @@ SELECT
     query,
     C.value :domain :: STRING AS domain,
     C.value :domain_with_suffix :: STRING AS domain_with_suffix,
-    C.value :creator_address :: STRING AS creator_address,
     C.value :expiration_timestamp :: datetime AS expiration_timestamp,
     C.value :is_active :: BOOLEAN AS is_active,
     C.value :is_primary :: BOOLEAN AS is_primary,
