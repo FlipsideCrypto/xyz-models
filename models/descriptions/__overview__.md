@@ -20,17 +20,20 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Core Tables (`aptos`.`CORE`.`<table_name>`)
 
 **Dimension Tables:**
+- [dim_aptos_names](#!/model/model.aptos.core__dim_aptos_names)
 - [dim_labels](#!/model/model.aptos.core__dim_labels)
 - [dim_tokens](#!/model/model.aptos.core__dim_tokens)
 
 
 **Fact Tables:**
 - [fact_blocks](#!/model/model.aptos.core__fact_blocks)
+- [fact_events](#!/model/model.aptos.core__fact_events)
+- [fact_changes](#!/model/model.aptos.core__fact_changes)
 - [fact_transactions](#!/model/model.aptos.core__fact_transactions)
 - [fact_transactions_block_metadata](#!/model/model.aptos.core__fact_transactions_block_metadata)
 - [fact_transactions_state_checkpoint](#!/model/model.aptos.core__fact_transactions_state_checkpoint)
-- [fact_events](#!/model/model.aptos.core__fact_events)
-- [fact_changes](#!/model/model.aptos.core__fact_changes)
+- [fact_transfers](#!/model/model.aptos.core__fact_transfers)
+
 
 
 **Convenience Tables:**
