@@ -121,7 +121,12 @@ SELECT
     address,
     group_id AS address_group,
     project_name,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+            ['address']
+        ) }} AS full_entity_cluster_id,
+    CURRENT_TIMESTAMP AS modified_timestamp,
+    '{{ invocation_id }}' AS invocation_id
 FROM
     {{ source(
         "bitcoin_bronze",
