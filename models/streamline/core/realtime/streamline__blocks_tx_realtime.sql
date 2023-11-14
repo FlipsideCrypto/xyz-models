@@ -23,14 +23,14 @@ calls AS (
     FROM
         (
             SELECT
-                block_height
+                block_number
             FROM
-                blocks
+                {{ ref('streamline__blocks') }}
             EXCEPT
             SELECT
                 block_number
             FROM
-                {{ ref('streamline__blocks') }}
+                {{ ref('streamline__complete_blocks_tx') }}
         )
 )
 SELECT
