@@ -7,16 +7,8 @@
     tags = ['streamline_core_realtime']
 ) }}
 
-WITH blocks AS (
+WITH calls AS (
 
-    SELECT
-        block_height
-    FROM
-        gen
-    ORDER BY
-        1 DESC
-),
-calls AS (
     SELECT
         '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
         block_height
