@@ -4,7 +4,7 @@
 ) }}
 
 {% if execute %}
-    {% set height = run_query('SELECT live.udf_api( ''GET'', ''https://twilight-silent-gas.aptos-mainnet.quiknode.pro/f64d711fb5881ce64cf18a31f796885050178031/v1'', OBJECT_CONSTRUCT( ''Content-Type'', ''application/json'' ),{} ) :data :block_height :: INT ') %}
+    {% set height = run_query('SELECT height from streamline.blocks_chainhead') %}
     {% set block_height = height.columns [0].values() [0] %}
 {% else %}
     {% set block_height = 0 %}
