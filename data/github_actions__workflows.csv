@@ -1,1 +1,2 @@
 workflow_name,workflow_schedule
+dbt_run_streamline_blocks_tx_realtime, "*/15 * * * *"

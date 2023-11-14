@@ -7,6 +7,9 @@
         {% do run_query(sql) %}
         {% if target.database != "APTOS_COMMUNITY_DEV" %}
             {% set sql %}
+            {{ create_udtf_get_base_table(
+            schema = "streamline"
+        ) }}
             {{ create_udf_bulk_json_rpc() }}
             {{ create_udf_bulk_rest_api() }}
 
