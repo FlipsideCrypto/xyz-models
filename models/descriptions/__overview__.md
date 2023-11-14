@@ -73,7 +73,7 @@ Note that you can also right-click on models to interactively filter and explore
 
 ### **More information**
 - [Flipside](https://flipsidecrypto.xyz/)
-- [Velocity](https://app.flipsidecrypto.com/velocity?nav=Discover)
+- [Data Studio](https://app.flipsidecrypto.com/edit)
 - [Tutorials](https://docs.flipsidecrypto.com/our-data/tutorials)
 - [Github](https://github.com/FlipsideCrypto/aptos-models)
 - [What is dbt?](https://docs.getdbt.com/docs/introduction)

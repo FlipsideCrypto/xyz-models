@@ -4,7 +4,7 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['_inserted_timestamp::DATE'],
-    tags = ['core']
+    tags = ['core','full_test']
 ) }}
 
 SELECT
