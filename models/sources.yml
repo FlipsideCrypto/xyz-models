@@ -8,6 +8,11 @@ sources:
       - name: dim_date_hours
       - name: dim_dates
       - name: dim_labels
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'aptos' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence
   - name: aptos_bronze
     database: aptos
     schema: bronze
@@ -18,3 +23,8 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  - name: bronze_streamline
+    database: streamline
+    schema: aptos
+    tables:
+      - name: blocks_tx
