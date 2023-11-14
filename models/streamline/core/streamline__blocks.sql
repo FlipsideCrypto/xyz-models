@@ -18,4 +18,4 @@ FROM
         'number_sequence'
     ) }}
 WHERE
-    _id >= {{ block_height }}
+    _id <= {{ block_height }}
