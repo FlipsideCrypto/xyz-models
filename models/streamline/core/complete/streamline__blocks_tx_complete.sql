@@ -9,7 +9,7 @@
 
 SELECT
     id,
-    block_number,
+    partition_key AS block_number,
     _inserted_timestamp
 FROM
 
@@ -20,12 +20,11 @@ WHERE
         SELECT
             COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
         FROM
-            {{ this }}
-    )
-{% else %}
-    {{ ref('bronze__streamline_FR_blocks_tx') }}
-{% endif %}
+            {{ this }})
+        {% else %}
+            {{ ref('bronze__streamline_FR_blocks_tx') }}
+        {% endif %}
 
-qualify(ROW_NUMBER() over (PARTITION BY id
-ORDER BY
-    _inserted_timestamp DESC)) = 1
+        qualify(ROW_NUMBER() over (PARTITION BY id
+        ORDER BY
+            _inserted_timestamp DESC)) = 1

@@ -23,3 +23,8 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  - name: bronze_streamline
+    database: streamline
+    schema: aptos
+    tables:
+      - name: blocks_tx
