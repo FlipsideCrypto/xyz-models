@@ -7,17 +7,8 @@
     tags = ['streamline_core_realtime']
 ) }}
 
-WITH gen AS (
+WITH blocks AS (
 
-    SELECT
-        ROW_NUMBER() over (
-            ORDER BY
-                SEQ4()
-        ) AS block_height
-    FROM
-        TABLE(GENERATOR(rowcount => 110000000))
-),
-blocks AS (
     SELECT
         block_height
     FROM
@@ -39,7 +30,7 @@ calls AS (
             SELECT
                 block_number
             FROM
-                {{ ref('streamline__complete_blocks_tx') }}
+                {{ ref('streamline__blocks') }}
         )
 )
 SELECT
