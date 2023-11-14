@@ -7,30 +7,22 @@
     tags = ['streamline_core_realtime']
 ) }}
 
-WITH blocks AS (
+WITH calls AS (
 
-    SELECT
-        block_height
-    FROM
-        gen
-    ORDER BY
-        1 DESC
-),
-calls AS (
     SELECT
         '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
         block_height
     FROM
         (
             SELECT
-                block_height
+                block_number
             FROM
-                blocks
+                {{ ref('streamline__blocks') }}
             EXCEPT
             SELECT
                 block_number
             FROM
-                {{ ref('streamline__blocks') }}
+                {{ ref('streamline__complete_blocks_tx') }}
         )
 )
 SELECT
