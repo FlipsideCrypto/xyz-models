@@ -18,7 +18,7 @@ FROM
 WHERE
     _inserted_timestamp >= (
         SELECT
-            MAX(_inserted_timestamp) _inserted_timestamp
+            COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
         FROM
             {{ this }}
     )
