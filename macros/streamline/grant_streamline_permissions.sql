@@ -2,12 +2,6 @@
 
 {% set db_name = project %}
 {% set dev_db_name = project + 'dev' %}
-{# {% set warehouse_name = 'dbt_cloud' %}
-{% set integration_name = 'aws_' + project + '_api' %}
-{% set dev_integration_name = 'aws_' + project + '_api_dev' %}
-{% set lambda_role = 'aws_lambda_' + project + '_api' %}
-{% set dbt_cloud_role = 'dbt_cloud_' + project %}
-{% set internal_dev_role = 'internal_dev' %} #}
 
 grant role {{ lambda_role }} to user {{ lambda_role }};
 grant role {{ internal_dev_role }} to role {{ lambda_role }};
