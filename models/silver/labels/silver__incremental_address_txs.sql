@@ -1,10 +1,17 @@
 {{ config(
   materialized = 'view',
-  tags = ['snowflake', 'cluster', 'labels', 'entity_cluster', 'incremental']
+  tags = ['entity_cluster_0']
 ) }}
 
-WITH base AS (
+WITH date_range AS (
 
+  SELECT
+    MAX(inserted_timestamp) AS max_inserted_timestamp,
+    MAX(inserted_timestamp) + INTERVAL '{{ var("INCREMENTAL_CLUSTER_INTERVAL", "24 hours") }}' AS max_inserted_timestamp_interval
+  FROM
+    {{ ref("silver__full_entity_cluster") }}
+),
+base AS (
   SELECT
     DISTINCT tx_id,
     pubkey_script_address AS input_address,
@@ -16,22 +23,17 @@ WITH base AS (
   FROM
     {{ ref('silver__inputs_final') }}
   WHERE
-    _inserted_timestamp between (
+    _inserted_timestamp BETWEEN (
       SELECT
-        MAX(_inserted_timestamp)
+        max_inserted_timestamp
       FROM
-        {{ ref(
-          "silver__full_entity_cluster"
-        ) }}
+        date_range
     )
-    and 
-    (
+    AND (
       SELECT
-        DATEADD(HOUR, 12, MAX(_inserted_timestamp))
+        max_inserted_timestamp_interval
       FROM
-        {{ ref(
-          "silver__full_entity_cluster"
-        ) }}
+        date_range
     )
 ),
 base2 AS (

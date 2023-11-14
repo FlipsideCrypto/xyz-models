@@ -10,7 +10,7 @@ def model(dbt, session):
         materialized="table",
         packages=["networkx"],
         unique_key="ADDRESS",
-        tags=['entity_cluster']
+        tags=['entity_cluster_0']
     )
 
 

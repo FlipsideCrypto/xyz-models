@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'view',
-  tags = ['snowflake', 'cluster', 'labels', 'entity_cluster', 'incremental']
+  tags = ['entity_cluster_0']
 ) }}
 
 SELECT

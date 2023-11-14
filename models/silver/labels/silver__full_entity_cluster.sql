@@ -1,15 +1,28 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "full_entity_cluster_id",
-    incremental_strategy = 'delete+insert',
-    tags = ['snowflake', 'cluster', 'labels', 'entity_cluster'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
-    full_refresh = False
+    incremental_strategy = 'merge',
+    merge_exclude_columns = ["inserted_timestamp"],
+    tags = ['entity_cluster'],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
 
 {% if is_incremental() %}
-WITH merges AS (
+WITH set_inserted_timestamp AS (
+    {% if var(
+            "INCREMENTAL_CLUSTER_BACKFILL",
+            False
+        ) %}
 
+        SELECT
+            MAX(inserted_timestamp) + INTERVAL '{{ var("INCREMENTAL_CLUSTER_INTERVAL", "24 hours") }}' AS inserted_timestamp
+        FROM
+            {{ this }}
+        {% else %}
+            SYSDATE() AS inserted_timestamp
+        {% endif %}
+),
+merges AS (
     SELECT
         s1.value :: STRING AS address_group_old,
         "new_cluster_id" AS address_group_new
@@ -102,26 +115,32 @@ labs AS (
         )
 )
 SELECT
-    DISTINCT A.address,
+    A.address,
     A.address_group,
     b.project_name,
-    CURRENT_TIMESTAMP AS _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
-            ['address']
-        ) }} AS full_entity_cluster_id,
-    CURRENT_TIMESTAMP AS modified_timestamp,
+        ['address']
+    ) }} AS full_entity_cluster_id,
+    ts.inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS invocation_id
-
 FROM
     base A
     LEFT JOIN labs b
     ON A.address_group = b.address_group
+    LEFT JOIN set_inserted_timestamp ts
+    ON 1 = 1
 {% else %}
 SELECT
     address,
     group_id AS address_group,
     project_name,
-    _inserted_timestamp
+    {{ dbt_utils.generate_surrogate_key(
+        ['address']
+    ) }} AS full_entity_cluster_id,
+    _inserted_timestamp AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS invocation_id
 FROM
     {{ source(
         "bitcoin_bronze",
