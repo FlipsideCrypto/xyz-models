@@ -39,7 +39,7 @@ calls AS (
             SELECT
                 block_number
             FROM
-                {{ ref('streamline__blocks_tx_complete') }}
+                {{ ref('streamline__complete_blocks_tx') }}
         )
 )
 SELECT
