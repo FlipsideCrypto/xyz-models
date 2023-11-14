@@ -1,0 +1,30 @@
+version: 2
+models:
+  - name: core__dim_tokens
+    description: '{{ doc("core__dim_tokens") }}'   
+
+    columns:
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'    
+      - name: NAME
+        description: 'The full token name'   
+      - name: SYMBOL
+        description: 'The token symbol'   
+      - name: DECIMALS
+        description: 'The number of decimals for the token'   
+      - name: COIN_TYPE_HASH
+        description: 'Hash of the coin type'   
+      - name: CREATOR_ADDRESS
+        description: 'The account address that created the token'   
+      - name: TRANSACTION_CREATED_TIMESTAMP
+        description: 'The timestamp of when the token was created'   
+      - name: TRANSACTION_VERSION_CREATED
+        description: 'The transaction version of when the token was created'  
+      - name: DIM_TOKENS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'  
+
+

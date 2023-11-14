@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: core__fact_transfers
+    description: '{{ doc("core__fact_transfers") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: EVENT_INDEX
+        description: '{{ doc("event_index") }}'   
+      - name: CREATION_NUMBER
+        description: '{{ doc("creation_number") }}'  
+      - name: TRANSFER_EVENT
+        description: '{{ doc("transfer_event") }}'   
+      - name: ACCOUNT_ADDRESS
+        description: '{{ doc("address_event") }}'  
+      - name: AMOUNT
+        description: '{{ doc("amount") }}' 
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'      
+      - name: FACT_TRANSFERS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   
