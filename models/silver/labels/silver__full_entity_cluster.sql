@@ -77,47 +77,11 @@ base AS (
         *
     FROM
         merges_full
-),
-labs AS (
-    SELECT
-        DISTINCT address_group,
-        project_name
-    FROM
-        base A
-        LEFT JOIN (
-            SELECT
-                DISTINCT address,
-                project_name
-            FROM
-                {{ source(
-                    "crosschain",
-                    "dim_labels"
-                ) }}
-            WHERE
-                blockchain = 'bitcoin'
-                AND label_type != 'nft'
-        ) b
-        ON A.address = b.address
-    WHERE
-        project_name IS NOT NULL
-    UNION
-    SELECT
-        DISTINCT address_group,
-        project_name
-    FROM
-        {{ this }}
-    WHERE
-        address_group IN (
-            SELECT
-                DISTINCT address_group
-            FROM
-                base
-        )
 )
 SELECT
     A.address,
     A.address_group,
-    b.project_name,
+    null as project_name,
     {{ dbt_utils.generate_surrogate_key(
         ['address']
     ) }} AS full_entity_cluster_id,
@@ -126,8 +90,6 @@ SELECT
     '{{ invocation_id }}' AS invocation_id
 FROM
     base A
-    LEFT JOIN labs b
-    ON A.address_group = b.address_group
     LEFT JOIN set_inserted_timestamp ts
     ON 1 = 1
 {% else %}

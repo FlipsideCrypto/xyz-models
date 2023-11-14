@@ -11,4 +11,4 @@ SELECT
   modified_timestamp,
   full_entity_cluster_id as dim_entity_clusters_id
 FROM
-  {{ ref('silver__full_entity_cluster') }}
+  {{ ref('silver__full_entity_cluster_label') }}
