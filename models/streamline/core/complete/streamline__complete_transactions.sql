@@ -4,7 +4,7 @@
     unique_key = "id",
     cluster_by = "ROUND(tx_version, -3)",
     merge_update_columns = ["id"],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(id)"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(id,tx_version)"
 ) }}
 
 SELECT

@@ -1,15 +1,40 @@
 {{ config (
-    materialized = "view",
+    materialized = "incremental",
+    unique_key = "tx_version",
     tags = ['streamline_view']
 ) }}
 
+WITH all_versions AS (
+
+    SELECT
+        block_number,
+        first_version,
+        last_version,
+        _inserted_timestamp
+    FROM
+        {{ ref(
+            'silver__blocks'
+        ) }}
+    WHERE
+        tx_count_from_transactions_array <> tx_count_from_versions
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
+    FROM
+        {{ this }}
+)
+{% endif %}
+)
 SELECT
+    block_number,
     _id AS tx_version,
-    A.block_number
+    _inserted_timestamp
 FROM
-    {{ ref(
-        'silver__blocks'
-    ) }} A
+    all_versions A
     JOIN {{ source(
         'crosschain_silver',
         'number_sequence'
@@ -17,5 +42,3 @@ FROM
     b
     ON b._id BETWEEN A.first_version
     AND A.last_version
-WHERE
-    tx_count_from_transactions_array <> tx_count_from_versions
