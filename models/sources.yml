@@ -29,3 +29,4 @@ sources:
       {{ "APTOS_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "APTOS" }}
     tables:
       - name: blocks_tx
+      - name: transactions
