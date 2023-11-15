@@ -1,3 +1,5 @@
 workflow_name,workflow_schedule
 dbt_run_streamline_blocks_tx_realtime,"0 * * * *"
+dbt_run_incremental_core,"55 * * * *"
+dbt_run_incremental_noncore,"10 * * * *"
 dbt_run_backfill_generic,"17 * * * *"

@@ -6,19 +6,19 @@
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     tags = ['core','full_test']
 ) }}
+-- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
 
 SELECT
-    block_height AS block_number,
-    DATA :data :block_hash :: STRING AS block_hash,
-    -- DATA :data :block_height :: INT AS block_height,
-    DATA :data :block_timestamp :: bigint AS block_timestamp_num,
+    partition_key AS block_number,
+    DATA :block_hash :: STRING AS block_hash,
+    DATA :block_timestamp :: bigint AS block_timestamp_num,
     TO_TIMESTAMP(
         block_timestamp_num :: STRING
     ) AS block_timestamp,
-    DATA :data :first_version :: bigint AS first_version,
-    DATA :data :last_version :: bigint AS last_version,
+    DATA :first_version :: bigint AS first_version,
+    DATA :last_version :: bigint AS last_version,
     ARRAY_SIZE(
-        DATA :data :transactions
+        DATA :transactions
     ) AS tx_count_from_transactions_array,
     last_version - first_version + 1 AS tx_count_from_versions,
     {{ dbt_utils.generate_surrogate_key(
@@ -29,12 +29,9 @@ SELECT
     _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ source(
-        'aptos_bronze',
-        'lq_blocks_txs'
-    ) }}
 
 {% if is_incremental() %}
+{{ ref('bronze__streamline_blocks_tx') }}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -44,6 +41,8 @@ WHERE
         FROM
             {{ this }}
     )
+{% else %}
+    {{ ref('bronze__streamline_FR_blocks_tx') }}
 {% endif %}
 
 qualify(ROW_NUMBER() over(PARTITION BY block_number
