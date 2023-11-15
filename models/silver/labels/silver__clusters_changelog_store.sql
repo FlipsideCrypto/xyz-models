@@ -4,7 +4,8 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['entity_cluster_0'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    full_refresh = False
 ) }}
 
 SELECT
