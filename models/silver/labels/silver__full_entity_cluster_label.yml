@@ -1,16 +1,22 @@
 version: 2
 models:
   - name: silver__full_entity_cluster_label
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - address
 
     columns:
-      - name: ADDRESS
-              
+      - name: address
+        tests:
+          - unique
+
       - name: address_group
 
       - name: project_name
 
-      - name: _inserted_timestamp
+      - name: full_entity_cluster_id
+
+      - name: inserted_timestamp,
+
+      - name: modified_timestamp
+
+      - name: invocation_id
+
+      - name: inserted_timestamp_label
