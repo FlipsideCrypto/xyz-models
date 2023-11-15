@@ -4,13 +4,12 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['_inserted_timestamp::DATE'],
-    tags = ['core']
+    tags = ['noncore','full_test']
 ) }}
 
 SELECT
     domain,
     domain_with_suffix,
-    creator_address,
     expiration_timestamp,
     is_active,
     is_primary,

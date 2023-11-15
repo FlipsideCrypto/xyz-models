@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: silver__coin_info
+
+    columns:
+      - name: coin_type
+        tests:
+          - not_null
+          - unique
+      - name: decimals
+        tests:
+          - not_null  
+      - name: NAME
+        tests:
+          - not_null  
+      - name: symbol
+        tests:
+          - not_null  
+      
+     
+      

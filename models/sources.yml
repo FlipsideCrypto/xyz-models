@@ -6,8 +6,8 @@ sources:
     schema: core
     tables:
       - name: dim_date_hours
-      - name: address_tags
       - name: dim_dates
+      - name: dim_labels
   - name: crosschain_silver
     database: "{{ 'crosschain' if target.database == 'aptos' else 'crosschain_dev' }}"
     schema: silver

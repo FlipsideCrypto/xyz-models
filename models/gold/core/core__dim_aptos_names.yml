@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: core__dim_aptos_names
+    description: '{{ doc("core__dim_aptos_names") }}'   
+
+    columns:
+      - name: token_name
+        description: 'The full aptos name'  
+      - name: domain
+        description: 'The domain of the aptos name'   
+      - name: domain_with_suffix
+        description: 'The domain plus the suffix'   
+      - name: subdomain
+        description: 'The subdomain of the aptos name'   
+      - name: owner_address
+        description: 'The account address that owns the aptos name'   
+      - name: registered_address
+        description: 'The account address that the aptos name is registered to'   
+      - name: is_active
+        description: 'Boolean value identifying if the aptos name is active'   
+      - name: is_primary
+        description: 'Boolean value identifying if the aptos name is primary'  
+      - name: token_standard
+        description: 'The token standard of the aptos name'   
+      - name: expiration_timestamp
+        description: 'The timestamp of when the aptos name expires'   
+      - name: last_transaction_version
+        description: 'The last transaction version of the aptos name'
+      - name: DIM_APTOS_NAMES_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'  
+
+
