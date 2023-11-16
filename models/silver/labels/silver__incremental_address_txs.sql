@@ -6,8 +6,12 @@
 WITH date_range AS (
 
   SELECT
-    MAX(inserted_timestamp) :: DATE :: TIMESTAMP_NTZ AS max_inserted_timestamp,
-    MAX(inserted_timestamp) :: DATE :: TIMESTAMP_NTZ + INTERVAL '{{ var("INCREMENTAL_CLUSTER_INTERVAL", 24 hours) }}' AS max_inserted_timestamp_interval
+    MAX(inserted_timestamp) :: DATE :: timestamp_ntz AS max_inserted_timestamp,
+    DATEADD(
+      'hours',
+      '{{ var("INCREMENTAL_CLUSTER_INTERVAL", 24 ) }}',
+      MAX(inserted_timestamp) :: DATE :: timestamp_ntz
+    ) AS max_inserted_timestamp_interval
   FROM
     {{ ref("silver__full_entity_cluster") }}
 ),
