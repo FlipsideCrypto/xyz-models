@@ -24,7 +24,7 @@ WITH set_inserted_timestamp AS (
         FROM
             {{ this }}
         {% else %}
-            SYSDATE() AS inserted_timestamp
+            select SYSDATE() AS inserted_timestamp
         {% endif %}
 ),
 merges AS (
