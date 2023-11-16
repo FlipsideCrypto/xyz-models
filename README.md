@@ -1,7 +1,7 @@
 
 ## Profile Set Up
 
-#### Use the following within profiles.yml 
+#### Use the following within profiles.yml
 ----
 
 ```yml
@@ -72,4 +72,10 @@ dbt run --var '{"UPDATE_SNOWFLAKE_TAGS":True}' -s models/core/core__fact_swaps.s
 ```
 select *
 from table(aptos.information_schema.tag_references('aptos.core.fact_blocks', 'table'));
+```
+
+### Running the streamline permissions macro
+
+```
+dbt run-operation grant_streamline_permissions --args '{"project": "aptos", "warehouse_name": "dbt_cloud", "integration_name": "aws_lambda_aptos_api", "dev_integration_name": "aws_lambda_aptos_api_dev", "lambda_role": "aws_lambda_aptos_api", "dbt_cloud_role": "dbt_cloud_aptos", "internal_dev_role": "internal_dev"}' --profile aptos --target dev
 ```
