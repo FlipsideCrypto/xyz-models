@@ -100,3 +100,15 @@ dbt run --var '{"UPDATE_SNOWFLAKE_TAGS": True}' -s models/core/core__fact_swaps.
 select *
 from table(admin.information_schema.tag_references('admin.core.fact_blocks', 'table'));
 ```
+
+### Running streamline permissions from Snowflake
+
+```
+call admin.streamline.create_streamline_users_roles_dev('<PROD_DB_NAME>', '<AWS_LAMBDA_DEV_USER_PASSWORD>');
+
+call admin.streamline.create_streamline_users_roles_prod('<PROD_DB_NAME>', '<AWS_LAMBDA_PROD_USER_PASSWORD>', 'DBT_CLOUD_PROD_USER_PASSWORD');
+
+call admin.streamline.streamline_dev_permissions('<DEV_DB_NAME>');
+
+call admin.streamline.streamline_prod_permissions('<PROD_DB_NAME>');
+```
