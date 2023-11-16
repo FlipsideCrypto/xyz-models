@@ -24,8 +24,6 @@ WITH calls AS (
             FROM
                 {{ ref('streamline__complete_blocks_tx') }}
         )
-    LIMIT
-        1200000
 )
 SELECT
     ARRAY_CONSTRUCT(
@@ -42,3 +40,5 @@ FROM
     calls
 ORDER BY
     block_height DESC
+LIMIT
+    1200000
