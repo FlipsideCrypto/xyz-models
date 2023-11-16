@@ -16,7 +16,7 @@ WITH set_inserted_timestamp AS (
         ) %}
 
         SELECT
-            MAX(inserted_timestamp) + INTERVAL '{{ var("INCREMENTAL_CLUSTER_INTERVAL", "24 hours") }}' AS inserted_timestamp
+            MAX(inserted_timestamp) + INTERVAL '{{ var("INCREMENTAL_CLUSTER_INTERVAL", 24 hours) }}' AS inserted_timestamp
         FROM
             {{ this }}
         {% else %}
