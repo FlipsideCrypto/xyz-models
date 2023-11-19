@@ -40,5 +40,3 @@ FROM
     calls
 ORDER BY
     block_height DESC
-LIMIT
-    1200000
