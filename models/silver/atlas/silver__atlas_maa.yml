@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: silver__atlas_maa
+    description: |-
+      Monthly Active Accounts (wallets) on Aurora, calculated over a rolling 30 day window. An active account, here, is defined as the signing of at least one transaction.
+
+    columns:
+      - name: atlas_maa_id
+        description: "{{ doc('id') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: day
+        description: "{{ doc('active_day') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: maa
+        description: "{{ doc('maa')}}"
+        tests:
+          - not_null
+
+      - name: inserted_timestamp
+        description: "{{ doc('inserted_timestamp') }}"
+        tests:
+          - not_null
+
+      - name: modified_timestamp
+        description: "{{ doc('modified_timestamp') }}"
+        tests:
+          - not_null
+
+      - name: invocation_id
+        description: "{{ doc('invocation_id') }}"
+        tests:
+          - not_null

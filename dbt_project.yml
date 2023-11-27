@@ -1,14 +1,14 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "xyz_models"
+name: "aurora_models"
 version: "1.0.0"
 config-version: 2
 
 require-dbt-version: ">=1.4.0"
 
 # This setting configures which "profile" dbt uses for this project.
-profile: "xyz"
+profile: "aurora"
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -41,14 +41,32 @@ models:
 
 vars:
   "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
+  STREAMLINE_INVOKE_STREAMS: False
+  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
+  STREAMLINE_RUN_HISTORY: False
+  UPDATE_UDFS_AND_SPS: False
+  UPDATE_SNOWFLAKE_TAGS: True
+  WAIT: 0
+  OBSERV_FULL_TEST: False
+  START_GHA_TASKS: False
 
 tests:
   +store_failures: true # all tests
 
 on-run-start:
-  - '{{create_sps()}}'
-  - '{{create_udfs()}}'
+  - "{{create_sps()}}"
+  - "{{create_udfs()}}"
 
 on-run-end:
-  - '{{ apply_meta_as_tags(results) }}'
+  - "{{ apply_meta_as_tags(results) }}"
+
+dispatch:
+  - macro_namespace: dbt
+    search_order:
+      - aurora-models
+      - dbt_snowflake_query_tags
+      - dbt
+
+query-comment:
+  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  append: true # Snowflake removes prefixed comments.
