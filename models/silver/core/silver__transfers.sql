@@ -111,9 +111,15 @@ SELECT
   e.event_resource AS transfer_event,
   e.account_address,
   e.amount,
-  COALESCE(
-    dep.token_address,
-    wth.token_address
+  REPLACE(
+    REPLACE(
+      COALESCE(
+        dep.token_address,
+        wth.token_address
+      ),
+      'CoinStore<'
+    ),
+    '>'
   ) AS token_address,
   {{ dbt_utils.generate_surrogate_key(
     ['e.tx_hash','e.event_index']
