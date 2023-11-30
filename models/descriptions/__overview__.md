@@ -19,13 +19,13 @@ There is more information on how to use dbt docs in the last section of this doc
 
 ### Core Tables (`aptos`.`CORE`.`<table_name>`)
 
-**Dimension Tables:**
+**Core Dimension Tables:**
 - [dim_aptos_names](#!/model/model.aptos.core__dim_aptos_names)
 - [dim_labels](#!/model/model.aptos.core__dim_labels)
 - [dim_tokens](#!/model/model.aptos.core__dim_tokens)
 
 
-**Fact Tables:**
+**Core Fact Tables:**
 - [fact_blocks](#!/model/model.aptos.core__fact_blocks)
 - [fact_events](#!/model/model.aptos.core__fact_events)
 - [fact_changes](#!/model/model.aptos.core__fact_changes)
@@ -34,10 +34,15 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_transactions_state_checkpoint](#!/model/model.aptos.core__fact_transactions_state_checkpoint)
 - [fact_transfers](#!/model/model.aptos.core__fact_transfers)
 
+**Core Dimension Tables:**
+- [dim_asset_metadata](#!/model/model.aptos.price__dim_asset_metadata)
 
+**Core Fact Tables:**
+- [fact_hourly_token_prices](#!/model/model.aptos.price__fact_hourly_token_prices)
 
-**Convenience Tables:**
-
+**Price Convenience Tables:**
+- [ez_asset_metadata](#!/model/model.aptos.price__ez_asset_metadata)
+- [ez_hourly_token_prices](#!/model/model.aptos.price__ez_hourly_token_prices)
 
 
 
