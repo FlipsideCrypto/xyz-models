@@ -18,3 +18,4 @@ FROM
     ) }}
 WHERE
     blockchain = 'aptos'
+    AND token_address LIKE '%:%'
