@@ -28,7 +28,11 @@ FROM
     p
     LEFT JOIN {{ ref('silver__asset_metadata_priority') }}
     m
-    ON p.token_address = m.token_address
+    ON LOWER(
+        p.token_address
+    ) = LOWER(
+        m.token_address
+    )
     LEFT JOIN {{ ref('silver__coin_info') }} C
     ON C.coin_type = p.token_address
 
