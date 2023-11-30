@@ -34,7 +34,9 @@ FROM
         m.token_address
     )
     LEFT JOIN {{ ref('silver__coin_info') }} C
-    ON C.coin_type = p.token_address
+    ON LOWER(
+        C.coin_type
+    ) = LOWER(p.token_address)
 
 {% if is_incremental() %}
 WHERE
