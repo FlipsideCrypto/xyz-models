@@ -16,7 +16,7 @@ WITH all_versions AS (
             'silver__blocks'
         ) }}
     WHERE
-        tx_count_from_transactions_array <> tx_count_from_versions
+        COALESCE(tx_count_from_transactions_array) <> tx_count_from_versions
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
