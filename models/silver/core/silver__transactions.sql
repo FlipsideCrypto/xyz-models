@@ -63,14 +63,14 @@ LATERAL FLATTEN (DATA :transactions) b
 WHERE
   _inserted_timestamp >= (
     SELECT
-      DATEADD('hour', -3, MAX(_inserted_timestamp))
+      DATEADD('hour', -2, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
   ),
   from_transactions AS (
     SELECT
-      DATA :block_height AS block_number,
+      {# b.block_number, #}
       TO_TIMESTAMP(
         DATA :timestamp :: STRING
       ) AS block_timestamp,
@@ -105,7 +105,7 @@ WHERE
       ) }} AS transactions_id,
       SYSDATE() AS inserted_timestamp,
       SYSDATE() AS modified_timestamp,
-      _inserted_timestamp,
+      A._inserted_timestamp,
       '{{ invocation_id }}' AS _invocation_id
     FROM
 
@@ -115,11 +115,13 @@ WHERE
   {{ ref('bronze__streamline_FR_transactions') }}
 {% endif %}
 
+A
+
 {% if is_incremental() %}
 WHERE
-  _inserted_timestamp >= (
+  A._inserted_timestamp >= (
     SELECT
-      DATEADD('hour', -3, MAX(_inserted_timestamp))
+      DATEADD('hour', -2, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -131,9 +133,14 @@ WHERE
       from_blocks
     UNION ALL
     SELECT
-      *
+      b.block_number,
+      A.*
     FROM
-      from_transactions
+      from_transactions A
+      JOIN {{ ref('silver__blocks') }}
+      b
+      ON A.version BETWEEN b.first_version
+      AND b.last_version
   )
 SELECT
   *
