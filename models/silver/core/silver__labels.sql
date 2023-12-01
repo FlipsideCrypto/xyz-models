@@ -2,7 +2,7 @@
     materialized = 'incremental',
     unique_key = 'address',
     merge_exclude_columns = ["inserted_timestamp"],
-    tags = ['noncore','full_test']
+    tags = ['noncore']
 ) }}
 
 SELECT
