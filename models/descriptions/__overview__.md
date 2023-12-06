@@ -18,6 +18,7 @@ There is more information on how to use dbt docs in the last section of this doc
 **Click on the links below to jump to the documentation for each schema.**
 
 ### Core Tables (`aptos`.`CORE`.`<table_name>`)
+### Price Tables (`aptos`.`PRICE`.`<table_name>`)
 
 **Core Dimension Tables:**
 - [dim_aptos_names](#!/model/model.aptos.core__dim_aptos_names)
@@ -34,10 +35,10 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_transactions_state_checkpoint](#!/model/model.aptos.core__fact_transactions_state_checkpoint)
 - [fact_transfers](#!/model/model.aptos.core__fact_transfers)
 
-**Core Dimension Tables:**
+**Price Dimension Tables:**
 - [dim_asset_metadata](#!/model/model.aptos.price__dim_asset_metadata)
 
-**Core Fact Tables:**
+**Price Fact Tables:**
 - [fact_hourly_token_prices](#!/model/model.aptos.price__fact_hourly_token_prices)
 
 **Price Convenience Tables:**
