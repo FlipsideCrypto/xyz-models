@@ -5,4 +5,3 @@ dbt_run_incremental_core,"10,30,50 * * * *"
 dbt_run_incremental_noncore,"15,45 * * * *"
 dbt_test_intraday,"20 */4 * * *"
 dbt_test_tasks,"0,30 * * * *"
-
