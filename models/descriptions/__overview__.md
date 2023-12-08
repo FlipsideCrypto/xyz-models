@@ -21,29 +21,29 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Price Tables (`aptos`.`PRICE`.`<table_name>`)
 
 **Core Dimension Tables:**
-- [dim_aptos_names](#!/model/model.aptos.core__dim_aptos_names)
-- [dim_labels](#!/model/model.aptos.core__dim_labels)
-- [dim_tokens](#!/model/model.aptos.core__dim_tokens)
+- [dim_aptos_names](#!/model/model.aptos_models.core__dim_aptos_names)
+- [dim_labels](#!/model/model.aptos_models.core__dim_labels)
+- [dim_tokens](#!/model/model.aptos_models.core__dim_tokens)
 
 
 **Core Fact Tables:**
-- [fact_blocks](#!/model/model.aptos.core__fact_blocks)
-- [fact_events](#!/model/model.aptos.core__fact_events)
-- [fact_changes](#!/model/model.aptos.core__fact_changes)
-- [fact_transactions](#!/model/model.aptos.core__fact_transactions)
-- [fact_transactions_block_metadata](#!/model/model.aptos.core__fact_transactions_block_metadata)
-- [fact_transactions_state_checkpoint](#!/model/model.aptos.core__fact_transactions_state_checkpoint)
-- [fact_transfers](#!/model/model.aptos.core__fact_transfers)
+- [fact_blocks](#!/model/model.aptos_models.core__fact_blocks)
+- [fact_events](#!/model/model.aptos_models.core__fact_events)
+- [fact_changes](#!/model/model.aptos_models.core__fact_changes)
+- [fact_transactions](#!/model/model.aptos_models.core__fact_transactions)
+- [fact_transactions_block_metadata](#!/model/model.aptos_models.core__fact_transactions_block_metadata)
+- [fact_transactions_state_checkpoint](#!/model/model.aptos_models.core__fact_transactions_state_checkpoint)
+- [fact_transfers](#!/model/model.aptos_models.core__fact_transfers)
 
 **Price Dimension Tables:**
-- [dim_asset_metadata](#!/model/model.aptos.price__dim_asset_metadata)
+- [dim_asset_metadata](#!/model/model.aptos_models.price__dim_asset_metadata)
 
 **Price Fact Tables:**
-- [fact_hourly_token_prices](#!/model/model.aptos.price__fact_hourly_token_prices)
+- [fact_hourly_token_prices](#!/model/model.aptos_models.price__fact_hourly_token_prices)
 
 **Price Convenience Tables:**
-- [ez_asset_metadata](#!/model/model.aptos.price__ez_asset_metadata)
-- [ez_hourly_token_prices](#!/model/model.aptos.price__ez_hourly_token_prices)
+- [ez_asset_metadata](#!/model/model.aptos_models.price__ez_asset_metadata)
+- [ez_hourly_token_prices](#!/model/model.aptos_models.price__ez_hourly_token_prices)
 
 
 
