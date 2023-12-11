@@ -76,6 +76,12 @@ blocks_final AS (
         LEFT JOIN coinbase C USING (block_number)
 )
 SELECT
-    *
+    *,
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number']
+    ) }} AS block_miner_rewards_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     blocks_final

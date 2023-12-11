@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'recorded_hour',
-    incremental_strategy='delete+insert',
+    incremental_strategy = 'merge',
+    merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['recorded_hour ::DATE'],
     tags = ["prices", "core", "scheduled_non_core"]
 ) }}
@@ -72,8 +73,14 @@ SELECT
     A.high,
     A.low,
     w.close,
-    '2023-10-31T13:00:00Z' as _inserted_timestamp,
-    'coinpaprika' as provider
+    '2023-10-31T13:00:00Z' AS _inserted_timestamp,
+    'coinpaprika' AS provider,
+    {{ dbt_utils.generate_surrogate_key(
+        ['A.recorded_hour']
+    ) }} AS price_coinpaprika_hourly_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     aggregated A
     JOIN windowed w
