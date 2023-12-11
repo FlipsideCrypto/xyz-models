@@ -1,6 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'recorded_hour',
+    incremental_strategy = 'merge',
+    merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['recorded_hour ::DATE'],
     tags = ["prices", "core", "scheduled_non_core"]
 ) }}
@@ -35,6 +37,12 @@ SELECT
     volume,
     market_cap,
     'coinmarketcap' AS provider,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['recorded_hour']
+    ) }} AS price_coinmarketcap_hourly_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     prices

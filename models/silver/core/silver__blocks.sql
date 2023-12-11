@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    incremental_strategy = 'delete+insert',
+    incremental_strategy = 'merge',
+    merge_exclude_columns = ["inserted_timestamp"],
     unique_key = 'block_number',
     cluster_by = ["_inserted_timestamp::DATE", "block_number"],
     tags = ["core", "scheduled_core"]
@@ -45,7 +46,13 @@ FINAL AS (
         DATA :result :weight :: STRING AS weight,
         DATA: error :: STRING AS error,
         _partition_by_block_id,
-        _inserted_timestamp
+        _inserted_timestamp,
+        {{ dbt_utils.generate_surrogate_key(
+            ['block_number']
+        ) }} AS blocks_id,
+        SYSDATE() AS inserted_timestamp,
+        SYSDATE() AS modified_timestamp,
+        '{{ invocation_id }}' AS _invocation_id
     FROM
         bronze_blocks
 )

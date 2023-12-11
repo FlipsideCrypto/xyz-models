@@ -1,12 +1,6 @@
 {{ config(
     materialized = 'view',
-        meta={
-        'database_tags':{
-            'table': {
-                'PURPOSE': 'BLOCKS'
-            }
-        }
-    },
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'BLOCKS' }}},
     tags = ['core']
 ) }}
 
@@ -30,7 +24,15 @@ WITH blocks AS (
         version,
         weight,
         error,
-        tx AS txs
+        tx AS txs,
+        COALESCE(
+            blocks_id,
+            {{ dbt_utils.generate_surrogate_key(
+                ['block_number']
+            ) }}
+        ) AS fact_blocks_id,
+        COALESCE(inserted_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
+        COALESCE(modified_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp
     FROM
         {{ ref('silver__blocks') }}
 )

@@ -1,12 +1,6 @@
 {{ config(
     materialized = 'view',
-        meta={
-        'database_tags':{
-            'table': {
-                'PURPOSE': 'TRANSACTIONS'
-            }
-        }
-    },
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'TRANSACTIONS' }}},
     tags = ['core']
 ) }}
 
@@ -33,7 +27,15 @@ WITH txs AS (
         virtual_size,
         weight,
         lock_time,
-        version
+        version,
+        COALESCE(
+            transactions_final_id,
+            {{ dbt_utils.generate_surrogate_key(
+                ['tx_id']
+            ) }}
+        ) AS fact_transactions_id,
+        COALESCE(inserted_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
+        COALESCE(modified_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp
     FROM
         {{ ref('silver__transactions_final') }}
 )

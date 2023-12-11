@@ -7,8 +7,8 @@ SELECT
   address,
   address_group,
   project_name,
-  inserted_timestamp,
-  modified_timestamp,
+  COALESCE(inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
+  COALESCE(modified_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp,
   full_entity_cluster_id as dim_entity_clusters_id
 FROM
   {{ ref('silver__full_entity_cluster_label') }}

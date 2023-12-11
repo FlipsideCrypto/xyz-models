@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
+    merge_exclude_columns = ["inserted_timestamp"],
     incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
     unique_key = 'input_id',
     cluster_by = ["block_number", "tx_id"],
@@ -64,6 +65,9 @@ FINAL AS (
         AND i.spent_output_index = o.index
 )
 SELECT
-    *
+    *,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL
