@@ -29,8 +29,8 @@ WITH inputs AS (
         tx_in_witness,
         input_id,
         input_id AS fact_inputs_id,
-        inserted_timestamp,
-        modified_timestamp
+        COALESCE(inserted_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
+        COALESCE(modified_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp
     FROM
         {{ ref('silver__inputs_final') }}
 )

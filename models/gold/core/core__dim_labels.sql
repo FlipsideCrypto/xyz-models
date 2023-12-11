@@ -17,7 +17,7 @@ SELECT
             ['address']
         ) }}
     ) AS dim_labels_id,
-    inserted_timestamp,
-    modified_timestamp
+    COALESCE(inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
+    COALESCE(modified_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp
 FROM
     {{ ref('silver__labels') }}
