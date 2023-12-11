@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
+    merge_exclude_columns = ["inserted_timestamp"],
     incremental_predicates = ['block_number >= (select min(block_number) from ' ~ generate_tmp_view_name(this) ~ ')'],
     unique_key = 'input_id',
     tags = ["core", "scheduled_core"],
@@ -49,6 +50,9 @@ inputs AS (
         LATERAL FLATTEN(inputs) i
 )
 SELECT
-    *
+    *,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     inputs
