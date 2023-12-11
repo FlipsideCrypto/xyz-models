@@ -1,12 +1,6 @@
 {{ config(
     materialized = 'view',
-        meta={
-        'database_tags':{
-            'table': {
-                'PURPOSE': 'OUTPUTS'
-            }
-        }
-    },
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'OUTPUTS' }}},
     tags = ['core']
 ) }}
 
@@ -24,7 +18,10 @@ WITH outputs AS (
         pubkey_script_type,
         pubkey_script_desc,
         VALUE,
-        output_id
+        output_id,
+        output_id AS fact_outputs_id,
+        inserted_timestamp,
+        modified_timestamp
     FROM
         {{ ref('silver__outputs') }}
 )
