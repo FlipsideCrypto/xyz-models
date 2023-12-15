@@ -30,7 +30,7 @@ labeled_groups AS(
         address_group,
         b.project_name,
         full_entity_cluster_id,
-        inserted_timestamp,
+        SYSDATE() AS inserted_timestamp,
         SYSDATE() AS modified_timestamp,
         '{{ invocation_id }}' AS invocation_id,
         b.insert_date AS inserted_timestamp_label
