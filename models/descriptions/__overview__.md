@@ -35,6 +35,10 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_transactions_state_checkpoint](#!/model/model.aptos_models.core__fact_transactions_state_checkpoint)
 - [fact_transfers](#!/model/model.aptos_models.core__fact_transfers)
 
+**Core Convenience Tables:**
+- [ez_native_transfers](#!/model/model.aptos_models.core__ez_native_transfers)
+
+
 **Price Dimension Tables:**
 - [dim_asset_metadata](#!/model/model.aptos_models.price__dim_asset_metadata)
 
