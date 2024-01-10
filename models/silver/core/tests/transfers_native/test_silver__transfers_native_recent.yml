@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: test_silver__transfers_native_recent
+
+
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: hour
+              interval: 3
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: VERSION
+        tests:
+          - not_null
+      - name: SUCCESS
+        tests:
+          - not_null
+      - name: FROM_ADDRESS
+        tests:
+          - not_null
+      - name: TO_ADDRESS
+        tests:
+          - not_null
+      - name: AMOUNT
+        tests:
+          - not_null
+      - name: TOKEN_ADDRESS
+        tests:
+          - not_null

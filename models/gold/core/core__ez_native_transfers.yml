@@ -1,0 +1,32 @@
+version: 2
+models:
+  - name: core__ez_native_transfers
+    description: '{{ doc("core__ez_native_transfers") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: EVENT_INDEX
+        description: '{{ doc("event_index") }}'    
+      - name: FROM_ADDRESS
+        description: '{{ doc("from_address_transfer") }}'  
+      - name: TO_ADDRESS
+        description: '{{ doc("to_address_transfer") }}'  
+      - name: AMOUNT
+        description: '{{ doc("amount") }}' 
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'      
+      - name: EZ_NATIVE_TRANSFERS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   

@@ -1,0 +1,54 @@
+version: 2
+models:
+  - name: silver__transfers_native
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: TRANSFERS_NATIVE_ID
+
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: VERSION
+        tests:
+          - not_null
+      - name: SUCCESS
+        tests:
+          - not_null
+      - name: FROM_ADDRESS
+        tests:
+          - not_null
+      - name: TO_ADDRESS
+        tests:
+          - not_null
+      - name: AMOUNT
+        tests:
+          - not_null
+      - name: TOKEN_ADDRESS
+        tests:
+          - not_null
+      - name: TRANSFERS_NATIVE_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - name: not_null_silver__transfers_native_INSERTED_TIMESTAMP_
+            test_name: not_null
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__transfers_native_INVOCATION_ID
+            test_name: not_null
+      
