@@ -1,0 +1,12 @@
+version: 2
+models:
+  - name: silver__bridge_wormhole_transfers
+
+    columns:
+      - name: TX_ID
+        tests:
+          - not_null
+          - unique
+      
+     
+      
