@@ -48,16 +48,7 @@ SELECT
         '::',
         3
     ) AS event_name,
-    (
-        CASE
-            WHEN SPLIT_PART(
-                payload :function,
-                '::',
-                1
-            ) = '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa' THEN 'layerzero' -- layerzero bridge address
-            ELSE 'Others'
-        END
-    ) AS platform,
+    'layerzero' AS platform,
     sender,
     (
         CASE
@@ -69,12 +60,12 @@ SELECT
         END
     ) AS destination_chain_receiver,
     chain_name AS destination_chain,
-    payload :arguments [0] AS destination_chain_id,
+    payload :arguments [0]::int AS destination_chain_id,
     payload :type_arguments [0] AS token_address,
-    payload :arguments [2] AS amount_unadj,
+    payload :arguments [2]::int AS amount_unadj,
         {{ dbt_utils.generate_surrogate_key(
         ['tx_hash']
-    ) }} AS bridge_layerzero_transfers_id, -- tx_id is unique but is it enough?
+    ) }} AS bridge_layerzero_transfers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     _inserted_timestamp,
@@ -84,5 +75,5 @@ FROM
     LEFT JOIN {{ ref('silver__bridge_layerzero_chain_id_seed') }}
     ON chain_id = destination_chain_id
 WHERE
-    success and FUNCTION = 'coin_bridge' -- bridge from aptos function in layerzero
+    FUNCTION = 'coin_bridge' -- bridge from aptos function in layerzero
     AND event_name = 'send_coin_from' -- bridge from aptos event_name in layer

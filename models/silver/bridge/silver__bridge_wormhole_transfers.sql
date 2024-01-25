@@ -41,7 +41,6 @@ wormhole_transfers AS (
         block_timestamp,
         version,
         tx_hash,
-        -- payload:function data structure is as follows ==> bridge_address::function::event_name
         payload,
         bridge_address,
         SPLIT_PART(
@@ -54,16 +53,7 @@ wormhole_transfers AS (
             '::',
             3
         ) AS event_name,
-        (
-            CASE
-                WHEN SPLIT_PART(
-                    payload :function,
-                    '::',
-                    1
-                ) = '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f' THEN 'Wormhole' -- wormhole bridge address
-                ELSE 'Others'
-            END
-        ) AS platform,
+        'wormhole' AS platform,
         sender,
         (
             CASE

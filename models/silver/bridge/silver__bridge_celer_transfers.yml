@@ -1,9 +1,9 @@
 version: 2
 models:
-  - name: silver__bridge_layerzero_transfers
+  - name: silver__bridge_celer_transfers
     tests:
       - dbt_constraints.primary_key:
-          column_name: BRIDGE_LAYERZERO_TRANSFERS_ID
+          column_name: BRIDGE_CELER_TRANSFERS_ID
     columns:
       - name: BLOCK_NUMBER
         tests:
