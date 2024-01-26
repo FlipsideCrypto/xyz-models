@@ -11,37 +11,44 @@ models:
       - name: BLOCK_TIMESTAMP
         tests:
           - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: hour
+              interval: 12
       - name: VERSION
         tests:
           - not_null
       - name: TX_HASH
         tests:
           - not_null
-      - name: PAYLOAD
+      - name: PLATFORM
         tests:
           - not_null
       - name: BRIDGE_ADDRESS
         tests:
           - not_null
-      - name: FUNCTION
-        tests:
-          - not_null
       - name: EVENT_NAME
         tests:
           - not_null
-      - name: PLATFORM   
+      - name: TX_SENDER
         tests:
-          - not_null   
+          - not_null
       - name: SENDER
         tests:
-          - not_null
-      - name: DESTINATION_CHAIN_RECEIVER
+          - not_null:
+              where: direction = 'outbound'
+      - name: RECEIVER
         tests:
           - not_null
-      - name: DESTINATION_CHAIN
+      - name: SOURCE_CHAIN_ID
+        tests:
+          - not_null
+      - name: SOURCE_CHAIN_NAME
         tests:
           - not_null
       - name: DESTINATION_CHAIN_ID
+        tests:
+          - not_null
+      - name: DESTINATION_CHAIN_NAME
         tests:
           - not_null
       - name: TOKEN_ADDRESS
