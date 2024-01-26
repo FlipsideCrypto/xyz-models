@@ -3,7 +3,7 @@
     unique_key = "bridge_layerzero_transfers_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['_inserted_timestamp::DATE'],
+    cluster_by = [block_timestamp::DATE','_inserted_timestamp::DATE'],
     tags = ['noncore']
 ) }}
 
@@ -11,7 +11,7 @@ WITH base AS (
 
     SELECT
         *,
-         split_part(payload:function,'::',1) AS bridge_address
+         split_part(payload_function,'::',1) AS bridge_address
     FROM
         {{ ref(
         'silver__transactions'

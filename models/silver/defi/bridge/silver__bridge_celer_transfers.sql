@@ -1,9 +1,9 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "bridge_mover_transfers_id",
+    unique_key = "bridge_celer_transfers_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['_inserted_timestamp::DATE'],
+    cluster_by = [block_timestamp::DATE','_inserted_timestamp::DATE'],
     tags = ['noncore']
 ) }}
 
@@ -12,7 +12,7 @@ WITH base AS (
     SELECT
         *,
         SPLIT_PART(
-            payload :function,
+            payload_function,
             '::',
             1
         ) AS bridge_address
@@ -21,7 +21,7 @@ WITH base AS (
             'silver__transactions'
         ) }}
     WHERE
-        bridge_address = '0xb3db6a8618db6e0eb9f2a3c98f693a7e622f986377c3153e6dd602ca74984ef1'
+        bridge_address = '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d'
         AND success
 
 {% if is_incremental() %}
@@ -32,7 +32,7 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% else %}
-    AND block_timestamp :: DATE >= '2023-08-24'
+    AND block_timestamp :: DATE >= '2022-10-19'
 {% endif %}
 )
 SELECT
@@ -41,35 +41,32 @@ SELECT
     version,
     tx_hash,
     payload,
+    bridge_address,
     SPLIT_PART(
-        payload :function,
-        '::',
-        1
-    ) AS bridge_address,
-    SPLIT_PART(
-        payload :function,
+        payload_function,
         '::',
         2
     ) AS FUNCTION,
     SPLIT_PART(
-        payload :function,
+        payload_function,
         '::',
         3
     ) AS event_name,
-    'mover' AS platform,
+    'celer' AS platform,
     sender,
-    payload :arguments [1] :: STRING AS destination_chain_receiver,
-    SPLIT_PART(
-        payload :type_arguments [1],
-        '::',
-        3
-    ) :: STRING AS destination_chain,
-    payload :arguments [2] :: INT AS destination_chain_id,
+    payload :arguments [2]::string AS destination_chain_receiver,
+    payload :arguments [1] :: INT AS destination_chain_id,
+    CASE
+        WHEN payload :arguments [1] = '1' THEN 'Ethereum'
+        WHEN payload :arguments [1] = '56' THEN 'BSC'
+        WHEN left(payload :arguments [1],2) = '56' THEN 'BSC'
+        ELSE 'Others'
+    END AS destination_chain,
     payload :type_arguments [0] :: STRING AS token_address,
     payload :arguments [0] :: INT AS amount_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash']
-    ) }} AS bridge_mover_transfers_id,
+    ) }} AS bridge_celer_transfers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     _inserted_timestamp,
@@ -77,5 +74,5 @@ SELECT
 FROM
     base tr
 WHERE
-    FUNCTION = 'bridge' --bridge from aptos function in mover
-    AND event_name = 'swap_out' --bridge from aptos event name in mover
+    FUNCTION = 'peg_bridge' -- bridge from aptos function in celer
+    AND event_name = 'burn' -- bridge from aptos event_name in celer
