@@ -54,7 +54,8 @@ txs AS (
         block_timestamp,
         tx_hash,
         sender,
-        payload :type_arguments [0] :: STRING AS token_address
+        payload :type_arguments [0] :: STRING AS token_address,
+        payload :arguments [1] :: STRING AS src_sender
     FROM
         {{ ref('silver__transactions') }}
     WHERE
@@ -93,6 +94,46 @@ AND _inserted_timestamp >= (
 {% else %}
     AND block_timestamp :: DATE >= '2022-10-19'
 {% endif %}
+),
+chngs_2 AS (
+    SELECT
+        block_timestamp,
+        tx_hash,
+        change_data :locked_coin :value :: INT AS amount,
+        change_resource :: STRING AS token_address
+    FROM
+        {{ ref('silver__changes') }}
+    WHERE
+        success
+        AND change_module = 'oft'
+        AND amount IS NOT NULL
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp)
+    FROM
+        {{ this }}
+)
+{% else %}
+    AND block_timestamp :: DATE >= '2022-10-19'
+{% endif %}
+),
+chngs_3 AS (
+    SELECT
+        block_timestamp,
+        tx_hash,
+        REPLACE(
+            REPLACE(
+                token_address,
+                'CoinInfo<'
+            ),
+            '>'
+        ) AS token_address
+    FROM
+        chngs
+    WHERE
+        token_address LIKE 'CoinInfo%'
 )
 SELECT
     A.block_number,
@@ -108,7 +149,8 @@ SELECT
     END AS direction,
     b.sender AS tx_sender,
     CASE
-        WHEN event_resource = 'SendEvent' THEN sender
+        WHEN event_resource = 'SendEvent' THEN b.sender
+        ELSE b.src_sender
     END AS sender,
     COALESCE(
         event_data :receiver,
@@ -130,12 +172,16 @@ SELECT
     COALESCE(
         event_data :coin_type :account_address || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :module_name, '0x')) || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :struct_name, '0x')),
         b.token_address,
-        C.token_address
+        C.token_address,
+        d.token_address,
+        e.token_address
     ) AS token_address,
+    event_data :stashed AS stashed,
     COALESCE(
         event_data :amount,
         event_data :amount_ld
     ) :: INT AS amount_unadj,
+    d.amount,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash','a.event_index']
     ) }} AS bridge_layerzero_transfers_id,
@@ -152,6 +198,12 @@ FROM
     ON A.tx_hash = C.tx_hash
     AND A.block_timestamp :: DATE = C.block_timestamp :: DATE
     AND amount_unadj = C.amount
+    LEFT JOIN chngs_2 d
+    ON A.tx_hash = d.tx_hash
+    AND A.block_timestamp :: DATE = d.block_timestamp :: DATE
+    LEFT JOIN chngs_3 e
+    ON A.tx_hash = e.tx_hash
+    AND A.block_timestamp :: DATE = e.block_timestamp :: DATE
     LEFT JOIN {{ ref('silver__bridge_layerzero_chain_id_seed') }}
     src
     ON source_chain_id = src.chain_id
