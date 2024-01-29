@@ -76,13 +76,20 @@ chngs AS (
     SELECT
         block_timestamp,
         tx_hash,
-        change_data :coin :value :: INT AS amount,
+        change_module,
+        CASE
+            WHEN change_module = 'coin' THEN change_data :coin :value
+            WHEN change_module = 'oft' THEN change_data :locked_coin :value
+        END :: INT AS amount,
         change_resource :: STRING AS token_address
     FROM
         {{ ref('silver__changes') }}
     WHERE
         success
-        AND change_module = 'coin'
+        AND change_module IN (
+            'coin',
+            'oft'
+        ) {# AND amount IS NOT NULL #}
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -99,41 +106,12 @@ chngs_2 AS (
     SELECT
         block_timestamp,
         tx_hash,
-        change_data :locked_coin :value :: INT AS amount,
-        change_resource :: STRING AS token_address
-    FROM
-        {{ ref('silver__changes') }}
-    WHERE
-        success
-        AND change_module = 'oft'
-        AND amount IS NOT NULL
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% else %}
-    AND block_timestamp :: DATE >= '2022-10-19'
-{% endif %}
-),
-chngs_3 AS (
-    SELECT
-        block_timestamp,
-        tx_hash,
-        REPLACE(
-            REPLACE(
-                token_address,
-                'CoinInfo<'
-            ),
-            '>'
-        ) AS token_address
+        token_address
     FROM
         chngs
     WHERE
-        token_address LIKE 'CoinInfo%'
+        change_module = 'coin'
+        AND token_address LIKE 'CoinInfo%'
 )
 SELECT
     A.block_number,
@@ -169,12 +147,21 @@ SELECT
         ELSE event_data :dst_chain_id :: INT
     END AS destination_chain_id,
     dst.chain_name AS destination_chain_name,
-    COALESCE(
-        event_data :coin_type :account_address || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :module_name, '0x')) || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :struct_name, '0x')),
-        b.token_address,
-        C.token_address,
-        d.token_address,
-        e.token_address
+    REPLACE(
+        REPLACE(
+            REPLACE(
+                COALESCE(
+                    event_data :coin_type :account_address || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :module_name, '0x')) || '::' || HEX_DECODE_STRING(REPLACE(event_data :coin_type :struct_name, '0x')),
+                    b.token_address,
+                    C.token_address,
+                    d.token_address,
+                    e.token_address
+                ),
+                'CoinStore<'
+            ),
+            'CoinInfo<'
+        ),
+        '>'
     ) AS token_address,
     event_data :stashed AS stashed,
     COALESCE(
@@ -198,12 +185,17 @@ FROM
     ON A.tx_hash = C.tx_hash
     AND A.block_timestamp :: DATE = C.block_timestamp :: DATE
     AND amount_unadj = C.amount
-    LEFT JOIN chngs_2 d
+    AND C.change_module = 'coin'
+    LEFT JOIN chngs d
     ON A.tx_hash = d.tx_hash
     AND A.block_timestamp :: DATE = d.block_timestamp :: DATE
-    LEFT JOIN chngs_3 e
+    AND d.change_module = 'oft'
+    AND d.amount IS NOT NULL
+    LEFT JOIN chngs_2 e
     ON A.tx_hash = e.tx_hash
     AND A.block_timestamp :: DATE = e.block_timestamp :: DATE
+    AND C.tx_hash IS NULL
+    AND d.tx_hash IS NULL
     LEFT JOIN {{ ref('silver__bridge_layerzero_chain_id_seed') }}
     src
     ON source_chain_id = src.chain_id
