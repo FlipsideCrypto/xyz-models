@@ -163,12 +163,10 @@ SELECT
         ),
         '>'
     ) AS token_address,
-    event_data :stashed AS stashed,
     COALESCE(
         event_data :amount,
         event_data :amount_ld
     ) :: INT AS amount_unadj,
-    d.amount,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash','a.event_index']
     ) }} AS bridge_layerzero_transfers_id,
