@@ -5,7 +5,7 @@ name: "bitcoin_models"
 version: "1.0.0"
 config-version: 2
 
-require-dbt-version: ">=1.4.0"
+require-dbt-version: ">=1.7.0"
 
 # This setting configures which "profile" dbt uses for this project.
 profile: "bitcoin"
@@ -54,11 +54,11 @@ tests:
   +store_failures: true # all tests
 
 on-run-start:
-  - '{{create_sps()}}'
-  - '{{create_udfs()}}'
+  - "{{create_sps()}}"
+  - "{{create_udfs()}}"
 
 on-run-end:
-  - '{{ apply_meta_as_tags(results) }}'
+  - "{{ apply_meta_as_tags(results) }}"
 
 dispatch:
   - macro_namespace: dbt
@@ -68,5 +68,5 @@ dispatch:
       - dbt
 
 query-comment:
-  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  comment: "{{ dbt_snowflake_query_tags.get_query_comment(node) }}"
   append: true # Snowflake removes prefixed comments.
