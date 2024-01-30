@@ -4,6 +4,7 @@
     merge_exclude_columns = ["inserted_timestamp"],
     unique_key = 'address',
     tags = ["core", "scheduled_non_core"],
+    cluster_by = 'modified_timestamp::DATE',
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address); DELETE FROM {{ this }} WHERE _is_deleted = TRUE;"
 ) }}
 
@@ -28,10 +29,10 @@ WHERE
     insert_date >= '2023-10-04'
 
 {% if is_incremental() %}
-AND insert_date >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
-            insert_date
+            modified_timestamp
         )
     FROM
         {{ this }}

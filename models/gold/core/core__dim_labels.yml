@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: core__dim_labels
-    description: This table contains labels for addresses on the Bitcoin blockchain.
+    description: '{{ doc("table_dim_labels") }}'
     columns:
       - name: BLOCKCHAIN
         description: '{{ doc("blockchain") }}'
@@ -25,7 +25,7 @@ models:
         description: '{{ doc("label") }}'
 
       - name: DIM_LABELS_ID
-        description: "{{doc('table_dim_labels')}}"
+        description: "{{doc('id')}}"
 
       - name: INSERTED_TIMESTAMP
         description: "{{doc('inserted_timestamp')}}"
