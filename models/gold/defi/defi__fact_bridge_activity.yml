@@ -18,10 +18,16 @@ models:
         description: '{{ doc("bridge_platform") }}'
       - name: EVENT_NAME
         description: '{{ doc("event_resource") }}'
+      - name: TX_SENDER
+        description: '{{ doc("sender") }}'
       - name: SENDER
         description: '{{ doc("bridge_sender") }}'
-      - name: DESTINATION_CHAIN_RECEIVER
-        description: '{{ doc("destination_chain_receiver") }}'
+      - name: RECEIVER
+        description: '{{ doc("bridge_receiver") }}'
+      - name: SOURCE_CHAIN
+        description: '{{ doc("source_chain") }}'
+      - name: SOURCE_CHAIN_ID
+        description: '{{ doc("source_chain_id") }}'
       - name: DESTINATION_CHAIN
         description: '{{ doc("destination_chain") }}'
       - name: DESTINATION_CHAIN_ID

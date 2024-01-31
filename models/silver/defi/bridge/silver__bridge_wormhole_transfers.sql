@@ -12,7 +12,7 @@ WITH txs AS (
     SELECT
         *
     FROM
-        aptos.silver.transactions
+        {{ ref('silver__transactions') }}
     WHERE
         payload_function IN (
             '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_entry',
@@ -35,7 +35,7 @@ events AS (
     SELECT
         *
     FROM
-        aptos.silver.events
+        {{ ref('silver__events') }}
     WHERE
         payload_function IN (
             '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_entry',
@@ -75,9 +75,10 @@ wormhole_transfers AS (
         NULL AS source_chain_id,
         NULL AS source_chain_name,
         21 AS destination_chain_id,
-        'aptos' AS destination_chain,
+        'aptos' AS destination_chain_name,
         payload :type_arguments [0] :: STRING AS token_address,
         event_data :amount :: INT AS amount_unadj,
+        a.event_index,
         a._inserted_timestamp
     FROM
         events A
@@ -113,9 +114,10 @@ wormhole_transfers AS (
         22 AS source_chain_id,
         'aptos' AS source_chain_name,
         payload :arguments [1] :: INT AS destination_chain_id,
-        chain_name AS destination_chain,
+        chain_name AS destination_chain_name,
         payload :type_arguments [0] :: STRING AS token_address,
         payload :arguments [0] :: INT AS amount_unadj,
+        a.event_index,
         a._inserted_timestamp
     FROM
         events A
@@ -151,55 +153,55 @@ SELECT
     t.tx_sender,
     t.sender,
     CASE
-        WHEN destination_chain = 'solana' THEN ethereum.utils.udf_hex_to_base58(receiver)
-        WHEN destination_chain IN (
+        WHEN destination_chain_name = 'solana' THEN ethereum.utils.udf_hex_to_base58(receiver)
+        WHEN destination_chain_name IN (
             'injective',
             'sei'
         ) THEN ethereum.utils.udf_hex_to_bech32(
             receiver,
             SUBSTR(
-                destination_chain,
+                destination_chain_name,
                 1,
                 3
             )
         )
-        WHEN destination_chain IN (
+        WHEN destination_chain_name IN (
             'osmosis',
             'xpla'
         ) THEN ethereum.utils.udf_hex_to_bech32(
             receiver,
             SUBSTR(
-                destination_chain,
+                destination_chain_name,
                 1,
                 4
             )
         )
-        WHEN destination_chain IN (
+        WHEN destination_chain_name IN (
             'terra',
             'terra2',
             'evmos'
         ) THEN ethereum.utils.udf_hex_to_bech32(
             receiver,
             SUBSTR(
-                destination_chain,
+                destination_chain_name,
                 1,
                 5
             )
         )
-        WHEN destination_chain IN (
+        WHEN destination_chain_name IN (
             'cosmoshub',
             'kujira'
         ) THEN ethereum.utils.udf_hex_to_bech32(
             receiver,
             SUBSTR(
-                destination_chain,
+                destination_chain_name,
                 1,
                 6
             )
         )
-        WHEN destination_chain IN ('near') THEN near_address
-        WHEN destination_chain IN ('algorand') THEN ethereum.utils.udf_hex_to_algorand(receiver)
-        WHEN destination_chain IN ('polygon') THEN SUBSTR(
+        WHEN destination_chain_name IN ('near') THEN near_address
+        WHEN destination_chain_name IN ('algorand') THEN ethereum.utils.udf_hex_to_algorand(receiver)
+        WHEN destination_chain_name IN ('polygon') THEN SUBSTR(
             receiver,
             1,
             42
@@ -209,11 +211,12 @@ SELECT
     t.source_chain_id,
     t.source_chain_name,
     t.destination_chain_id,
-    t.destination_chain AS destination_chain_name,
+    t.destination_chain_name,
     t.token_address,
     t.amount_unadj,
+    t.event_index,
     {{ dbt_utils.generate_surrogate_key(
-        ['tx_hash']
+        ['tx_hash','event_index']
     ) }} AS bridge_wormhole_transfers_id,
     -- tx_id is unique but is it enough?
     SYSDATE() AS inserted_timestamp,

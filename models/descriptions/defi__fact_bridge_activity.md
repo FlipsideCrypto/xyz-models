@@ -11,7 +11,7 @@ The address that initiated the bridge deposit or transfer. This address is the s
 
 {% enddocs %}
 
-{% docs destination_chain_receiver %}
+{% docs bridge_receiver %}
 
 The designated address set to receive the bridged tokens on the target chain after the completion of the bridge transaction. For non-evm chains, the hex address is decoded/encoded to match the data format of the destination chain, where possible.
 
@@ -39,5 +39,17 @@ The address of the contract responsible for handling the bridge deposit or trans
 {% docs bridge_token_address %}
 
 The address associated with the token that is being bridged. It provides a unique identifier for the token within its origin blockchain.
+
+{% enddocs %}
+
+{% docs source_chain_id %}
+
+The numeric identifier associated with the source blockchain network. This is specific to the chain and helps in uniquely identifying it.
+
+{% enddocs %}
+
+{% docs source_chain %}
+
+The name of the blockchain network from which the assets are being bridged.
 
 {% enddocs %}

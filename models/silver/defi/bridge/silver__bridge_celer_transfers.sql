@@ -78,7 +78,7 @@ SELECT
     A.event_data :burner :: STRING AS sender,
     event_data :to_addr :: STRING AS receiver,
     12360001 AS source_chain_id,
-    'Aptos' AS source_chain,
+    'Aptos' AS source_chain_name,
     event_data :to_chain :: INT AS destination_chain_id,
     CASE
         WHEN event_data :to_chain IS NULL THEN 'Aptos'
@@ -124,7 +124,7 @@ SELECT
         WHEN event_data :ref_chain_id :: INT = 56 THEN 'BSC'
         WHEN left(event_data :ref_chain_id,2) = '56' THEN 'BSC'
         
-    END AS source_chain_id,
+    END AS source_chain_name,
     12360001 AS destination_chain_id,
     'Aptos' AS destination_chain_name,
     event_data :coin_id :: STRING AS token_address,
