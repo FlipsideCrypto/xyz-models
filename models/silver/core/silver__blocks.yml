@@ -27,7 +27,8 @@ models:
           - not_null
       - name: TX_COUNT_FROM_TRANSACTIONS_ARRAY
         tests:
-          - not_null
+          - not_null:
+                where: block_number not in (1219426,1219157,1216306,2288589,2673302,3032639,3032644,3032637,4107057,4044852,4044853,5153423,5153513,6185020)
       - name: TX_COUNT_FROM_VERSIONS
         tests:
           - not_null

@@ -1,0 +1,52 @@
+version: 2
+models:
+  - name: silver__bridge_wormhole_transfers
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: BRIDGE_WORMHOLE_TRANSFERS_ID
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: hour
+              interval: 12
+      - name: VERSION
+        tests:
+          - not_null
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: PLATFORM
+        tests:
+          - not_null
+      - name: BRIDGE_ADDRESS
+        tests:
+          - not_null
+      - name: EVENT_NAME
+        tests:
+          - not_null
+      - name: TX_SENDER
+        tests:
+          - not_null
+      - name: SENDER
+      - name: RECEIVER
+        tests:
+          - not_null
+      - name: SOURCE_CHAIN_ID
+      - name: SOURCE_CHAIN_NAME
+      - name: DESTINATION_CHAIN_ID
+        tests:
+          - not_null
+      - name: DESTINATION_CHAIN_NAME
+        tests:
+          - not_null
+      - name: TOKEN_ADDRESS
+        tests:
+          - not_null
+      - name: AMOUNT_UNADJ
+        tests:
+          - not_null

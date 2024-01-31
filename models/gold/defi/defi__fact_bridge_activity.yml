@@ -1,0 +1,46 @@
+version: 2
+models:
+  - name: defi__fact_bridge_activity
+    description: '{{ doc("defi__fact_bridge_activity") }}'
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: fact_bridge_activity_id
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: BRIDGE_ADDRESS
+        description: '{{ doc("bridge_address") }}'
+      - name: PLATFORM
+        description: '{{ doc("bridge_platform") }}'
+      - name: EVENT_NAME
+        description: '{{ doc("event_resource") }}'
+      - name: TX_SENDER
+        description: '{{ doc("sender") }}'
+      - name: SENDER
+        description: '{{ doc("bridge_sender") }}'
+      - name: RECEIVER
+        description: '{{ doc("bridge_receiver") }}'
+      - name: SOURCE_CHAIN
+        description: '{{ doc("source_chain") }}'
+      - name: SOURCE_CHAIN_ID
+        description: '{{ doc("source_chain_id") }}'
+      - name: DESTINATION_CHAIN
+        description: '{{ doc("destination_chain") }}'
+      - name: DESTINATION_CHAIN_ID
+        description: '{{ doc("destination_chain_id") }}'
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("bridge_token_address") }}'
+      - name: AMOUNT_UNADJ
+        description: '{{ doc("amount") }}'
+      - name: FACT_BRIDGE_ACTIVITY_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
