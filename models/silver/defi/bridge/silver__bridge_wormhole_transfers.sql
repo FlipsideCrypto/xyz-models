@@ -7,22 +7,45 @@
     tags = ['noncore']
 ) }}
 
-WITH base AS (
+WITH txs AS (
 
     SELECT
-        *,
-        SPLIT_PART(
-            payload :function,
-            '::',
-            1
-        ) AS bridge_address
+        *
     FROM
-        {{ ref(
-            'silver__transactions'
-        ) }}
+        aptos.silver.transactions
     WHERE
-        bridge_address = '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f'
-        AND success
+        payload_function IN (
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_entry',
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_with_payload_entry',
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::complete_transfer::submit_vaa_and_register_entry'
+        )
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp)
+    FROM
+        {{ this }}
+)
+{% else %}
+    AND block_timestamp :: DATE >= '2022-10-19'
+{% endif %}
+),
+events AS (
+    SELECT
+        *
+    FROM
+        aptos.silver.events
+    WHERE
+        payload_function IN (
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_entry',
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_with_payload_entry',
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::complete_transfer::submit_vaa_and_register_entry'
+        )
+        AND event_type IN (
+            '0x1::coin::DepositEvent',
+            '0x1::coin::WithdrawEvent'
+        )
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -36,25 +59,48 @@ AND _inserted_timestamp >= (
 {% endif %}
 ),
 wormhole_transfers AS (
+    --wormhole in
     SELECT
-        block_number,
-        block_timestamp,
-        version,
-        tx_hash,
-        payload,
-        bridge_address,
-        SPLIT_PART(
-            payload :function,
-            '::',
-            2
-        ) AS function,
-        SPLIT_PART(
-            payload :function,
-            '::',
-            3
-        ) AS event_name,
+        A.block_number,
+        A.block_timestamp,
+        A.version,
+        A.tx_hash,
         'wormhole' AS platform,
-        sender,
+        '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f' AS bridge_address,
+        A.event_resource AS event_name,
+        'inbound' AS direction,
+        b.sender AS tx_sender,
+        NULL AS sender,
+        b.sender AS receiver,
+        NULL AS source_chain_id,
+        NULL AS source_chain_name,
+        21 AS destination_chain_id,
+        'aptos' AS destination_chain,
+        payload :type_arguments [0] :: STRING AS token_address,
+        event_data :amount :: INT AS amount_unadj,
+        a._inserted_timestamp
+    FROM
+        events A
+        LEFT JOIN txs b
+        ON A.tx_hash = b.tx_hash
+        AND A.block_timestamp :: DATE = b.block_timestamp :: DATE
+    WHERE
+        A.event_resource = 'DepositEvent'
+        AND b.payload_function = '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::complete_transfer::submit_vaa_and_register_entry'
+        AND event_data :amount :: INT <> 0
+    UNION ALL
+    --wormhole out
+    SELECT
+        A.block_number,
+        A.block_timestamp,
+        A.version,
+        A.tx_hash,
+        'wormhole' AS platform,
+        '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f' AS bridge_address,
+        A.event_resource AS event_name,
+        'outbound' AS direction,
+        b.sender AS tx_sender,
+        b.sender AS sender,
         (
             CASE
                 WHEN LEFT(
@@ -63,19 +109,28 @@ wormhole_transfers AS (
                 ) = '0x000000000000000000000000' THEN CONCAT('0x', RIGHT(payload :arguments [2], 40))
                 ELSE payload :arguments [2]
             END
-        ) AS destination_recipient_address,
-        chain_name AS destination_chain,
+        ) AS receiver,
+        22 AS source_chain_id,
+        'aptos' AS source_chain_name,
         payload :arguments [1] :: INT AS destination_chain_id,
+        chain_name AS destination_chain,
         payload :type_arguments [0] :: STRING AS token_address,
         payload :arguments [0] :: INT AS amount_unadj,
-        _inserted_timestamp
+        a._inserted_timestamp
     FROM
-        base
-        LEFT JOIN {{ ref('silver__bridge_wormhole_chain_id_seed') }}
+        events A
+        LEFT JOIN txs b
+        ON A.tx_hash = b.tx_hash
+        AND A.block_timestamp :: DATE = b.block_timestamp :: DATE
+        LEFT JOIN aptos_dev.silver.bridge_wormhole_chain_id_seed
         ON chain_id = destination_chain_id
     WHERE
-        function = 'transfer_tokens' --bridge from aptos function in wormhole
-        AND event_name = 'transfer_tokens_entry' --bridge from aptos event name in wormhole
+        A.event_resource = 'WithdrawEvent'
+        AND b.payload_function IN (
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_entry',
+            '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_with_payload_entry'
+        )
+        AND event_data :amount :: INT <> 0
 ),
 near_addresses AS (
     SELECT
@@ -89,22 +144,19 @@ SELECT
     t.block_timestamp,
     t.version,
     t.tx_hash,
-    t.payload,
-    t.bridge_address,
-    t.function,
-    t.event_name,
     t.platform,
+    t.bridge_address,
+    t.event_name,
+    t.direction,
+    t.tx_sender,
     t.sender,
-    t.destination_recipient_address,
-    t.destination_chain,
-    t.destination_chain_id,
     CASE
-        WHEN destination_chain = 'solana' THEN ethereum.utils.udf_hex_to_base58(destination_recipient_address)
+        WHEN destination_chain = 'solana' THEN ethereum.utils.udf_hex_to_base58(receiver)
         WHEN destination_chain IN (
             'injective',
             'sei'
         ) THEN ethereum.utils.udf_hex_to_bech32(
-            destination_recipient_address,
+            receiver,
             SUBSTR(
                 destination_chain,
                 1,
@@ -115,7 +167,7 @@ SELECT
             'osmosis',
             'xpla'
         ) THEN ethereum.utils.udf_hex_to_bech32(
-            destination_recipient_address,
+            receiver,
             SUBSTR(
                 destination_chain,
                 1,
@@ -127,7 +179,7 @@ SELECT
             'terra2',
             'evmos'
         ) THEN ethereum.utils.udf_hex_to_bech32(
-            destination_recipient_address,
+            receiver,
             SUBSTR(
                 destination_chain,
                 1,
@@ -138,7 +190,7 @@ SELECT
             'cosmoshub',
             'kujira'
         ) THEN ethereum.utils.udf_hex_to_bech32(
-            destination_recipient_address,
+            receiver,
             SUBSTR(
                 destination_chain,
                 1,
@@ -146,19 +198,24 @@ SELECT
             )
         )
         WHEN destination_chain IN ('near') THEN near_address
-        WHEN destination_chain IN ('algorand') THEN ethereum.utils.udf_hex_to_algorand(destination_recipient_address)
+        WHEN destination_chain IN ('algorand') THEN ethereum.utils.udf_hex_to_algorand(receiver)
         WHEN destination_chain IN ('polygon') THEN SUBSTR(
-            destination_recipient_address,
+            receiver,
             1,
             42
         )
-        ELSE destination_recipient_address
-    END AS destination_chain_receiver,
+        ELSE receiver
+    END AS receiver,
+    t.source_chain_id,
+    t.source_chain_name,
+    t.destination_chain_id,
+    t.destination_chain AS destination_chain_name,
     t.token_address,
     t.amount_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash']
-    ) }} AS bridge_wormhole_transfers_id, -- tx_id is unique but is it enough?
+    ) }} AS bridge_wormhole_transfers_id,
+    -- tx_id is unique but is it enough?
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     t._inserted_timestamp,
@@ -166,4 +223,4 @@ SELECT
 FROM
     wormhole_transfers t
     LEFT JOIN near_addresses n
-    ON t.destination_recipient_address = n.addr_encoded
+    ON t.receiver = n.addr_encoded
