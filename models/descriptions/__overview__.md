@@ -38,6 +38,9 @@ There is more information on how to use dbt docs in the last section of this doc
 **Core Convenience Tables:**
 - [ez_native_transfers](#!/model/model.aptos_models.core__ez_native_transfers)
 
+**Defi Fact Tables:**
+- [fact_bridge_activity](#!/model/model.aptos_models.defi__fact_bridge_activity)
+
 
 **Price Dimension Tables:**
 - [dim_asset_metadata](#!/model/model.aptos_models.price__dim_asset_metadata)

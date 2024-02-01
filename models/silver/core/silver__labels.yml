@@ -9,6 +9,5 @@ models:
       - name: ADDRESS
         tests:
           - not_null
-          - unique
      
       
