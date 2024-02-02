@@ -78,8 +78,8 @@ wormhole_transfers AS (
         'aptos' AS destination_chain_name,
         payload :type_arguments [0] :: STRING AS token_address,
         event_data :amount :: INT AS amount_unadj,
-        a.event_index,
-        a._inserted_timestamp
+        A.event_index,
+        A._inserted_timestamp
     FROM
         events A
         LEFT JOIN txs b
@@ -90,7 +90,7 @@ wormhole_transfers AS (
         AND b.payload_function = '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::complete_transfer::submit_vaa_and_register_entry'
         AND event_data :amount :: INT <> 0
     UNION ALL
-    --wormhole out
+        --wormhole out
     SELECT
         A.block_number,
         A.block_timestamp,
@@ -117,14 +117,14 @@ wormhole_transfers AS (
         chain_name AS destination_chain_name,
         payload :type_arguments [0] :: STRING AS token_address,
         payload :arguments [0] :: INT AS amount_unadj,
-        a.event_index,
-        a._inserted_timestamp
+        A.event_index,
+        A._inserted_timestamp
     FROM
         events A
         LEFT JOIN txs b
         ON A.tx_hash = b.tx_hash
         AND A.block_timestamp :: DATE = b.block_timestamp :: DATE
-        LEFT JOIN aptos_dev.silver.bridge_wormhole_chain_id_seed
+        LEFT JOIN {{ ref('silver__bridge_wormhole_chain_id_seed') }}
         ON chain_id = destination_chain_id
     WHERE
         A.event_resource = 'WithdrawEvent'
