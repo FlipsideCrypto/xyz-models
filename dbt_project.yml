@@ -52,6 +52,8 @@ vars:
   ROLES: |
       ["INTERNAL_DEV"]
 
+  dbt_constraints_sources_nn_enabled: false
+
 tests:
   +store_failures: true # all tests
 
