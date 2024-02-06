@@ -1,7 +1,10 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'address',
+    unique_key = ['address', 'blockchain'],
+    incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
+    cluster_by = 'modified_timestamp::DATE',
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address); DELETE FROM {{ this }} WHERE _is_deleted = TRUE;",
     tags = ['noncore']
 ) }}
 
@@ -13,32 +16,26 @@ SELECT
     label_subtype,
     address_name,
     project_name,
-    {{ dbt_utils.generate_surrogate_key(
-        ['address']
-    ) }} AS labels_id,
+    _is_deleted,
+    labels_combined_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    TO_TIMESTAMP_NTZ(insert_date) AS _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ source(
-        'crosschain',
-        'dim_labels'
+        'crosschain_silver',
+        'labels_combined'
     ) }}
 WHERE
     blockchain = 'aptos'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp
+            modified_timestamp
         )
     FROM
         {{ this }}
 )
 {% endif %}
-
-qualify(ROW_NUMBER() over (PARTITION BY address
-ORDER BY
-    _inserted_timestamp DESC) = 1)
