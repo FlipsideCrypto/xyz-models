@@ -82,8 +82,7 @@ FINAL AS (
   SELECT
     fo.tx_id,
     block_timestamp,
-    fo.pubkey_script_address AS to_address
-,
+    fo.pubkey_script_address AS to_address,
     -- TODO: tbd if we need this
     from_entity,
     COALESCE(
@@ -124,4 +123,4 @@ SELECT
   SYSDATE() AS inserted_timestamp,
   SYSDATE() AS modified_timestamp
 FROM
-  FINAL
+  FINAL -- TODO: why from and to address can be both NULL?
