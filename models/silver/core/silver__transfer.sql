@@ -3,7 +3,7 @@
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
   unique_key = 'tx_id',
-  cluster_by = ["from_entity", "to_entity"],
+  cluster_by = ["_partition_by_address_group_from_entity", "_partition_by_address_group_to_entity"],
 ) }}
 
 WITH inputs AS (
@@ -12,6 +12,9 @@ WITH inputs AS (
     *
   FROM
     {{ ref('silver__inputs_final') }}
+  WHERE
+    block_number >= 813567
+    AND block_number <= 813692
 
 {% if is_incremental() %}
 WHERE
@@ -27,7 +30,10 @@ output AS (
   SELECT
     *
   FROM
-    {{ ref('silver__outputs_final') }}
+    {{ ref('silver__outputs') }}
+  WHERE
+    block_number >= 813567
+    AND block_number <= 813692
 
 {% if is_incremental() %}
 WHERE
@@ -48,8 +54,10 @@ full_entity_cluster AS (
 inputs_mapped AS (
   SELECT
     tx_id,
+    pubkey_script_address AS from_address,
+    -- TODO: tbd if we need this
     COALESCE(
-      address_group :VARCHAR,
+      address_group :: VARCHAR,
       pubkey_script_address
     ) AS from_entity,
     IFF(
@@ -67,15 +75,19 @@ inputs_mapped AS (
   GROUP BY
     tx_id,
     from_entity,
-    _partition_by_address_group
+    _partition_by_address_group_from_entity,
+    from_address
 ),
 FINAL AS (
   SELECT
     fo.tx_id,
     block_timestamp,
+    fo.pubkey_script_address AS to_address
+,
+    -- TODO: tbd if we need this
     from_entity,
     COALESCE(
-      address_group :VARCHAR,
+      address_group :: VARCHAR,
       pubkey_script_address
     ) AS to_entity,
     IFF(
@@ -99,6 +111,8 @@ FINAL AS (
     block_timestamp,
     from_entity,
     to_entity,
+    from_address,
+    to_address,
     _partition_by_address_group_to_entity,
     _partition_by_address_group_from_entity
 )
