@@ -27,10 +27,10 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-    modified_timestamp >= (
+    system_created_at >= (
         SELECT
             MAX(
-                modified_timestamp
+                system_created_at
             )
         FROM
             {{ this }}
@@ -40,5 +40,5 @@ WHERE
 qualify ROW_NUMBER() over (
     PARTITION BY lower(address)
     ORDER BY
-        insert_date DESC
+        system_created_at DESC
 ) = 1
