@@ -2,14 +2,14 @@
     materialized = 'incremental',
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    unique_key = 'address',
+    unique_key = 'labels_id',
     tags = ["core", "scheduled_non_core"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address); DELETE FROM {{ this }} WHERE _is_deleted = TRUE;"
 ) }}
 
 SELECT
-    TO_TIMESTAMP_NTZ(system_created_at) AS system_created_at,
-    TO_TIMESTAMP_NTZ(insert_date) AS insert_date,
+    system_created_at :: TIMESTAMP_NTZ AS system_created_at,
+    insert_date :: TIMESTAMP_NTZ AS insert_date,
     blockchain,
     address,
     creator,
@@ -20,7 +20,9 @@ SELECT
     _is_deleted,
     source,
     modified_timestamp AS _modified_timestamp,
-    labels_combined_id,
+    {{ dbt_utils.generate_surrogate_key(
+        ['address']
+    ) }} AS labels_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
@@ -38,9 +40,3 @@ WHERE
             {{ this }}
     )
 {% endif %}
-
-qualify ROW_NUMBER() over (
-    PARTITION BY lower(address)
-    ORDER BY
-        _modified_timestamp DESC
-) = 1
