@@ -2,14 +2,14 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'aptos' else 'crosschain_dev' }}"
+    database: crosschain
     schema: core
     tables:
       - name: dim_date_hours
       - name: dim_dates
       - name: dim_labels
   - name: crosschain_silver
-    database: "{{ 'crosschain' if target.database == 'aptos' else 'crosschain_dev' }}"
+    database: crosschain
     schema: silver
     tables:
       - name: number_sequence
