@@ -14,8 +14,10 @@ SELECT
     label_subtype,
     address_name,
     project_name,
+    source,
     _is_deleted,
-    labels_combined_id
+    labels_combined_id,
+    modified_timestamp
 FROM
     {{ source(
         'crosschain_silver',

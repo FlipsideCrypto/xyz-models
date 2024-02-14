@@ -18,6 +18,8 @@ SELECT
     address_name,
     project_name,
     _is_deleted,
+    source,
+    modified_timestamp AS _modified_timestamp,
     labels_combined_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
@@ -27,10 +29,10 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-    modified_timestamp >= (
+    _modified_timestamp >= (
         SELECT
             MAX(
-                modified_timestamp
+                _modified_timestamp
             )
         FROM
             {{ this }}
@@ -40,5 +42,5 @@ WHERE
 qualify ROW_NUMBER() over (
     PARTITION BY lower(address)
     ORDER BY
-        insert_date DESC
+        _modified_timestamp DESC
 ) = 1
