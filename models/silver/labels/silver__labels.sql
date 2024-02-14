@@ -39,7 +39,7 @@ WHERE
 {% endif %}
 
 qualify ROW_NUMBER() over (
-    PARTITION BY address
+    PARTITION BY lower(address)
     ORDER BY
         insert_date DESC
 ) = 1
