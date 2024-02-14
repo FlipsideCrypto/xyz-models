@@ -21,6 +21,9 @@ models:
       - name: LABEL_SUBTYPE
         description: '{{ doc("label_subtype") }}'
 
+      - name: PROJECT_NAME
+        description: '{{ doc("project_name") }}'
+
       - name: LABEL
         description: '{{ doc("label") }}'
 
