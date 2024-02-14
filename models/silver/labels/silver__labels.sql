@@ -4,7 +4,6 @@
     merge_exclude_columns = ["inserted_timestamp"],
     unique_key = 'address',
     tags = ["core", "scheduled_non_core"],
-    cluster_by = ["label_type", "label_subtype", "project_name"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address); DELETE FROM {{ this }} WHERE _is_deleted = TRUE;"
 ) }}
 
