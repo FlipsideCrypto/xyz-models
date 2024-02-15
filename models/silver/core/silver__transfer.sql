@@ -21,10 +21,8 @@ WITH inputs AS (
 WHERE
     -- see comment below on null address field
     PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
-    AND _partition_by_block_id = 814000
-    AND block_number BETWEEN 813567
-    AND 813692 
-    {# AND tx_id = '69420c6b5d48807535d5b01555df8b455e38cbad89949cdbd0927a67b11cfbb2' #}
+    AND block_timestamp :: DATE >= sysdate() - interval '14 days'
+    AND block_timestamp :: DATE != CURRENT_DATE
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -50,10 +48,8 @@ outputs AS (
   WHERE
     -- see comment below on null address field
     PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
-    AND _partition_by_block_id = 814000
-    AND block_number BETWEEN 813567
-    AND 813692 
-    {# AND tx_id = '69420c6b5d48807535d5b01555df8b455e38cbad89949cdbd0927a67b11cfbb2' #}
+    AND block_timestamp :: DATE >= sysdate() - interval '14 days'
+    AND block_timestamp :: DATE != CURRENT_DATE
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -131,6 +127,7 @@ FINAL AS (
     i._partition_by_address_group_from_entity,
     o._partition_by_address_group_to_entity,
     i._partition_by_block_id,
+    {# TODO - probably remove the groupby inserted/modified timestamp. Join in after agg #}
     i._inserted_timestamp,
     i._modified_timestamp,
     SUM(VALUE) AS transfer_amount
@@ -175,46 +172,6 @@ SELECT
   SYSDATE() AS modified_timestamp
 FROM
   FINAL
-  
-  
-{#
-  example tx
-FROM
-  this SET
-SELECT
-  *
-FROM
-  bitcoin_dev.silver.transfer -- from bitcoin_dev.silver.inputs_final
-  -- from bitcoin_dev.silver.outputs
-  -- from bitcoin_dev.silver.transactions
-WHERE
-  tx_id = '69420c6b5d48807535d5b01555df8b455e38cbad89949cdbd0927a67b11cfbb2'
-  AND block_number = 813583;
-
-  -- 2 inputs
-  -- both w address bc1qkag02t5ptfplscrtec2ltdapk5hh8vmk29vm9j
-  -- values 249.01061636 and 0.02465336 = 249.03526972
-
-  -- 3 outputs
-  -- index 2 = nulldata with value 0 and address null
-  -- values 248.71402963 to bc1qkag02t5ptfplscrtec2ltdapk5hh8vmk29vm9j and 0.32116104 to bc1qjqcr75tqzxduk37wmykd3j68un5up8ln50323s
-
-  -- so in this tx, total input across 2 UTXO was 249.03526972
-  -- looks like this was a ransfer of 0.32116104 to bc1qjqcr75tqzxduk37wmykd3j68un5up8ln50323s
-  -- and a "refund" UTXO of 248.71402963 back to bc1qkag02t5ptfplscrtec2ltdapk5hh8vmk29vm9j
-  
-  -- HOWEVER, neither is clustered
-SELECT
-  *
-FROM
-  bitcoin_dev.silver.full_entity_cluster
-WHERE
-  address IN (
-    'bc1qkag02t5ptfplscrtec2ltdapk5hh8vmk29vm9j',
-    'bc1qjqcr75tqzxduk37wmykd3j68un5up8ln50323s'
-  );
-#}
-
 
 
 {# 
