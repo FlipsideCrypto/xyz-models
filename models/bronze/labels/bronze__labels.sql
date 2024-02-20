@@ -13,11 +13,15 @@ SELECT
     label_type,
     label_subtype,
     address_name,
-    project_name
+    project_name,
+    source,
+    _is_deleted,
+    labels_combined_id,
+    modified_timestamp
 FROM
     {{ source(
-        'crosschain',
-        'dim_labels'
+        'crosschain_silver',
+        'labels_combined'
     ) }}
 WHERE
     blockchain = 'bitcoin'

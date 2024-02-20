@@ -1,34 +1,26 @@
 version: 2
 models:
   - name: silver__labels
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - BLOCKCHAIN
-            - CREATOR
-            - ADDRESS
-
+    description: Labels for Bitcoin addresses.
     columns:
+      - name: SYSTEM_CREATED_AT
+
+      - name: INSERT_DATE
+
       - name: BLOCKCHAIN
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_set:
               value_set: ["bitcoin"]
 
-      - name: CREATOR
-        tests:
-          - not_null
-          
       - name: ADDRESS
         tests:
           - not_null
+          - unique
               
-      - name: ADDRESS_NAME
+      - name: CREATOR
         tests:
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - STRING
-                - VARCHAR
+          - not_null
 
       - name: LABEL_TYPE
         tests:
@@ -37,6 +29,13 @@ models:
       - name: LABEL_SUBTYPE
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING
+                - VARCHAR
+          
+      - name: ADDRESS_NAME
+        tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING
@@ -50,8 +49,17 @@ models:
                 - STRING
                 - VARCHAR
 
+      - name: IS_DELETED
+
+      - name: SOURCE
+
+      - name: _MODIFIED_TIMESTAMP
+
       - name: LABELS_ID
         description: "{{doc('id')}}"
+        tests:
+          - not_null
+          - unique
 
       - name: INSERTED_TIMESTAMP
         description: "{{doc('inserted_timestamp')}}"

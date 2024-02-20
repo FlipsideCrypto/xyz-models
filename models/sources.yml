@@ -22,6 +22,7 @@ sources:
     schema: silver
     tables:
       - name: number_sequence
+      - name: labels_combined
       - name: hourly_prices_coin_market_cap
       - name: hourly_prices_coin_gecko
   - name: streamline_crosschain
