@@ -16,7 +16,7 @@ transfers AS (
   SELECT
     *
   FROM
-    {{ ref('silver__transfer') }}
+    {{ ref('silver__transfers') }}
 ),
 merge_clusters AS (
   SELECT

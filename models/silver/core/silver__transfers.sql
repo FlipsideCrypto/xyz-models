@@ -5,7 +5,7 @@
   unique_key = 'transfer_id',
   cluster_by = ["_partition_by_address_group_from_entity", "_partition_by_address_group_to_entity", "_modified_timestamp"],
 ) }}
-{# TODO - rename model transferS #}
+
 WITH inputs AS (
 
   SELECT
