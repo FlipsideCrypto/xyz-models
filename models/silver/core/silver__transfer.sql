@@ -21,8 +21,6 @@ WITH inputs AS (
 WHERE
     -- see comment below on null address field
     PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
-    AND block_timestamp :: DATE >= sysdate() - interval '14 days'
-    AND block_timestamp :: DATE != CURRENT_DATE
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -48,8 +46,6 @@ outputs AS (
   WHERE
     -- see comment below on null address field
     PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
-    AND block_timestamp :: DATE >= sysdate() - interval '14 days'
-    AND block_timestamp :: DATE != CURRENT_DATE
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
