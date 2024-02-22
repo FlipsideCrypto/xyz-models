@@ -18,7 +18,7 @@ WITH INPUT_ADDRESS AS (
     WHERE
         block_timestamp_hour < DATE_TRUNC(
             'hour',
-            CURRENT_TIMESTAMP
+            systimestamp()
         )
     {% if is_incremental() %}
     AND DATE_TRUNC(
@@ -76,7 +76,7 @@ TRANSACTIONS AS (
         COUNT(
             DISTINCT tx_hash
         ) AS transaction_count,
-        SUM(fee) AS total_fees,
+        SUM(fee) :: DECIMALS AS total_fees,
         MAX(_inserted_timestamp) AS _inserted_timestamp
     FROM
         {{ ref('silver__transactions_final') }} AS txs
