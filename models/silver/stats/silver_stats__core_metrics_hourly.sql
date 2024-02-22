@@ -6,63 +6,67 @@
     tags = ['curated']
 ) }}
 
-WITH INPUT_ADDRESS AS (
+WITH input_address AS (
+
     SELECT
         DATE_TRUNC(
             'hour',
             block_timestamp
         ) AS block_timestamp_hour,
-        COUNT ( DISTINCT pubkey_script_address) as input_address_count
+        COUNT (
+            DISTINCT pubkey_script_address
+        ) AS input_address_count
     FROM
-    {{ ref('silver__inputs_final') }}
+        {{ ref('silver__inputs_final') }}
     WHERE
-        block_timestamp_hour < DATE_TRUNC(
-            'hour',
-            systimestamp()
-        )
-    {% if is_incremental() %}
-    AND DATE_TRUNC(
-        'hour',
-        _inserted_timestamp
-    ) >= (
-        SELECT
-            MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
-        FROM
-            {{ this }}
-    )
-    {% endif %}
-    GROUP BY
-        1
+        block_timestamp_hour < DATE_TRUNC('hour', systimestamp())
+
+{% if is_incremental() %}
+AND DATE_TRUNC(
+    'hour',
+    _inserted_timestamp
+) >= (
+    SELECT
+        MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
+)
+{% endif %}
+GROUP BY
+    1
 ),
-OUTPUT_ADDRESS AS (
+output_address AS (
     SELECT
         DATE_TRUNC(
             'hour',
             block_timestamp
         ) AS block_timestamp_hour,
-        COUNT ( DISTINCT pubkey_script_address) as output_address_count
+        COUNT (
+            DISTINCT pubkey_script_address
+        ) AS output_address_count
     FROM
-    {{ ref('silver__outputs') }}
+        {{ ref('silver__outputs') }}
     WHERE
         block_timestamp_hour < DATE_TRUNC(
             'hour',
             CURRENT_TIMESTAMP
         )
-    {% if is_incremental() %}
-    AND DATE_TRUNC(
-        'hour',
-        _inserted_timestamp
-    ) >= (
-        SELECT
-            MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
-        FROM
-            {{ this }}
-    )
-    {% endif %}
-    GROUP BY
-        1
+
+{% if is_incremental() %}
+AND DATE_TRUNC(
+    'hour',
+    _inserted_timestamp
+) >= (
+    SELECT
+        MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
+)
+{% endif %}
+GROUP BY
+    1
 ),
-TRANSACTIONS AS (
+transactions AS (
     SELECT
         DATE_TRUNC(
             'hour',
@@ -76,7 +80,7 @@ TRANSACTIONS AS (
         COUNT(
             DISTINCT tx_hash
         ) AS transaction_count,
-        SUM(fee) :: DECIMAL AS total_fees,
+        SUM(fee) AS total_fees,
         MAX(_inserted_timestamp) AS _inserted_timestamp
     FROM
         {{ ref('silver__transactions_final') }} AS txs
@@ -85,20 +89,20 @@ TRANSACTIONS AS (
             'hour',
             CURRENT_TIMESTAMP
         )
-    {% if is_incremental() %}
-    AND DATE_TRUNC(
-        'hour',
-        _inserted_timestamp
-    ) >= (
-        SELECT
-            MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
-        FROM
-            {{ this }}
-    )
-    {% endif %}
-    GROUP BY
-        1
-    limit 10
+
+{% if is_incremental() %}
+AND DATE_TRUNC(
+    'hour',
+    _inserted_timestamp
+) >= (
+    SELECT
+        MAX(DATE_TRUNC('hour', _inserted_timestamp)) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
+)
+{% endif %}
+GROUP BY
+    1
 )
 SELECT
     txs.*,
@@ -110,13 +114,9 @@ SELECT
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
-FROM 
-    TRANSACTIONS as txs
-LEFT JOIN
-    INPUT_ADDRESS as input
-ON
-    txs.block_timestamp_hour = input.block_timestamp_hour
-LEFT JOIN
-    OUTPUT_ADDRESS as output
-ON
-    txs.block_timestamp_hour = output.block_timestamp_hour
+FROM
+    transactions AS txs
+    LEFT JOIN input_address AS input
+    ON txs.block_timestamp_hour = input.block_timestamp_hour
+    LEFT JOIN output_address AS output
+    ON txs.block_timestamp_hour = output.block_timestamp_hour
