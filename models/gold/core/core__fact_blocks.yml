@@ -1,0 +1,131 @@
+version: 2
+
+models:
+  - name: core__fact_blocks
+    description: |-
+      Bitcoin blocks with associated header metadata.
+    tests:
+      - sequence_gaps:
+          column_name: block_number
+          where: BLOCK_TIMESTAMP::DATE < CURRENT_DATE
+      - dbt_utils.recency:
+          datepart: day
+          field: block_timestamp
+          interval: 1
+
+    columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - unique
+          - not_null
+
+      - name: MEDIAN_TIME
+        description: "{{ doc('median_time') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: TX_COUNT
+        description: "{{ doc('tx_count') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: NUMBER
+
+      - name: NEXT_BLOCK_HASH
+        description: "{{ doc('next_block_hash') }}"
+        tests:
+          - unique
+          - not_null:
+              config:
+                error_if: ">3"
+                warn_if: "between 1 and 3"
+
+      - name: PREVIOUS_BLOCK_HASH
+        description: "{{ doc('previous_block_hash') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: BITS
+        description: "{{ doc('bits') }}"
+        tests:
+          - not_null
+
+      - name: CHAINWORK
+        description: "{{ doc('chainwork') }}"
+        tests:
+          - not_null
+
+      - name: DIFFICULTY
+        description: "{{ doc('difficulty') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: MERKLE_ROOT
+        description: "{{ doc('merkle_root') }}"
+        tests:
+          - not_null
+
+      - name: NONCE
+        description: "{{ doc('nonce') }}"
+        tests:
+          - not_null
+
+      - name: SIZE
+        description: "{{ doc('size') }}"
+        tests:
+          - not_null
+
+      - name: STRIPPED_SIZE
+        description: "{{ doc('stripped_size') }}"
+        tests:
+          - not_null
+
+      - name: VERSION
+        description: "{{ doc('version') }}"
+        tests:
+          - not_null
+
+      - name: WEIGHT
+        description: "{{ doc('weight_block') }}"
+        tests:
+          - not_null
+
+      - name: ERROR
+        description: "{{ doc('error') }}"
+
+      - name: TXS
+        description: "{{ doc('tx') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: ARRAY
+
+      - name: FACT_BLOCKS_ID
+        description: "{{doc('id')}}"
+
+      - name: INSERTED_TIMESTAMP
+        description: "{{doc('inserted_timestamp')}}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{doc('modified_timestamp')}}"

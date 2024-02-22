@@ -1,0 +1,33 @@
+version: 2
+models:
+  - name: price__ez_hourly_token_prices
+    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin, with the difference from the fact table being only one provider is reported per hour. The price provided is the closing price for the hour.
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: hour
+          interval: 1
+
+    columns:
+      - name: HOUR
+        description: "{{ doc('hour') }}"
+        tests:
+          - not_null
+          - unique
+
+      - name: PRICE
+        description: "{{ doc('price') }}"
+        tests:
+          - not_null
+
+      - name: PROVIDER
+        description: "{{ doc('provider') }}"
+
+      - name: EZ_HOURLY_TOKEN_PRICES_ID
+        description: "{{doc('id')}}"
+
+      - name: INSERTED_TIMESTAMP
+        description: "{{doc('inserted_timestamp')}}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{doc('modified_timestamp')}}"

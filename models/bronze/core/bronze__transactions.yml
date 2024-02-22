@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: bronze__transactions
+    description: |-
+      This bronze table loads and de-duplicates raw Bitcoin transactions using Streamline.
+
+    columns:
+      - name: BLOCK_NUMBER
+
+      - name: DATA
+      
+      - name: _inserted_timestamp
+          
+      - name: ID
+
+      - name: _partition_by_block_id
+
+      - name: VALUE
+
+      - name: TX_ID
+        tests:
+          - unique
+          - not_null
