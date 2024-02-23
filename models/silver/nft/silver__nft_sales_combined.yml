@@ -1,10 +1,10 @@
 version: 2
 models:
-  - name: silver__nft_sales_mercato
+  - name: silver__nft_sales_combined
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - nft_sales_mercato_id
+            - nft_sales_combined_id
     columns:
       - name: BLOCK_NUMBER
         tests:
@@ -92,3 +92,7 @@ models:
               column_type_list:
                 - NUMBER    
                 - FLOAT 
+      - name: aggregator_name
+      - name: currency_address
+        tests:
+          - not_null

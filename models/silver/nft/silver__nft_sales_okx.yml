@@ -1,10 +1,10 @@
 version: 2
 models:
-  - name: silver__nft_sales_mercato
+  - name: silver__nft_sales_okx
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - nft_sales_mercato_id
+            - nft_sales_okx_id
     columns:
       - name: BLOCK_NUMBER
         tests:
@@ -53,11 +53,11 @@ models:
         tests:
           - not_null
       - name: PROJECT_NAME
-        # tests:
-        #   - not_null
+        tests:
+          - not_null
       - name: TOKENID
-        # tests:
-        #   - not_null
+        tests:
+          - not_null
       - name: PLATFORM_NAME
         tests:
           - not_null
