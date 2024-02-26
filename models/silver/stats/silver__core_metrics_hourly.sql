@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_timestamp_hour",
     cluster_by = ['block_timestamp_hour::DATE'],
-    tags = ['curated']
+    tags = ['noncore']
 ) }}
 
 SELECT
@@ -11,8 +11,8 @@ SELECT
         'hour',
         block_timestamp
     ) AS block_timestamp_hour,
-    MIN(block_number)::float AS block_number_min,
-    MAX(block_number)::float AS block_number_max,
+    MIN(block_number) :: FLOAT AS block_number_min,
+    MAX(block_number) :: FLOAT AS block_number_max,
     COUNT(
         DISTINCT block_number
     ) AS block_count,
@@ -35,7 +35,8 @@ SELECT
     COUNT(
         DISTINCT payload_function
     ) AS unique_payload_function_count,
-    SUM(gas_used) AS total_fees, -- in Octa = 10^-8 Aptos
+    SUM(gas_used) AS total_fees,
+    -- in Octa = 10^-8 Aptos
     MAX(_inserted_timestamp) AS _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['block_timestamp_hour']
