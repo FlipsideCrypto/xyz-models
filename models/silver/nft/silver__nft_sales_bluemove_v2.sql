@@ -48,8 +48,6 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-{% else %}
-    {# AND block_timestamp :: DATE >= '2022-10-19' #}
 {% endif %}
 )
 SELECT

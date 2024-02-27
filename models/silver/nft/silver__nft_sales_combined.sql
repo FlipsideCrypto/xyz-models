@@ -13,6 +13,16 @@ WITH all_nft_platform_sales AS (
         *
     FROM
         {{ ref('silver__nft_sales_combined_view') }}
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
 txns AS (
     SELECT

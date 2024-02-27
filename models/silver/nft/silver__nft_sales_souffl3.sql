@@ -26,7 +26,6 @@ WITH evnts AS (
     FROM
         {{ ref('silver__events') }}
     WHERE
-        --mercato
         (
             (
                 event_address = '0xf6994988bd40261af9431cd6dd3fcf765569719e66322c7a05cc78a89cd366d4'
@@ -46,8 +45,6 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-{% else %}
-    {# AND block_timestamp :: DATE >= '2022-10-19' #}
 {% endif %}
 ),
 evnts_2 AS (
@@ -76,8 +73,8 @@ evnts_2 AS (
                         evnts
                     WHERE
                         (
-                            event_address = 'BuyTokenEvent<0x1'
-                            AND event_resource = 'BuyListingEvent'
+                            event_address = '0xf6994988bd40261af9431cd6dd3fcf765569719e66322c7a05cc78a89cd366d4'
+                            AND event_resource = 'BuyTokenEvent<0x1'
                         )
                 )
             WHERE

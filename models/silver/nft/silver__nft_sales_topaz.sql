@@ -33,22 +33,7 @@ WITH evnts AS (
     FROM
         {{ ref('silver__events') }}
     WHERE
-        --mercato
-        {# (
-        (
-            event_address = '0x2c7bccf7b31baf770fdbcc768d9e9cb3d87805e255355df5db32ac9a669010a2' --types of events that indicate a sale
-            AND event_resource IN (
-                'BuyEvent',
-                'FillCollectionBidEvent',
-                'SellEvent'
-            )
-        )
-        OR (
-            event_resource = 'DepositEvent'
-            AND event_module = 'coin'
-        )
-) #}
-success
+        success
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -57,8 +42,6 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-{% else %}
-    {# AND block_timestamp :: DATE >= '2022-10-19' #}
 {% endif %}
 ),
 evnts_2 AS (

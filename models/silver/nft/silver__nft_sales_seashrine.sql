@@ -26,7 +26,6 @@ WITH evnts AS (
     FROM
         {{ ref('silver__events') }}
     WHERE
-        --mercato
         (
             (
                 event_address = '0xd5431191333a6185105c172e65f9fcd945ae92159ab648e1a9ea88c71e275548'
@@ -46,8 +45,6 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-{% else %}
-    {# AND block_timestamp :: DATE >= '2022-10-19' #}
 {% endif %}
 ),
 evnts_2 AS (
