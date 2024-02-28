@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'view',
-    tags = ['noncore']
+    tags = ['noncore'],
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' }} }
 ) }}
 
 WITH base AS (
