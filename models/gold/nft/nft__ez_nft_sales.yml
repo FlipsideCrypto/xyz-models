@@ -1,6 +1,7 @@
 version: 2
 models:
   - name: nft__ez_nft_sales
+    description: A convenience model that combines fact nft sales with tokens and prices
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
