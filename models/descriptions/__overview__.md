@@ -19,6 +19,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 ### Core Tables (`aptos`.`CORE`.`<table_name>`)
 ### Price Tables (`aptos`.`PRICE`.`<table_name>`)
+### NFT Tables (`aptos`.`NFT`.`<table_name>`)
 
 **Core Dimension Tables:**
 - [dim_aptos_names](#!/model/model.aptos_models.core__dim_aptos_names)
@@ -51,6 +52,13 @@ There is more information on how to use dbt docs in the last section of this doc
 **Price Convenience Tables:**
 - [ez_asset_metadata](#!/model/model.aptos_models.price__ez_asset_metadata)
 - [ez_hourly_token_prices](#!/model/model.aptos_models.price__ez_hourly_token_prices)
+
+**NFT Fact Tables:**
+- [fact_nft_sales](#!/model/model.aptos_models.nft__fact_nft_sales)
+
+**NFT Convenience Tables:**
+- [ez_nft_sales](#!/model/model.aptos_models.nft__ez_nft_sales)
+
 
 
 

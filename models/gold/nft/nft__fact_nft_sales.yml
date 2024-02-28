@@ -1,0 +1,45 @@
+version: 2
+models:
+  - name: nft__fact_nft_sales
+    description: This table contains NFT sale events from bluemove, mercato, okx, seashrine,souffl3,topaz, and wapal
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("nft_block_number") }}'
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("nft_blocktime") }}'   
+      - name: TX_HASH
+        description: '{{ doc("nft_tx_hash") }}'   
+      - name: EVENT_INDEX
+        description: '{{ doc("nft_event_index") }}'   
+      - name: EVENT_TYPE
+        description: '{{ doc("nft_event_type") }}'   
+      - name: SELLER_ADDRES 
+        description: '{{ doc("nft_seller_address") }}'
+      - name: BUYER_ADDRESS
+        description: '{{ doc("nft_buyer_address") }}'
+      - name: NFT_ADDRESS
+        description: '{{ doc("nft_nft_address") }}'
+      - name: TOKEN_VERSION
+        description: '{{ doc("nft_token_version") }}'
+      - name: PLATFORM_ADDRESS
+        description: '{{ doc("nft_platform_address") }}'
+      - name: PROJECT_NAME
+        description: '{{ doc("nft_project_name") }}'
+      - name: TOKENID
+        description: '{{ doc("nft_tokenid") }}'
+      - name: PLATFORM_NAME
+        description: '{{ doc("nft_platform_name") }}'
+      - name: PLATFORM_EXCHANGE_VERSION
+        description: '{{ doc("nft_platform_exchange_version") }}'
+      - name: TOTAL_PRICE_RAW
+        description: '{{ doc("nft_price_raw") }}'
+      - name: PLATFORM_FEE_RAW
+        description: '{{ doc("nft_platform_fee_raw") }}'
+      - name: CREATOR_FEE_RAW
+        description: '{{ doc("nft_creator_fee_raw") }}'
+      - name: TOTAL_FEES_RAW
+        description: '{{ doc("nft_total_fees_raw") }}'
+      - name: AGGREGATOR_NAME
+        description: '{{ doc("nft_aggregator_name") }}'
+      - name: CURRENCY_ADDRESS
+        description: '{{ doc("nft_currency_address") }}'
