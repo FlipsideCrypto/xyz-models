@@ -1,0 +1,63 @@
+version: 2
+models:
+  - name: silver__nft_mints_v1
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - nft_mints_v1_id
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER
+                - FLOAT
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - TIMESTAMP_LTZ
+                - TIMESTAMP_NTZ
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: hour
+              interval: 72
+      - name: TX_HASH
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: EVENT_INDEX
+        tests:
+          - not_null
+      - name: EVENT_TYPE
+        tests:
+          - not_null
+      - name: NFT_FROM_ADDRESS
+        tests:
+          - not_null
+      - name: NFT_TO_ADDRESS
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: NFT_ADDRESS
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: TOKEN_VERSION
+        tests:
+          - not_null
+      - name: PROJECT_NAME
+        tests:
+          - not_null
+      - name: TOKENID
+      - name: PRICE_RAW
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER    
+                - FLOAT 
