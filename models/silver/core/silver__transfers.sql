@@ -15,7 +15,7 @@ WITH inputs AS (
     pubkey_script_address,
     _partition_by_block_id,
     _inserted_timestamp,
-    array_max([_inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
+    array_max([inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
   FROM
     {{ ref('silver__inputs_final') }}
 WHERE
@@ -40,7 +40,7 @@ outputs AS (
     VALUE,
     _partition_by_block_id,
     _inserted_timestamp,
-    array_max([_inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
+    array_max([inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
   FROM
     {{ ref('silver__outputs') }}
   WHERE
