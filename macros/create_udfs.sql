@@ -6,6 +6,9 @@
 {{ create_udf_hex_to_int(
             schema = "public"
         ) }}
+{{ create_udf_decode_hex_to_string(
+            schema = "public"
+        ) }}
         {{ create_udtf_get_base_table(
             schema = "streamline"
         ) }}
