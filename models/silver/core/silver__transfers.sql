@@ -66,21 +66,10 @@ full_entity_cluster AS (
 label_inputs AS (
   SELECT
     DISTINCT tx_id,
-    block_number,
-    block_timestamp,
-    pubkey_script_address,
-    address_group,
-    IFF(
-      address_group IS NOT NULL,
-      FLOOR(
-        address_group,
-        -3
-      ),
-      0
-    ) AS _partition_by_address_group_from_entity,
-    i._partition_by_block_id,
-    i._inserted_timestamp,
-    i._modified_timestamp
+    COALESCE(
+      ec.address_group :: VARCHAR,
+      i.pubkey_script_address
+    ) AS from_entity
   FROM
     inputs i
     LEFT JOIN full_entity_cluster ec
@@ -90,42 +79,21 @@ label_outputs AS (
   SELECT
     DISTINCT tx_id,
     pubkey_script_address,
-    address_group,
-    VALUE,
-    IFF(
-      address_group IS NOT NULL,
-      FLOOR(
-        address_group,
-        -3
-      ),
-      0
-    ) AS _partition_by_address_group_to_entity,
-    o._inserted_timestamp,
-    o._modified_timestamp
+    COALESCE(
+      ec.address_group :: VARCHAR,
+      o.pubkey_script_address
+    ) AS to_entity,
+    VALUE
   FROM
     outputs o
     LEFT JOIN full_entity_cluster ec
     ON o.pubkey_script_address = ec.address
 ),
-FINAL AS (
+SUM_VALUE AS (
   SELECT
     i.tx_id,
-    i.block_number,
-    i.block_timestamp,
-    COALESCE(
-      i.address_group :: VARCHAR,
-      i.pubkey_script_address
-    ) AS from_entity,
-    COALESCE(
-      o.address_group :: VARCHAR,
-      o.pubkey_script_address
-    ) AS to_entity,
-    i._partition_by_address_group_from_entity,
-    o._partition_by_address_group_to_entity,
-    i._partition_by_block_id,
-    {# TODO - probably remove the groupby inserted/modified timestamp. Join in after agg #}
-    i._inserted_timestamp,
-    i._modified_timestamp,
+    from_entity,
+    to_entity,
     SUM(VALUE) AS transfer_amount
   FROM
     label_outputs o
@@ -134,20 +102,13 @@ FINAL AS (
   WHERE 
     -- filtering out "refund" UTXO generation events
     from_entity != to_entity
-  {# TODO - must check for any unintended consequence of granular groupby (duplication)
-      can join in descriptive info like ids and timestamps in a later step, if needed
-   #}
   GROUP BY
     1,
     2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10
+    3
+),
+FINAL AS (
+  {# TODO - join in block num, block ts, ins/mod ts, partitions #}
 )
 SELECT
   tx_id,
