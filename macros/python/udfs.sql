@@ -21,7 +21,6 @@ $$;
 {% endmacro %}
 
 {% macro create_udf_decode_hex_to_string() %}
-{% set sql %}
 CREATE OR REPLACE FUNCTION {{ target.database }}.STREAMLINE.UDF_DECODE_HEX_TO_STRING(hex_string STRING)
   RETURNS STRING
   LANGUAGE PYTHON
@@ -46,6 +45,4 @@ def decode_hex_to_string(hex_string):
     return decode_hex_to_string(hex_string)
 
 $$;
-{% endset %}
-{% do run_query(sql) %}
 {% endmacro %}

@@ -15,6 +15,7 @@ SELECT
     block_timestamp,
     block_number,
     block_hash,
+    coinbase_decoded,
     total_reward,
     block_reward,
     fees,
