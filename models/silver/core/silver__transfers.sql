@@ -15,12 +15,17 @@ WITH inputs AS (
     pubkey_script_address,
     _partition_by_block_id,
     _inserted_timestamp,
-    array_max([inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
+    array_max([inserted_timestamp, modified_timestamp]) :: timestamp_ntz AS _modified_timestamp
   FROM
     {{ ref('silver__inputs_final') }}
-WHERE
+  WHERE
     -- see comment below on null address field
-    PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
+    pubkey_script_type NOT IN (
+      'multisig',
+      'nonstandard',
+      'nulldata',
+      'pubkey'
+    )
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -40,12 +45,17 @@ outputs AS (
     VALUE,
     _partition_by_block_id,
     _inserted_timestamp,
-    array_max([inserted_timestamp, modified_timestamp]) :: TIMESTAMP_NTZ AS _modified_timestamp
+    array_max([inserted_timestamp, modified_timestamp]) :: timestamp_ntz AS _modified_timestamp
   FROM
     {{ ref('silver__outputs') }}
   WHERE
     -- see comment below on null address field
-    PUBKEY_SCRIPT_TYPE not in ('multisig', 'nonstandard', 'nulldata', 'pubkey')
+    pubkey_script_type NOT IN (
+      'multisig',
+      'nonstandard',
+      'nulldata',
+      'pubkey'
+    )
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -82,7 +92,10 @@ label_inputs AS (
     inputs i
     LEFT JOIN full_entity_cluster ec
     ON i.pubkey_script_address = ec.address
-  GROUP BY 1,2,3
+  GROUP BY
+    1,
+    2,
+    3
 ),
 label_outputs AS (
   SELECT
@@ -105,9 +118,14 @@ label_outputs AS (
     outputs o
     LEFT JOIN full_entity_cluster ec
     ON o.pubkey_script_address = ec.address
-  GROUP BY 1,2,3,4,5
+  GROUP BY
+    1,
+    2,
+    3,
+    4,
+    5
 ),
-SUM_VALUE AS (
+sum_value AS (
   SELECT
     o.tx_id,
     from_entity,
@@ -119,7 +137,7 @@ SUM_VALUE AS (
     label_outputs o
     LEFT JOIN label_inputs i
     ON o.tx_id = i.tx_id
-  WHERE 
+  WHERE
     -- filtering out "refund" UTXO generation events
     from_entity != to_entity
   GROUP BY
@@ -143,8 +161,16 @@ FINAL AS (
     i._inserted_timestamp,
     i._modified_timestamp
   FROM
-    SUM_VALUE V
-    LEFT JOIN inputs i ON v.tx_id = i.tx_id
+    sum_value v
+    LEFT JOIN (
+      SELECT
+        DISTINCT tx_id,
+        block_number,
+        block_timestamp
+      FROM
+        inputs
+    ) i
+    ON v.tx_id = i.tx_id
 )
 SELECT
   tx_id,
@@ -157,7 +183,7 @@ SELECT
   _partition_by_address_group_to_entity,
   _partition_by_block_id,
   _inserted_timestamp,
-  _modified_timestamp, 
+  _modified_timestamp,
   {{ dbt_utils.generate_surrogate_key(
     ['tx_id', 'from_entity', 'to_entity']
   ) }} AS transfer_id,
@@ -165,4 +191,3 @@ SELECT
   SYSDATE() AS modified_timestamp
 FROM
   FINAL
-
