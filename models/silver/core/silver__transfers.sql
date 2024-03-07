@@ -65,35 +65,55 @@ full_entity_cluster AS (
 ),
 label_inputs AS (
   SELECT
-    DISTINCT tx_id,
+    tx_id,
     COALESCE(
       ec.address_group :: VARCHAR,
       i.pubkey_script_address
-    ) AS from_entity
+    ) AS from_entity,
+    IFF(
+      ec.address_group IS NOT NULL,
+      FLOOR(
+        ec.address_group,
+        -3
+      ),
+      0
+    ) AS _partition_by_address_group_from_entity
   FROM
     inputs i
     LEFT JOIN full_entity_cluster ec
     ON i.pubkey_script_address = ec.address
+  GROUP BY 1,2,3
 ),
 label_outputs AS (
   SELECT
-    DISTINCT tx_id,
+    tx_id,
     pubkey_script_address,
     COALESCE(
       ec.address_group :: VARCHAR,
       o.pubkey_script_address
     ) AS to_entity,
-    VALUE
+    VALUE,
+    IFF(
+      ec.address_group IS NOT NULL,
+      FLOOR(
+        ec.address_group,
+        -3
+      ),
+      0
+    ) AS _partition_by_address_group_to_entity
   FROM
     outputs o
     LEFT JOIN full_entity_cluster ec
     ON o.pubkey_script_address = ec.address
+  GROUP BY 1,2,3,4,5
 ),
 SUM_VALUE AS (
   SELECT
-    i.tx_id,
+    o.tx_id,
     from_entity,
     to_entity,
+    _partition_by_address_group_from_entity,
+    _partition_by_address_group_to_entity,
     SUM(VALUE) AS transfer_amount
   FROM
     label_outputs o
@@ -105,10 +125,26 @@ SUM_VALUE AS (
   GROUP BY
     1,
     2,
-    3
+    3,
+    4,
+    5
 ),
 FINAL AS (
-  {# TODO - join in block num, block ts, ins/mod ts, partitions #}
+  SELECT
+    v.tx_id,
+    i.block_number,
+    i.block_timestamp,
+    v.from_entity,
+    v.to_entity,
+    v.transfer_amount,
+    v._partition_by_address_group_from_entity,
+    v._partition_by_address_group_to_entity,
+    i._partition_by_block_id,
+    i._inserted_timestamp,
+    i._modified_timestamp
+  FROM
+    SUM_VALUE V
+    LEFT JOIN inputs i ON v.tx_id = i.tx_id
 )
 SELECT
   tx_id,
@@ -121,7 +157,7 @@ SELECT
   _partition_by_address_group_to_entity,
   _partition_by_block_id,
   _inserted_timestamp,
-  _modified_timestamp,
+  _modified_timestamp, 
   {{ dbt_utils.generate_surrogate_key(
     ['tx_id', 'from_entity', 'to_entity']
   ) }} AS transfer_id,
@@ -130,19 +166,3 @@ SELECT
 FROM
   FINAL
 
-
-{# 
-  TODO - what to do with NULL ADDRESS IN OUTPUTS
-  (pubkey is known / need to look in to - AN-4019)
-  Note that many of these DO HAVE VALUE associated with them, so should not be overlooked.
-
-  select 
-      pubkey_script_type,
-      pubkey_script_address is null,
-      value > 0,
-      count(1) 
-  from bitcoin_dev.silver.outputs
-  group by 1,2,3
-  order by 1,2,3;
-
- #}
