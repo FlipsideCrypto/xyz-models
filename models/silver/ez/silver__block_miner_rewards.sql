@@ -54,7 +54,7 @@ coinbase AS (
         block_number,
         coinbase,
         output_value AS coinbase_value,
-        STREAMLINE.DECODE_HEX_TO_STRING(coinbase) AS coinbase_decoded
+        STREAMLINE.UDF_DECODE_HEX_TO_STRING(coinbase) AS coinbase_decoded
     FROM
         transactions
     WHERE
