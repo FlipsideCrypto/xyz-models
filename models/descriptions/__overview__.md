@@ -54,10 +54,13 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_hourly_token_prices](#!/model/model.aptos_models.price__ez_hourly_token_prices)
 
 **NFT Fact Tables:**
+- [fact_nft_mints](#!/model/model.aptos_models.nft__fact_nft_mints)
 - [fact_nft_sales](#!/model/model.aptos_models.nft__fact_nft_sales)
 
 **NFT Convenience Tables:**
+- [ez_nft_mints](#!/model/model.aptos_models.nft__ez_nft_mints)
 - [ez_nft_sales](#!/model/model.aptos_models.nft__ez_nft_sales)
+
 
 
 
