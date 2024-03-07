@@ -53,7 +53,8 @@ coinbase AS (
     SELECT
         block_number,
         coinbase,
-        output_value AS coinbase_value
+        output_value AS coinbase_value,
+        STREAMLINE.DECODE_HEX_TO_STRING(coinbase) AS coinbase_decoded
     FROM
         transactions
     WHERE
@@ -68,6 +69,7 @@ blocks_final AS (
         C.coinbase_value - v.fees AS block_reward,
         v.fees,
         C.coinbase,
+        C.coinbase_decoded,
         b._partition_by_block_id,
         b._inserted_timestamp
     FROM
