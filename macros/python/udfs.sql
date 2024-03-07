@@ -42,7 +42,5 @@ def decode_hex_to_string(hex_string):
     except Exception as e:
         return str(e)
 
-    return decode_hex_to_string(hex_string)
-
 $$;
 {% endmacro %}
