@@ -19,3 +19,28 @@ def hex_to_int(hex) -> str:
   return str(int(hex, 16)) if hex else None
 $$;
 {% endmacro %}
+
+{% macro create_udf_decode_hex_to_string() %}
+CREATE OR REPLACE FUNCTION {{ target.database }}.STREAMLINE.UDF_DECODE_HEX_TO_STRING(hex_string STRING)
+  RETURNS STRING
+  LANGUAGE PYTHON
+  RUNTIME_VERSION = '3.10'
+  HANDLER = 'decode_hex_to_string'
+AS
+$$
+import binascii
+
+def decode_hex_to_string(hex_string):
+    """
+    This UDF decodes a hexadecimal string input into its original ASCII representation using the binascii.unhexlify function in Python. 
+    If successful, it returns the decoded message; otherwise, it handles errors and returns the error message or NULL if decoding fails.
+    The primary use-case for this function will be to decode the COINBASE message.
+    """
+    try:
+        decoded_message = binascii.unhexlify(hex_string).decode("utf-8", errors="ignore")
+        return decoded_message
+    except Exception as e:
+        return str(e)
+
+$$;
+{% endmacro %}

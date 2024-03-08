@@ -15,6 +15,7 @@ SELECT
     block_timestamp,
     block_number,
     block_hash,
+    coinbase_decoded,
     total_reward,
     block_reward,
     fees,
@@ -24,7 +25,7 @@ SELECT
             ['block_number']
         ) }}
     ) AS ez_miner_rewards_id,
-    COALESCE(inserted_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,
-    COALESCE(modified_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as modified_timestamp
+    inserted_timestamp,
+    modified_timestamp
 FROM
     blocks
