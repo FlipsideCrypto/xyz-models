@@ -26,6 +26,10 @@ WITH inputs AS (
       'nulldata',
       'pubkey'
     )
+    {# where block_number = 830560
+and tx_id = 'e60ae75d5dedab341a5d5e62899aae7ae9c81120dffe1f39faa5199a224f813e' #}
+
+
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -56,6 +60,9 @@ outputs AS (
       'nulldata',
       'pubkey'
     )
+  {# where block_number = 830560
+and tx_id = 'e60ae75d5dedab341a5d5e62899aae7ae9c81120dffe1f39faa5199a224f813e'
+#}
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
