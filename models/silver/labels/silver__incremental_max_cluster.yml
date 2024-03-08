@@ -1,0 +1,6 @@
+version: 2
+models:
+  - name: silver__incremental_max_cluster
+
+    columns:
+      - name: max_group_id
