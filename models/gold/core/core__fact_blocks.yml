@@ -61,9 +61,9 @@ models:
       - name: PREVIOUS_BLOCK_HASH
         description: "{{ doc('previous_block_hash') }}"
         tests:
-          - not_null
           - unique
-
+          - not_null:
+              where: block_number > 0
       - name: BITS
         description: "{{ doc('bits') }}"
         tests:
