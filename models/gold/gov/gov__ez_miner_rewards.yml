@@ -29,6 +29,9 @@ models:
       - name: BLOCK_HASH
         description: "{{ doc('block_hash') }}"
 
+      - name: COINBASE_DECODED
+        description: "{{ doc('coinbase_decoded') }}"
+
       - name: TOTAL_REWARD
         description: "{{ doc('total_reward') }}"
         tests: 
