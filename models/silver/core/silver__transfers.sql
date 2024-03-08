@@ -173,7 +173,10 @@ FINAL AS (
       SELECT
         DISTINCT tx_id,
         block_number,
-        block_timestamp
+        block_timestamp,
+        _partition_by_block_id,
+        _inserted_timestamp,
+        _modified_timestamp
       FROM
         inputs
     ) i
