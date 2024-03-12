@@ -10,7 +10,6 @@ WITH changelog AS (
     *
   FROM
     {{ ref('silver__clusters_changelog') }}
-    -- TODO fix column names so they're not strings
 ),
 transfers AS (
   SELECT
@@ -25,12 +24,12 @@ merge_clusters AS (
       VALUE :: INT,
       -3
     ) AS _partition_by_address_group,
-    "new_cluster_id" AS new_cluster_id
+    new_cluster_id
   FROM
     changelog,
     LATERAL FLATTEN("clusters")
   WHERE
-    "type" = 'merge'
+    change_type = 'merge'
 ),
 MERGE AS (
   -- TODO test with subset of transfers in known merge from changelog
@@ -76,15 +75,15 @@ add_or_new_addresses AS (
   SELECT
     VALUE :: STRING AS address,
     FLOOR(
-      "cluster_id",
+      cluster_id,
       -3
     ) AS _partition_by_address_group,
-    "new_cluster_id" AS new_cluster_id
+    new_cluster_id
   FROM
     clusters_changelog,
     LATERAL FLATTEN ("addresses")
   WHERE
-    "type" IN (
+    change_type IN (
       'addition',
       'new'
     )

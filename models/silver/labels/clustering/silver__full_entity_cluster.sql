@@ -30,22 +30,22 @@ WITH set_inserted_timestamp AS (
 merges AS (
     SELECT
         s1.value :: STRING AS address_group_old,
-        "new_cluster_id" AS address_group_new
+        new_cluster_id AS address_group_new
     FROM
         {{ target.database }}.silver.clusters_changelog t,
-        TABLE(FLATTEN(t."clusters")) s1
+        TABLE(FLATTEN(t.clusters)) s1
     WHERE
-        t."type" IN ('merge')
+        t.change_type IN ('merge')
 ),
 adds_news AS (
     SELECT
         s1.value :: STRING AS address,
-        t."new_cluster_id" AS address_group
+        t.new_cluster_id AS address_group
     FROM
         {{ target.database }}.silver.clusters_changelog t,
-        TABLE(FLATTEN(t."addresses")) s1
+        TABLE(FLATTEN(t.addresses)) s1
     WHERE
-        t."type" IN (
+        t.change_type IN (
             'new',
             'addition'
         )
