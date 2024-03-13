@@ -11,6 +11,7 @@ WITH changelog AS (
     new_cluster_id
   FROM
     {{ ref('silver__clusters_changelog') }}
+    -- use the changelog store? what if a job fails or a day is missed?
 ),
 transfers AS (
   SELECT
@@ -55,15 +56,17 @@ update_merge AS (
       ELSE 'neither'
     END AS record_updated,
     'merge' AS change_type,
-    COALESCE(
+    {# COALESCE(
       C.new_cluster_id,
       t.from_entity
-    ) AS from_entity,
+    ) AS from_entity, #}
+    C.new_cluster_id AS from_entity,
     from_entity AS from_entity_prior,
-    COALESCE(
+    {# COALESCE(
       c2.new_cluster_id,
       t.to_entity
-    ) AS to_entity,
+    ) AS to_entity, #}
+    c2.new_cluster_id AS to_entity,
     to_entity AS to_entity_prior,
     COALESCE(
       C._partition_by_address_group_new,
