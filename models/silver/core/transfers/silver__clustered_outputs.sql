@@ -18,7 +18,7 @@ WITH CLUSTERS AS (
         -- might want change_type as well tbd
         modified_timestamp AS _modified_timestamp
     FROM
-        {{ ref('silver__full_entity_cluster') }}
+        {{ ref('silver__clusters_changelog_store') }}
         -- import incrementally
 ),
 outputs AS (
@@ -76,13 +76,13 @@ update_modified_cluster AS (
         t
         LEFT JOIN CLUSTERS C
         ON t.pubkey_script_address = C.address
-    WHERE
+    {# WHERE
         _partition_by_address_group IN (
             SELECT
                 DISTINCT _partition_by_address_group
             FROM
                 CLUSTERS
-        )
+        ) #}
         AND C.address_group is not null
 
 ),
