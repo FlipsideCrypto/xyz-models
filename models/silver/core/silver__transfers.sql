@@ -4,7 +4,7 @@
   merge_exclude_columns = ["inserted_timestamp"],
   unique_key = 'transfer_id',
   cluster_by = ["_partition_by_address_group_from_entity", "_partition_by_address_group_to_entity", "_modified_timestamp"],
-  snowflake_warehouse="DBT_EMERGENCY"
+  snowflake_warehouse = "DBT_EMERGENCY"
 ) }}
 
 WITH inputs AS (
@@ -20,17 +20,12 @@ WITH inputs AS (
   FROM
     {{ ref('silver__inputs_final') }}
   WHERE
-    -- see comment below on null address field
     pubkey_script_type NOT IN (
       'multisig',
       'nonstandard',
       'nulldata',
       'pubkey'
     )
-    {# where block_number = 830560
-and tx_id = 'e60ae75d5dedab341a5d5e62899aae7ae9c81120dffe1f39faa5199a224f813e' #}
-
-
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
@@ -54,16 +49,12 @@ outputs AS (
   FROM
     {{ ref('silver__outputs') }}
   WHERE
-    -- see comment below on null address field
     pubkey_script_type NOT IN (
       'multisig',
       'nonstandard',
       'nulldata',
       'pubkey'
     )
-  {# where block_number = 830560
-and tx_id = 'e60ae75d5dedab341a5d5e62899aae7ae9c81120dffe1f39faa5199a224f813e'
-#}
 
 {% if is_incremental() %}
 AND _modified_timestamp >= (
