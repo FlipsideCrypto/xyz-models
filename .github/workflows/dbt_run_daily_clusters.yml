@@ -48,3 +48,7 @@ jobs:
       - name: Run Entity Cluster Full Log Update
         run: |
           dbt run -s tag:entity_cluster
+
+      - name: Build Clustered Transfers Table
+        run: |
+          dbt run -s silver__transfers --full-refresh
