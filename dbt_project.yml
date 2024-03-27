@@ -33,6 +33,10 @@ clean-targets: # directories to be removed by `dbt clean`
 # as tables. These settings can be overridden in the individual model files
 # using the `{{ config(...) }}` macro.
 models:
+  livequery_models:
+    deploy:
+      core:
+        materialized: ephemeral
   +copy_grants: true
   +persist_docs:
     relation: true
