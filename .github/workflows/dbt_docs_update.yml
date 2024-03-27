@@ -61,7 +61,7 @@ jobs:
 
       - name: commit changed files
         run: |
-          git config user.email "abc@xyz"
+          git config user.email "abc@datascience"
           git config user.name "github-actions"
           git commit -am "Auto-update docs"
       - name: push changes to docs

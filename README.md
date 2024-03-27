@@ -1,5 +1,6 @@
+# DATASCIENCE DBT Project
 
-# Please find and replace all instances of `xyz` with your project name.
+This repo is a fork of the [FlistsideCrypto/xyz-models](https://github.com/FlipsideCrypto/xyz-models) repo, the `xyz-models` repo holds scafolding for DBT projects at `Flipside Crypto`.  `datascience-models` is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
 
 ## Profile Set Up
 
@@ -7,7 +8,7 @@
 ----
 
 ```yml
-xyz:
+datascience:
   target: dev
   outputs:
     dev:
@@ -17,7 +18,7 @@ xyz:
       user: <USERNAME>
       password: <PASSWORD>
       region: <REGION>
-      database: xyz_DEV
+      database: DATASCIENCE_DEV
       warehouse: <WAREHOUSE>
       schema: silver
       threads: 4
@@ -73,5 +74,5 @@ dbt run --var '{"UPDATE_SNOWFLAKE_TAGS":True}' -s models/core/core__fact_swaps.s
 
 ```
 select *
-from table(xyz.information_schema.tag_references('xyz.core.fact_blocks', 'table'));
+from table(datascience.information_schema.tag_references('datascience.core.fact_blocks', 'table'));
 ```
