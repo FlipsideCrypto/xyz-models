@@ -43,10 +43,6 @@ models:
     columns: true
   +on_schema_change: "append_new_columns"
 
-vars:
-  "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
-
 tests:
   +store_failures: true # all tests
 
@@ -56,3 +52,17 @@ on-run-start:
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'
+
+vars:
+  "dbt_date:time_zone": GMT
+  "UPDATE_SNOWFLAKE_TAGS": TRUE
+
+  # Setup variables in dbt_project.yml
+  API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] }}' 
+  EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] }}'
+
+  config:
+  # The keys correspond to dbt profiles and are case sensitive
+    dev:
+        API_INTEGRATION: AWS_DATASCIENCE_API_STG
+        EXTERNAL_FUNCTION_URI: 65sji95ax3.execute-api.us-east-1.amazonaws.com/stg
