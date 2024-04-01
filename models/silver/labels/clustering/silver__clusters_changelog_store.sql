@@ -9,11 +9,11 @@
 ) }}
 
 SELECT
-    MD5(concat_ws('-', "addresses", SYSDATE() :: DATE)) AS clusters_changelog_store_id,
-    "clusters" :: ARRAY AS CLUSTERS,
-    "addresses" :: ARRAY AS addresses,
-    "type" :: STRING AS change_type,
-    "new_cluster_id" :: bigint AS new_cluster_id,
+    MD5(concat_ws('-', addresses, SYSDATE() :: DATE)) AS clusters_changelog_store_id,
+    clusters :: ARRAY AS clusters,
+    addresses :: ARRAY AS addresses,
+    change_type :: STRING AS change_type,
+    new_cluster_id :: bigint AS new_cluster_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS invocation_id
