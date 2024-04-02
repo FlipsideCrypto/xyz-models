@@ -1,5 +1,5 @@
 bitcoin:
-  target: dev
+  target: prod
   outputs:
     dev:
       type: snowflake
