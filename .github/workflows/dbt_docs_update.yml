@@ -1,7 +1,7 @@
 name: docs_update
 
 on:
-  push:
+  workflow_dispatch:
     
 
 env:
