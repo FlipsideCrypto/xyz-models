@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: silver__transfers
+    description: |-
+      Bitcoin transfers between unrelated clustered entities. Read more on our clustering process in the bitcoin-models repository (https://github.com/FlipsideCrypto/bitcoin-models/tree/main/models/silver/labels/clustering).
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: block_timestamp
+          interval: 1
+
+    columns:
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+
+      - name: FROM_ENTITY
+        description: "{{ doc('from_entity') }}"
+        tests:
+          - not_null
+
+      - name: TO_ENTITY
+        description: "{{ doc('to_entity') }}"
+        tests:
+          - not_null
+
+      - name: TRANSFER_AMOUNT
+        description: "{{ doc('transfer_amount') }}"
+        tests:
+          - not_null
+
+      - name: _PARTITION_BY_ADDRESS_GROUP_FROM_ENTITY
+        description: "Partition group for column FROM_ENTITY"
+
+      - name: _PARTITION_BY_ADDRESS_GROUP_TO_ENTITY
+        description: "Partition group for column TO_ENTITY"
+      
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP
+      
+      - name: _MODIFIED_TIMESTAMP
+
+      - name: TRANSFER_ID
+        description: "{{ doc('id') }}"
+        tests:
+          - not_null
+          - unique
+        
+      - name: INSERTED_TIMESTAMP
+        description: "{{ doc('inserted_timestamp') }}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{ doc('modified_timestamp') }}"

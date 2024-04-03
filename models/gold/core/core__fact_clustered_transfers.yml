@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: core__fact_clustered_transfers
+    description: |-
+      Bitcoin transfers between unrelated clustered entities. This table updates daily around 00:00 UTC after our clustering process. 
+      Note that records (from entity, to entity) in this table are expected to change as addresses are clustered and re-clustered on a daily basis. Previously ungrouped transfers may be flattened into singular transfers as addresses are clustered together. 
+      Read more on our clustering process in the bitcoin-models repository (https://github.com/FlipsideCrypto/bitcoin-models/tree/main/models/silver/labels/clustering).
+    tests:
+      - dbt_utils.recency:
+          datepart: hours
+          field: block_timestamp
+          interval: 28
+
+    columns:
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+
+      - name: FROM_ENTITY
+        description: "{{ doc('from_entity') }}"
+        tests:
+          - not_null
+
+      - name: TO_ENTITY
+        description: "{{ doc('to_entity') }}"
+        tests:
+          - not_null
+
+      - name: TRANSFER_AMOUNT
+        description: "{{ doc('transfer_amount') }}"
+        tests:
+          - not_null
+
+      - name: FACT_CLUSTERED_TRANSFERS_ID
+        description: "{{ doc('id') }}"
+        tests:
+          - not_null
+          - unique
+        
+      - name: INSERTED_TIMESTAMP
+        description: "{{ doc('inserted_timestamp') }}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{ doc('modified_timestamp') }}"
