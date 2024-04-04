@@ -41,14 +41,18 @@ adds_news AS (
     SELECT
         s1.value :: STRING AS address,
         t.new_cluster_id AS address_group
+    {% if var('TEMP_RUN_STORE', False) %}
+        FROM 
+            {{ target.database }}.silver.clusters_changelog_store t,
+            TABLE(FLATTEN(t.addresses)) s1
+        WHERE
+            t.change_type = 'merge'
+    {% else %}
     FROM
         {{ target.database }}.silver.clusters_changelog t,
         TABLE(FLATTEN(t.addresses)) s1
-    WHERE
-        t.change_type IN (
-            'new',
-            'addition'
-        )
+
+    {% endif %}
 ),
 adds_news_full AS (
     SELECT
