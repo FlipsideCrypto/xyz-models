@@ -9,4 +9,4 @@ SELECT
         {},
         {},
         'vault/stg/thesportsdb'
-    ) AS resp;
+    ) AS resp
