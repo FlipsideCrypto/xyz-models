@@ -47,6 +47,7 @@ adds_news AS (
             TABLE(FLATTEN(t.addresses)) s1
         WHERE
             t.change_type = 'merge'
+        qualify row_number() over (partition by s1.value order by t.inserted_timestamp desc) = 1
     {% else %}
     FROM
         {{ target.database }}.silver.clusters_changelog t,
