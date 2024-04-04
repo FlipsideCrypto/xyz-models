@@ -10,7 +10,11 @@
 WITH txs AS (
 
     SELECT
-        *
+        block_timestamp,
+        tx_hash,
+        sender,
+        payload_function,
+        payload
     FROM
         {{ ref('silver__transactions') }}
     WHERE
@@ -33,7 +37,14 @@ AND _inserted_timestamp >= (
 ),
 events AS (
     SELECT
-        *
+        block_number,
+        block_timestamp,
+        version,
+        tx_hash,
+        event_data,
+        event_index,
+        event_resource,
+        _inserted_timestamp
     FROM
         {{ ref('silver__events') }}
     WHERE
@@ -113,10 +124,18 @@ wormhole_transfers AS (
         ) AS receiver,
         22 AS source_chain_id,
         'aptos' AS source_chain_name,
-        payload :arguments [1] :: INT AS destination_chain_id,
+        CASE
+            WHEN A.block_number < 165050375
+            AND A.block_timestamp :: DATE <= '2024-04-04' THEN payload :arguments [1]
+            ELSE utils.udf_hex_to_int(RTRIM(payload :arguments [1] :: STRING, '0'))
+        END :: INT AS destination_chain_id,
         chain_name AS destination_chain_name,
         payload :type_arguments [0] :: STRING AS token_address,
-        payload :arguments [0] :: INT AS amount_unadj,
+        CASE
+            WHEN A.block_number < 165050375
+            AND A.block_timestamp :: DATE <= '2024-04-04' THEN payload :arguments [0]
+            ELSE event_data :amount
+        END :: INT AS amount_unadj,
         A.event_index,
         A._inserted_timestamp
     FROM
