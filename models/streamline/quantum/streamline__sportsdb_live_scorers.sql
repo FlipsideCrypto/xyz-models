@@ -16,11 +16,11 @@
 
 -- This POC model showcases the push and pull mechanisms you can enable using a Quantum Model. Here we Use Livequery to `pull` all the goal scorers from the latest ice hockey games and then `push` work to streamline to ingest data about the goal scorers in batches using streamline.
 
--- Note: The post_hook will enable the push mechanism to streamline. The post_hook will call the udf_bulk_rest_api_v2 function to push work to streamline in batches. Refere to: https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378 for more information on how you can use the params to fan out worker lambdas for streamline.
+-- Note: The post_hook will enable the push mechanism to streamline. The post_hook will call the udf_bulk_rest_api_v2 function to push work to streamline in batches. Refer to: https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378 for more information on how you can use the params to fan out worker lambdas for streamline.
 
 WITH live_scores as (
     -- Get the latest ice hockey games
-    -- Note: Setting the 'fsc-quantum-state' to 'livequery' will enable us to "pull" the latest data from the API
+    -- Note: Setting the 'fsc-quantum-state' header to 'livequery' will enable us to "pull" the latest data from the API
     SELECT
         {{ target.database }}.live.udf_api(
             'GET',

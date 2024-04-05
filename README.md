@@ -30,6 +30,57 @@ datascience:
 
 This project has been setup with `fsc_utils == 1.20.0` according to the instruction in the  [fsc_utils setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#adding-the-fsc_utils-dbt-package) documentation. In addition `livequery` models and schema has also been deployed to the `DATASCIENCE_DEV` database as per the instructions in the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions) documentation.
 
+## Invoking the POC Quantum model
+
+You will find a `POC` `quantum` model in [models/streamline/quantum/streamline__sportsdb_live_scorers.sql](/models/streamline/quantum/streamline__sportsdb_live_scorers.sql).  
+
+This model is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
+
+The is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make poc`. Invoking `make poc` will run the `POC` quantum model and the output will be as follows :
+
+```sh
+make poc
+
+03:45:36  Running with dbt=1.7.10
+03:45:36  Registered adapter: snowflake=1.7.0
+03:45:37  Found 85 models, 2 seeds, 5 operations, 5 analyses, 130 tests, 9 sources, 0 exposures, 0 metrics, 975 macros, 0 groups, 0 semantic models
+03:45:37  
+03:45:41  
+03:45:41  Running 3 on-run-start hooks
+03:45:41  1 of 3 START hook: datascience_models.on-run-start.0 ........................... [RUN]
+03:45:41  1 of 3 OK hook: datascience_models.on-run-start.0 .............................. [OK in 0.00s]
+03:45:41  2 of 3 START hook: datascience_models.on-run-start.1 ........................... [RUN]
+03:45:41  2 of 3 OK hook: datascience_models.on-run-start.1 .............................. [OK in 0.00s]
+03:45:41  3 of 3 START hook: livequery_models.on-run-start.0 ............................. [RUN]
+03:45:41  3 of 3 OK hook: livequery_models.on-run-start.0 ................................ [OK in 0.00s]
+03:45:41  
+03:45:41  Concurrency: 12 threads (target='dev')
+03:45:41  
+03:45:41  1 of 1 START sql view model streamline.sportsdb_live_scorers ................... [RUN]
+03:45:41  Running macro `if_data_call_function`: Calling udf udf_bulk_rest_api_v2 with params: 
+{
+  "external_table": "external_table",
+  "producer_batch_size": "10",
+  "sql_limit": "10",
+  "sql_source": "{{this.identifier}}",
+  "worker_batch_size": "10"
+}
+ on {{this.schema}}.{{this.identifier}}
+03:45:50  1 of 1 OK created sql view model streamline.sportsdb_live_scorers .............. [SUCCESS 1 in 9.13s]
+03:45:50  
+03:45:50  Running 2 on-run-end hooks
+03:45:50  1 of 2 START hook: datascience_models.on-run-end.0 ............................. [RUN]
+03:45:50  1 of 2 OK hook: datascience_models.on-run-end.0 ................................ [OK in 0.00s]
+03:45:50  2 of 2 START hook: livequery_models.on-run-end.0 ............................... [RUN]
+03:45:50  2 of 2 OK hook: livequery_models.on-run-end.0 .................................. [OK in 0.00s]
+03:45:50  
+03:45:50  
+03:45:50  Finished running 1 view model, 5 hooks in 0 hours 0 minutes and 13.73 seconds (13.73s).
+03:45:50  
+03:45:50  Completed successfully
+03:45:50  
+03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+```
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
