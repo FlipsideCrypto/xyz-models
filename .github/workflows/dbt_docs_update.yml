@@ -2,9 +2,6 @@ name: docs_update
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - "main"
 
 env:
   USE_VARS: "${{ vars.USE_VARS }}"

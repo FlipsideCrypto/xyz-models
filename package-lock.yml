@@ -9,4 +9,4 @@ packages:
   version: 1.0.0
 - git: https://github.com/FlipsideCrypto/livequery-models.git
   revision: 883675b4021cc9a777e12fe6be8114ab039ab365
-sha1_hash: 46d993bb10ddbe80a60101d642a73fe1327d3ebb
+sha1_hash: e9373a4cf62383a106e22a0cb0ad84b9a6b76ffa
