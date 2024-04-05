@@ -81,7 +81,10 @@ make poc
 03:45:50  
 03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
-**Note:** For more details on using the `udf params` in the models post hook refer to this [discussion](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378).
+**Note:** For more details on using the `udf params` in streamline models post hook refer to the following: 
+ - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  
+ - [Optimizing backfill tuning Streamline models](https://flipsidecrypto.slack.com/docs/T6F1AJ69E/F05V71L3ZJS)
+ - [Streamline architecture overview](https://github.com/flipsideCrypto/streamline?tab=readme-ov-file#architecture-overview) f
 
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
