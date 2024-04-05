@@ -1,6 +1,6 @@
 # DATASCIENCE DBT Project
 
-This repo is a fork of the [FlistsideCrypto/xyz-models](https://github.com/FlipsideCrypto/xyz-models) repo, the `xyz-models` repo holds scafolding for DBT projects at `Flipside Crypto`.  `datascience-models` is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
+This repo is a fork of the [FlistsideCrypto/xyz-models](https://github.com/FlipsideCrypto/xyz-models) repo, the `xyz-models` repo holds scafolding for DBT projects at `Flipside Crypto`.  This repo is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
 
 ## Profile Set Up
 
@@ -19,7 +19,7 @@ datascience:
       password: <PASSWORD>
       region: <REGION>
       database: DATASCIENCE_DEV
-      warehouse: <WAREHOUSE>
+      warehouse: DBT_CLOUD
       schema: silver
       threads: 4
       client_session_keep_alive: False
@@ -28,15 +28,19 @@ datascience:
 
 ### Project setup
 
-This project has been setup with `fsc_utils == 1.21.7` according to the instructions in the [fsc_utils setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#adding-the-fsc_utils-dbt-package) documentation. In addition `livequery` & `livequery marketplace GHA` models, schemas & functions has also been deployed to the `DATASCIENCE_DEV` database as per the instructions in the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions) & [snowflake GHA tasks setup](https://github.com/flipsideCrypto/fsc-utils?tab=readme-ov-file#snowflake-tasks-for-github-actions) documentations.
+This project has been setup with `fsc_utils == 1.21.7` according to the instructions in the [fsc_utils setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#adding-the-fsc_utils-dbt-package) documentation. In addition `livequery` & `livequery marketplace GHA` models, schemas & functions have also been deployed to the `DATASCIENCE_DEV` database as per the instructions in the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions) & [snowflake GHA tasks setup](https://github.com/flipsideCrypto/fsc-utils?tab=readme-ov-file#snowflake-tasks-for-github-actions) documentations.
 
 ## Invoking the POC Quantum model
 
-You will find a `POC` `quantum` model in [models/streamline/quantum/streamline__sportsdb_live_scorers.sql](/models/streamline/quantum/streamline__sportsdb_live_scorers.sql).  
+You will find a `POC` `quantum` model at [models/streamline/quantum/streamline__sportsdb_live_scorers.sql](/models/streamline/quantum/streamline__sportsdb_live_scorers.sql)  
 
-This model is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
+There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, ensure you have you `~/.dbt/profiles.yml` setup according to the [profile setup](#Profile-setup) and run the following make command: 
 
-There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make quantum-poc`. Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
+```sh
+make quantum-poc
+``` 
+
+Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
 
 ```sh
 make poc
