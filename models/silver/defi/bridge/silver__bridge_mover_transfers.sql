@@ -60,8 +60,7 @@ AND _inserted_timestamp >= (
 {% else %}
     AND block_timestamp :: DATE >= '2023-03-12'
 {% endif %}
-)
---bridge in
+) --bridge in
 SELECT
     A.block_number,
     A.block_timestamp,
@@ -103,7 +102,7 @@ WHERE
         '0xbb49903ab2f89554575df14adea91790b7dce260bdc8f6dab7edeee08b01fca5::bridge::swap_in'
     )
 UNION ALL
---bridge out
+    --bridge out
 SELECT
     A.block_number,
     A.block_timestamp,
@@ -125,7 +124,7 @@ SELECT
         3
     ) :: STRING AS destination_chain_name,
     payload :type_arguments [0] :: STRING AS token_address,
-    payload :arguments [0] :: INT AS amount_unadj,
+    COALESCE(TRY_CAST(payload :arguments [0] :: STRING AS INT), event_data :amount_before :: INT) AS amount_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_mover_transfers_id,
