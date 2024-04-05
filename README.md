@@ -28,7 +28,7 @@ datascience:
 
 ### Project setup
 
-This project has been setup with `fsc_utils == 1.20.0` according to the instruction in the  [fsc_utils setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#adding-the-fsc_utils-dbt-package) documentation. In addition `livequery` models and schema has also been deployed to the `DATASCIENCE_DEV` database as per the instructions in the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions) documentation.
+This project has been setup with `fsc_utils == 1.21.7` according to the instructions in the  [fsc_utils setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#adding-the-fsc_utils-dbt-package) documentation. In addition `livequery` & `livequery marketplace GHA` models, schemas & functions has also been deployed to the `DATASCIENCE_DEV` database as per the instructions in the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions) & [snowflake GHA tasks setup](https://github.com/flipsideCrypto/fsc-utils?tab=readme-ov-file#snowflake-tasks-for-github-actions) documentations.
 
 ## Invoking the POC Quantum model
 
@@ -36,7 +36,7 @@ You will find a `POC` `quantum` model in [models/streamline/quantum/streamline__
 
 This model is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
 
-The is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make poc`. Invoking `make poc` will run the `POC` quantum model and the output will be as follows :
+The is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make quantum-poc`. Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
 
 ```sh
 make poc
