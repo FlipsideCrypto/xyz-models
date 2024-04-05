@@ -2,11 +2,11 @@ packages:
 - package: calogica/dbt_expectations
   version: 0.8.5
 - git: https://github.com/FlipsideCrypto/fsc-utils.git
-  revision: 80485821ff14c1393b9a533cd06ca2ec6fdb04df
+  revision: b1e612ace7060a257e9622fe01b0854722c6fae7
 - package: calogica/dbt_date
   version: 0.7.2
 - package: dbt-labs/dbt_utils
   version: 1.0.0
 - git: https://github.com/FlipsideCrypto/livequery-models.git
   revision: 883675b4021cc9a777e12fe6be8114ab039ab365
-sha1_hash: 738b656e4b0b92b75900da3263f8a5971cad3c69
+sha1_hash: 46d993bb10ddbe80a60101d642a73fe1327d3ebb

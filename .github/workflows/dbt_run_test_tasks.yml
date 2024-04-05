@@ -4,7 +4,6 @@ run-name: dbt_test_tasks
 on:
   workflow_dispatch:
     
-    
 env:
   DBT_PROFILES_DIR: ./
 
