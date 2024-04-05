@@ -4,7 +4,7 @@
         func = 'udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
          params = {
-            "external_table": "external_table",
+            "external_table": "quantum_poc/goal_scorers",
             "sql_limit": "10",
             "producer_batch_size": "10",
             "worker_batch_size": "10",
