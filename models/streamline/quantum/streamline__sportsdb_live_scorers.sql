@@ -22,13 +22,14 @@ WITH live_scores as (
     -- Get the latest ice hockey games
     -- Note: Setting the 'fsc-quantum-state' header to 'livequery' will enable us to "pull" the latest data from the API
     SELECT
-        {{ target.database }}.live.udf_api(
-            'GET',
-            'https://{service}/api/v1/json/3/latesticehockey.php',
-            {'fsc-quantum-state':'livequery'},
-            {},
-            'vault/stg/thesportsdb'
-        ) AS calls
+        {{ target.database}}._live.udf_api(
+        'GET',
+        'https://{service}/api/v1/json/3/latesticehockey.php',
+        {'fsc-quantum-state':'livequery'},
+        {},
+        'SYSTEM',
+        'vault/stg/thesportsdb'
+    ) AS calls
 ),
 parsed_json AS (
     -- Parse games from the live scores
