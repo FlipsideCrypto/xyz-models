@@ -85,6 +85,12 @@ make poc
 03:45:50  
 03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
+Once the invocation is complete, you can see the ingested data in `streamline.datascience_dev.quantum_poc_scorers_v2`:
+
+```sql
+select * from streamline.datascience_dev.quantum_poc_scorers_v2 limit 10;
+```
+
 **Note:** For more details on using the `udf params` in streamline models post hook refer to the following: 
  - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  
  - [Optimizing backfill tuning Streamline models](https://flipsidecrypto.slack.com/docs/T6F1AJ69E/F05V71L3ZJS)
