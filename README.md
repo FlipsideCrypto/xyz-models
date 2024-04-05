@@ -81,6 +81,8 @@ make poc
 03:45:50  
 03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
+**Note:** For more details on using the `udf params` in the models post hook refer to this [discussion](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378).
+
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
