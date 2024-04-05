@@ -36,7 +36,7 @@ You will find a `POC` `quantum` model in [models/streamline/quantum/streamline__
 
 This model is intended to be used as a `POC` for showcasing the capabilities of using `Quantum Models` with a `streamine` backend wherein a single `DBT` model can be used for both `pull` and `push` based workloads. 
 
-The is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make quantum-poc`. Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
+There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, run the following make command `make quantum-poc`. Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
 
 ```sh
 make poc
