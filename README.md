@@ -85,7 +85,7 @@ make poc
 03:45:50  
 03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
-Once the invocation is complete, you can see the ingested data in `streamline.datascience_dev.quantum_poc_scorers_v2`:
+Once the invocation is complete, you can see the ingested data by querying snowflake with:
 
 ```sql
 select * from streamline.datascience_dev.quantum_poc_scorers_v2 limit 10;
