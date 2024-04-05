@@ -34,7 +34,7 @@ This project has been setup with `fsc_utils == 1.21.7` according to the instruct
 
 You will find a `POC` `quantum` model at [models/streamline/quantum/streamline__sportsdb_live_scorers.sql](/models/streamline/quantum/streamline__sportsdb_live_scorers.sql)  
 
-There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, ensure you have you `~/.dbt/profiles.yml` setup according to the [profile setup](#Profile-setup) and run the following make command: 
+There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum model. To invoke the model, ensure you have you `~/.dbt/profiles.yml` setup according to the [profile setup](#profile-setup) instructions and run the following make command: 
 
 ```sh
 make quantum-poc
