@@ -10,7 +10,16 @@
 
 SELECT
     MD5(concat_ws('-', addresses, SYSDATE() :: DATE)) AS clusters_changelog_store_id,
-    clusters :: ARRAY AS clusters,
+    
+    {% if var(
+            'CLUSTER_BACKFILL',
+            False
+        ) %},
+        [] AS CLUSTERS
+    {% else %}
+        CLUSTERS :: ARRAY AS CLUSTERS,
+    {% endif %}
+
     addresses :: ARRAY AS addresses,
     change_type :: STRING AS change_type,
     new_cluster_id :: bigint AS new_cluster_id,
@@ -18,6 +27,13 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS invocation_id
 FROM
-    {{ ref(
-        "silver__clusters_changelog"
-    ) }}
+    {% if var(
+            'CLUSTER_BACKFILL',
+            False
+        ) %}
+        {{ target.database }}.bronze.clusters_fix_040824
+    {% else %}
+        {{ ref(
+            "silver__clusters_changelog"
+        ) }}
+    {% endif %}

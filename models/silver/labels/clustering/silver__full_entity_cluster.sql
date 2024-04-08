@@ -30,8 +30,12 @@ WITH set_inserted_timestamp AS (
 clusters_changelog AS (
     SELECT
         *
+        {% if var('CLUSTER_BACKFILL', False) %}
+            , [] AS CLUSTERS
+        {% endif %}
     FROM
-        {% if var('CLUSTER_BACKFILL') %}
+        {% if var('CLUSTER_BACKFILL', False) %}
+        
             {{ target.database }}.BRONZE.CLUSTERS_FIX_040824
         {% else %}
             {{ target.database }}.silver.clusters_changelog
