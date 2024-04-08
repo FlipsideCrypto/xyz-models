@@ -10,11 +10,11 @@
 
 SELECT
     MD5(concat_ws('-', addresses, SYSDATE() :: DATE)) AS clusters_changelog_store_id,
-    
+
     {% if var(
             'CLUSTER_BACKFILL',
             False
-        ) %},
+        ) %}
         [] AS CLUSTERS
     {% else %}
         CLUSTERS :: ARRAY AS CLUSTERS,
