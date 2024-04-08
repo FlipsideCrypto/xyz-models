@@ -26,46 +26,19 @@ base AS (
     ) AS max_index
   FROM
     {{ ref('silver__inputs_final') }}
-
-    {% if var(
-        'TEMP_RUN_STORE',
-        False
-      ) %}
-    WHERE
-      tx_id IN (
-        SELECT
-          DISTINCT tx_id
-        FROM
-          {{ ref("silver__inputs_final") }}
-        WHERE
-          block_timestamp >= '2023-10-27' 
-          AND pubkey_script_address IN (
-            SELECT
-              DISTINCT VALUE :: STRING AS address
-            FROM
-              bitcoin_dev.silver.clusters_changelog_store,
-              LATERAL FLATTEN(
-                input => addresses
-              ) f
-            WHERE
-              change_type = 'merge'
-          )
-      )
-    {% else %}
-    WHERE
-      _inserted_timestamp BETWEEN (
-        SELECT
-          max_inserted_timestamp
-        FROM
-          date_range
-      )
-      AND (
-        SELECT
-          max_inserted_timestamp_interval
-        FROM
-          date_range
-      )
-    {% endif %}
+  WHERE
+    _inserted_timestamp BETWEEN (
+      SELECT
+        max_inserted_timestamp
+      FROM
+        date_range
+    )
+    AND (
+      SELECT
+        max_inserted_timestamp_interval
+      FROM
+        date_range
+    )
 ),
 base2 AS (
   SELECT
