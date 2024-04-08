@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "full_entity_cluster_id",
-    incremental_strategy = 'merge',
+    incremental_strategy = 'delete+insert',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['entity_cluster'],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
