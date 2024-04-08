@@ -27,12 +27,22 @@ WITH set_inserted_timestamp AS (
             select SYSDATE() AS inserted_timestamp
         {% endif %}
 ),
+clusters_changelog AS (
+    SELECT
+        *
+    FROM
+        {% if var('CLUSTER_BACKFILL') %}
+            {{ target.database }}.BRONZE.CLUSTERS_FIX_040824
+        {% else %}
+            {{ target.database }}.silver.clusters_changelog
+        {% endif %}
+),
 merges AS (
     SELECT
         s1.value :: STRING AS address_group_old,
         new_cluster_id AS address_group_new
     FROM
-        {{ target.database }}.silver.clusters_changelog t,
+        clusters_changelog t,
         TABLE(FLATTEN(t.clusters)) s1
     WHERE
         t.change_type IN ('merge')
@@ -42,7 +52,7 @@ adds_news AS (
         s1.value :: STRING AS address,
         t.new_cluster_id AS address_group
     FROM
-        {{ target.database }}.silver.clusters_changelog t,
+        clusters_changelog t,
         TABLE(FLATTEN(t.addresses)) s1
 
 ),
