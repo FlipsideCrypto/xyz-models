@@ -28,17 +28,31 @@ WITH set_inserted_timestamp AS (
         {% endif %}
 ),
 clusters_changelog AS (
-    SELECT
-        *
-        {% if var('CLUSTER_BACKFILL', False) %}
-            , [] AS CLUSTERS
-        {% endif %}
-    FROM
-        {% if var('CLUSTER_BACKFILL', False) %}
-        
-            {{ target.database }}.BRONZE.CLUSTERS_FIX_040824
+    {% if var('CLUSTER_BACKFILL', False) %}
+        SELECT
+            CLUSTERS :: ARRAY AS clusters,
+            ADDRESSES :: ARRAY AS addresses,
+            CHANGE_TYPE :: STRING AS change_type,
+            NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
+        FROM
+            {{ target.database }}.BRONZE.FIX_CLUSTER_ADDITION
+        UNION ALL 
+        SELECT
+            CLUSTERS :: ARRAY AS clusters,
+            ADDRESSES :: ARRAY AS addresses,
+            CHANGE_TYPE :: STRING AS change_type,
+            NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
+        FROM
+            {{ target.database }}.BRONZE.FIX_CLUSTER_MERGE
+
         {% else %}
-            {{ target.database }}.silver.clusters_changelog
+            SELECT
+                CLUSTERS :: ARRAY AS clusters,
+                ADDRESSES :: ARRAY AS addresses,
+                CHANGE_TYPE :: STRING AS change_type,
+                NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
+            FROM
+                {{ target.database }}.silver.clusters_changelog
         {% endif %}
 ),
 merges AS (
@@ -49,7 +63,7 @@ merges AS (
         clusters_changelog t,
         TABLE(FLATTEN(t.clusters)) s1
     WHERE
-        t.change_type IN ('merge')
+        t.change_type = 'merge'
 ),
 adds_news AS (
     SELECT
