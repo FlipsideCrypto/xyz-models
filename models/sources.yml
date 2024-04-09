@@ -2,14 +2,14 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'DATASCIENCE' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'datascience' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
   - name: crosschain_silver
-    database: "{{ 'crosschain' if target.database == 'DATASCIENCE' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'datascience' else 'crosschain_dev' }}"
     schema: silver
     tables:
       - name: number_sequence
@@ -17,7 +17,7 @@ sources:
     database: streamline
     schema: datascience_dev
     tables:
-      - name: blocks_tx
+      - name: quantum_poc_aptos_blocks_tx
   - name: github_actions
     database: "{{ target.database }}"
     schema: github_actions
