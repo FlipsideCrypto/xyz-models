@@ -28,32 +28,14 @@ WITH set_inserted_timestamp AS (
         {% endif %}
 ),
 clusters_changelog AS (
-    {% if var('CLUSTER_BACKFILL', False) %}
-        SELECT
-            CLUSTERS :: ARRAY AS clusters,
-            ADDRESSES :: ARRAY AS addresses,
-            CHANGE_TYPE :: STRING AS change_type,
-            NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
-        FROM
-            {{ target.database }}.BRONZE.FIX_CLUSTER_ADDITION
-        UNION ALL 
-        SELECT
-            CLUSTERS :: ARRAY AS clusters,
-            ADDRESSES :: ARRAY AS addresses,
-            CHANGE_TYPE :: STRING AS change_type,
-            NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
-        FROM
-            {{ target.database }}.BRONZE.FIX_CLUSTER_MERGE
+    SELECT
+        clusters :: ARRAY AS clusters,
+        addresses :: ARRAY AS addresses,
+        change_type :: STRING AS change_type,
+        new_cluster_id :: BIGINT AS new_cluster_id
+    FROM
+        {{ target.database }}.silver.clusters_changelog
 
-        {% else %}
-            SELECT
-                CLUSTERS :: ARRAY AS clusters,
-                ADDRESSES :: ARRAY AS addresses,
-                CHANGE_TYPE :: STRING AS change_type,
-                NEW_CLUSTER_ID :: BIGINT AS new_cluster_id
-            FROM
-                {{ target.database }}.silver.clusters_changelog
-        {% endif %}
 ),
 merges AS (
     SELECT
