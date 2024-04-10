@@ -15,10 +15,10 @@
 ) }}
 
 WITH node_calls AS (
+
     SELECT
         '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
-        block_height,
-        CEIL(ROW_NUMBER() OVER(ORDER BY block_height DESC) / 10.0) AS batch_number
+        block_height
     FROM
         (
             SELECT
@@ -32,29 +32,18 @@ WITH node_calls AS (
                 aptos.streamline.complete_blocks_tx
         )
     ORDER BY block_height DESC
-    LIMIT 1000
-),
-batches AS (
-    SELECT
-        batch_number,
-        ARRAY_AGG(calls) AS calls,
-        ROUND(AVG(block_height),-3) AS partition_key
-    FROM
-        node_calls
-    GROUP BY
-        batch_number
+    LIMIT 200
 )
 SELECT
     DATE_PART('EPOCH', CURRENT_TIMESTAMP())::INTEGER AS created_at,
-    partition_key,
+    ROUND(block_height,-3) AS partition_key,
     {{ target.database }}.live.udf_api(
         'GET', -- request method
-        t.VALUE, -- request url
+        calls, -- request url
         {}, -- request headers
         {}, -- request body
         'vault/dev/aptos/node/mainnet' -- aws secret manager entry, contents of which is used 
                                        -- to string interpolate the url
     ) AS request
 FROM
-    batches,
-    TABLE(FLATTEN(input => calls)) AS t(VALUE)
+    node_calls
