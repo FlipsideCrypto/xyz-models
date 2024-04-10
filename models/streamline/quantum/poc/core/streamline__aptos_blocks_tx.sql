@@ -15,6 +15,7 @@
 ) }}
 
 WITH node_calls AS (
+    -- generate a list of URLs for API calls and assign a batch number to each
     SELECT
         '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
         block_height,
@@ -35,10 +36,11 @@ WITH node_calls AS (
     LIMIT 1000
 ),
 batches AS (
+    -- group URLs by batch number and calculate the partition key
     SELECT
         batch_number,
         ARRAY_AGG(calls) AS calls,
-        ROUND(block_height,-3) AS partition_key
+        ROUND(AVG(block_height),-3) AS partition_key
     FROM
         node_calls
     GROUP BY

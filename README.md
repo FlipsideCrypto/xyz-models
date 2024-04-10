@@ -40,7 +40,51 @@ There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum 
 make quantum-poc
 ``` 
 
-Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
+### Understanding the `POC` quantum model
+
+Invoking `make quantum-poc` will run the `POC` quantum model dbt [aptos_blocks_tx](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx.sql) model with the following CTEs:
+
+1. **node_calls CTE**: This CTE is generats a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
+
+   It starts by selecting block numbers from the `streamline__aptos_blocks` table that are not already present in the `aptos.streamline.complete_blocks_tx` table. For each of these block numbers, it constructs a `URL` for an `Aptos Node API` call to get information about the block. 
+
+   It also assigns a batch number to each URL, with up to 10 `URLs` per batch. This is done using the `CEIL(ROW_NUMBER() OVER(ORDER BY block_height DESC) / 10.0)` expression, which assigns a row number to each URL (ordered by block height in descending order), divides it by 10, and rounds up to the nearest integer. This effectively groups every 10 URLs into a batch.
+
+   For example, if the `streamline__aptos_blocks` table contains block numbers `1` to `1000`, and the `aptos.streamline.complete_blocks_tx` table contains block numbers `1` to `900`, the `node_calls` CTE would generate URLs for block numbers `901` to `1000`, and assign a batch number to each `URL`, with batch numbers `1` to `10` for URLs `901` to `910`, batch numbers `11` to `20` for URLs `911` to `920`, and so on.
+
+2. **batches CTE**: This CTE groups the URLs into batches and calculates a partition key for each batch.
+
+   It does this by aggregating the `URLs` for each batch into an array using the `ARRAY_AGG(calls) AS calls` expression. It also calculates the average block number for each batch and rounds it to the nearest multiple of `1000` using the `ROUND(block_height,-3) AS partition_key` expression.
+
+   For example, if batch `1` contains URLs for block numbers 901 to 910, the `batches` CTE would aggregate these URLs into an array and calculate the partition key as `ROUND(905.5, -3) = 1000`. Similarly, if batch 2 contains URLs for block numbers 911 to 920, the `batches` CTE would aggregate these URLs into an array and calculate the partition key as `ROUND(915.5, -3) = 1000`, and so on.
+
+These two CTEs are preparing the data for making batched API calls. The `node_calls` CTE generates the URLs for the API calls and assigns a batch number to each URL, and the `batches` CTE groups the URLs into batches and calculates a partition key for each batch.
+
+The SELECT statement is designed to make API calls for each URL in the batches and store the results in a table. It does this by unnesting the array of URLs for each batch and making an API call for each URL.
+
+The TABLE(FLATTEN(input => calls)) AS t(VALUE) part of the query is where the unnesting happens. The FLATTEN function is used to transform a semi-structured data type (like an array) into a relational representation. In this case, it's being used to unnest the calls array from the batches CTE.
+
+The input => calls argument tells FLATTEN to unnest the calls array. The FLATTEN function returns a table with a single column named VALUE. This column contains the unnested elements of the array. The AS t(VALUE) part of the query renames this column to VALUE.
+
+For example, if the batches CTE produces the following table:
+
+| batch_number | calls                  | partition_key |
+|--------------|------------------------|---------------|
+| 1            | ['url1', 'url2', 'url3'] | 1000        |
+| 2            | ['url4', 'url5', 'url6'] | 2000        |
+
+The TABLE(FLATTEN(input => calls)) AS t(VALUE) part of the query would unnest the calls array and produce the following table:
+
+| VALUE | partition_key |
+|-------|---------------|
+| url1  | 1000          |
+| url2  | 1000          |
+| url3  | 1000          |
+| url4  | 2000          |
+| url5  | 2000          |
+| url6  | 2000          |
+
+The final `SELECT` statement then makes an API call in batches using the {{ target.database }}.live.udf_api function, and selects the results of these API calls along with the current timestamp and the partition key.
 
 ```sh
 make poc
@@ -85,10 +129,21 @@ make poc
 03:45:50  
 03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
-Once the invocation is complete, you can see the ingested data by querying snowflake with:
+Once the invocation is complete, you can invoke streamline mode or livequery mode using the following sql:
+
 
 ```sql
-select * from streamline.datascience_dev.quantum_poc_scorers_v2 limit 10;
+
+-- Streamline mode
+SET LIVEQUERY_CONTEXT = '{"userId":"aws_lambda_datascience_api"}';
+
+SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
+
+-- Livequery mode
+SET LIVEQUERY_CONTEXT = '{"userId":"SYSTEM"}';
+
+SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
+
 ```
 
 **Note:** For more details on using the `udf params` in streamline models post hook refer to the following: 
