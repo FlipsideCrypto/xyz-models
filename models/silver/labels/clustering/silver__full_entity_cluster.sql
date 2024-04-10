@@ -27,28 +27,34 @@ WITH set_inserted_timestamp AS (
             select SYSDATE() AS inserted_timestamp
         {% endif %}
 ),
+clusters_changelog AS (
+    SELECT
+        clusters :: ARRAY AS clusters,
+        addresses :: ARRAY AS addresses,
+        change_type :: STRING AS change_type,
+        new_cluster_id :: BIGINT AS new_cluster_id
+    FROM
+        {{ target.database }}.silver.clusters_changelog
+
+),
 merges AS (
     SELECT
         s1.value :: STRING AS address_group_old,
         new_cluster_id AS address_group_new
     FROM
-        {{ target.database }}.silver.clusters_changelog t,
+        clusters_changelog t,
         TABLE(FLATTEN(t.clusters)) s1
     WHERE
-        t.change_type IN ('merge')
+        t.change_type = 'merge'
 ),
 adds_news AS (
     SELECT
         s1.value :: STRING AS address,
         t.new_cluster_id AS address_group
     FROM
-        {{ target.database }}.silver.clusters_changelog t,
+        clusters_changelog t,
         TABLE(FLATTEN(t.addresses)) s1
-    WHERE
-        t.change_type IN (
-            'new',
-            'addition'
-        )
+
 ),
 adds_news_full AS (
     SELECT

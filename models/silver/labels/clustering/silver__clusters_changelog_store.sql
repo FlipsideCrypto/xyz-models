@@ -9,7 +9,7 @@
 ) }}
 
 SELECT
-    MD5(concat_ws('-', addresses, SYSDATE() :: DATE)) AS clusters_changelog_store_id,
+    MD5(concat_ws('-', addresses :: STRING, SYSDATE() :: DATE)) AS clusters_changelog_store_id,
     clusters :: ARRAY AS clusters,
     addresses :: ARRAY AS addresses,
     change_type :: STRING AS change_type,
@@ -21,3 +21,4 @@ FROM
     {{ ref(
         "silver__clusters_changelog"
     ) }}
+
