@@ -42,8 +42,7 @@ SELECT
         calls, -- request url
         {}, -- request headers
         {}, -- request body
-        'vault/dev/aptos/node/mainnet' -- aws secret manager entry, contents of which is used 
-                                       -- to string interpolate the url
+        'vault/dev/aptos/node/mainnet'
     ) AS request
 FROM
     node_calls

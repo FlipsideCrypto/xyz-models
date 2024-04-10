@@ -38,7 +38,7 @@ batches AS (
     SELECT
         batch_number,
         ARRAY_AGG(calls) AS calls,
-        ROUND(AVG(block_height),-3) AS partition_key
+        ROUND(block_height,-3) AS partition_key
     FROM
         node_calls
     GROUP BY
@@ -52,8 +52,7 @@ SELECT
         t.VALUE, -- request url
         {}, -- request headers
         {}, -- request body
-        'vault/dev/aptos/node/mainnet' -- aws secret manager entry, contents of which is used 
-                                       -- to string interpolate the url
+        'vault/dev/aptos/node/mainnet'
     ) AS request
 FROM
     batches,
