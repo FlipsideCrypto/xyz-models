@@ -34,6 +34,7 @@ WITH node_calls AS (
     LIMIT 20
 )
 SELECT
+    DATE_PART('EPOCH', CURRENT_TIMESTAMP())::INTEGER AS created_at,
     ROUND(block_height,-3) AS partition_key,
     {{ target.database }}.live.udf_api(
         'GET', -- request method
