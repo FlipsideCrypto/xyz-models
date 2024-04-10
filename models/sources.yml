@@ -17,6 +17,7 @@ sources:
     database: streamline
     schema: datascience_dev
     tables:
+      - name: blocks_tx
       - name: quantum_poc_aptos_blocks_tx
   - name: github_actions
     database: "{{ target.database }}"
