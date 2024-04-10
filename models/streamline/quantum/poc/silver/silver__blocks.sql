@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
 {{ config(
     materialized = 'incremental',
     unique_key = "block_number",
@@ -6,8 +7,6 @@
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     tags = ['silver']
 ) }}
--- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
-
 SELECT
     partition_key AS block_number,
     DATA :block_hash :: STRING AS block_hash,
