@@ -42,7 +42,7 @@ make quantum-poc
 
 ### Understanding the `POC` quantum model
 
-Invoking `make quantum-poc` will run the `POC` quantum model dbt [aptos_blocks_tx](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx.sql) model with the following CTEs:
+Invoking `make silver` will run the `POC` quantum model dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model with the following CTEs:
 
 1. **node_calls CTE**: This CTE is generats a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
 
@@ -58,11 +58,11 @@ Invoking `make quantum-poc` will run the `POC` quantum model dbt [aptos_blocks_t
 
    For example, if batch `1` contains URLs for block numbers 901 to 910, the `batches` CTE would aggregate these URLs into an array and calculate the partition key as `ROUND(905.5, -3) = 1000`. Similarly, if batch 2 contains URLs for block numbers 911 to 920, the `batches` CTE would aggregate these URLs into an array and calculate the partition key as `ROUND(915.5, -3) = 1000`, and so on.
 
-These two CTEs are preparing the data for making batched API calls. The `node_calls` CTE generates the URLs for the API calls and assigns a batch number to each URL, and the `batches` CTE groups the URLs into batches and calculates a partition key for each batch.
+These two `CTEs` are preparing the data for making batched `Livequery API` calls. The `node_calls` CTE generates the URLs for the API calls and assigns a batch number to each URL, and the `batches` CTE groups the URLs into batches and calculates a partition key for each batch.
 
-The SELECT statement is designed to make API calls for each URL in the batches and store the results in a table. It does this by unnesting the array of URLs for each batch and making an API call for each URL.
+The `SELECT` statement is designed to make API calls for each URL in the batches and store the results in a table. It does this by unnesting the array of URLs for each batch and making an API call for each URL.
 
-The TABLE(FLATTEN(input => calls)) AS t(VALUE) part of the query is where the unnesting happens. The FLATTEN function is used to transform a semi-structured data type (like an array) into a relational representation. In this case, it's being used to unnest the calls array from the batches CTE.
+The `TABLE(FLATTEN(input => calls)) AS t(VALUE)` part of the query is where the unnesting happens. The FLATTEN function is used to transform a semi-structured data type (like an array) into a relational representation. In this case, it's being used to unnest the calls array from the batches CTE.
 
 The input => calls argument tells FLATTEN to unnest the calls array. The FLATTEN function returns a table with a single column named VALUE. This column contains the unnested elements of the array. The AS t(VALUE) part of the query renames this column to VALUE.
 
@@ -86,67 +86,15 @@ The TABLE(FLATTEN(input => calls)) AS t(VALUE) part of the query would unnest th
 
 The final `SELECT` statement then makes an API call in batches using the {{ target.database }}.live.udf_api function, and selects the results of these API calls along with the current timestamp and the partition key.
 
-```sh
-make poc
+### Quantum Synergy
 
-03:45:36  Running with dbt=1.7.10
-03:45:36  Registered adapter: snowflake=1.7.0
-03:45:37  Found 85 models, 2 seeds, 5 operations, 5 analyses, 130 tests, 9 sources, 0 exposures, 0 metrics, 975 macros, 0 groups, 0 semantic models
-03:45:37  
-03:45:41  
-03:45:41  Running 3 on-run-start hooks
-03:45:41  1 of 3 START hook: datascience_models.on-run-start.0 ........................... [RUN]
-03:45:41  1 of 3 OK hook: datascience_models.on-run-start.0 .............................. [OK in 0.00s]
-03:45:41  2 of 3 START hook: datascience_models.on-run-start.1 ........................... [RUN]
-03:45:41  2 of 3 OK hook: datascience_models.on-run-start.1 .............................. [OK in 0.00s]
-03:45:41  3 of 3 START hook: livequery_models.on-run-start.0 ............................. [RUN]
-03:45:41  3 of 3 OK hook: livequery_models.on-run-start.0 ................................ [OK in 0.00s]
-03:45:41  
-03:45:41  Concurrency: 12 threads (target='dev')
-03:45:41  
-03:45:41  1 of 1 START sql view model streamline.sportsdb_live_scorers ................... [RUN]
-03:45:41  Running macro `if_data_call_function`: Calling udf udf_bulk_rest_api_v2 with params: 
-{
-  "external_table": "external_table",
-  "producer_batch_size": "10",
-  "sql_limit": "10",
-  "sql_source": "{{this.identifier}}",
-  "worker_batch_size": "10"
-}
- on {{this.schema}}.{{this.identifier}}
-03:45:50  1 of 1 OK created sql view model streamline.sportsdb_live_scorers .............. [SUCCESS 1 in 9.13s]
-03:45:50  
-03:45:50  Running 2 on-run-end hooks
-03:45:50  1 of 2 START hook: datascience_models.on-run-end.0 ............................. [RUN]
-03:45:50  1 of 2 OK hook: datascience_models.on-run-end.0 ................................ [OK in 0.00s]
-03:45:50  2 of 2 START hook: livequery_models.on-run-end.0 ............................... [RUN]
-03:45:50  2 of 2 OK hook: livequery_models.on-run-end.0 .................................. [OK in 0.00s]
-03:45:50  
-03:45:50  
-03:45:50  Finished running 1 view model, 5 hooks in 0 hours 0 minutes and 13.73 seconds (13.73s).
-03:45:50  
-03:45:50  Completed successfully
-03:45:50  
-03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
-```
-Once the invocation is complete, you can invoke streamline mode or livequery mode using the following sql:
-
+Once the `make silver` invocation is complete, this resulting `datascience_dev.silver__blocks` view will contain all the data from the `Aptos Node API` calls from the bronze layer and the delta `block_heights` that were not present in the `aptos.streamline.complete_blocks_tx` table pulled in via the `quantum state` livequery mode.
 
 ```sql
-
--- Streamline mode
-SET LIVEQUERY_CONTEXT = '{"userId":"aws_lambda_datascience_api"}';
-
-SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
-
--- Livequery mode
-SET LIVEQUERY_CONTEXT = '{"userId":"SYSTEM"}';
-
-SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
-
+SELECT * FROM DATASCIENCE_DEV.SILVER.BLOCKS;
 ```
 
-**Note:** For more details on using the `udf params` in streamline models post hook refer to the following: 
+**Note:** For more details on using the `udf params` used in streamline mode `post_hooks` refer to the following: 
  - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  
  - [Optimizing backfill tuning Streamline models](https://flipsidecrypto.slack.com/docs/T6F1AJ69E/F05V71L3ZJS)
  - [Streamline architecture overview](https://github.com/flipsideCrypto/streamline?tab=readme-ov-file#architecture-overview) 
@@ -156,8 +104,6 @@ SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
 - Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
 - Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
-
 - Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
 
 ## Applying Model Tags
