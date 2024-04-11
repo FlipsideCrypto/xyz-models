@@ -44,7 +44,7 @@ make quantum-poc
 
 Invoking `make silver` will run the `POC` quantum dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model with the following CTEs:
 
-1. **node_calls CTE**: This CTE is generats a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
+1. **node_calls CTE**: This CTE is generates a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
 
    It starts by selecting block numbers from the `streamline__aptos_blocks` table that are not already present in the `aptos.streamline.complete_blocks_tx` table. For each of these block numbers, it constructs a `URL` for an `Aptos Node API` call to get information about the block. 
 
