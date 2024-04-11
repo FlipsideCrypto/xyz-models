@@ -64,11 +64,13 @@ vars:
   API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] }}' 
   EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] }}'
   ROLES: '{{ var("config")[target.name]["ROLES"] }}'
+  API_INTEGRATION_OPTIONS: '{{ var("config")[target.name]["API_INTEGRATION_OPTIONS"] }}'
 
   config:
   # The keys correspond to dbt profiles and are case sensitive
     dev:
         API_INTEGRATION: AWS_DATASCIENCE_API_STG
         EXTERNAL_FUNCTION_URI: 65sji95ax3.execute-api.us-east-1.amazonaws.com/stg/
+        API_INTEGRATION_OPTIONS: MAX_BATCH_ROWS = 10
         ROLES:
           - INTERNAL_DEV
