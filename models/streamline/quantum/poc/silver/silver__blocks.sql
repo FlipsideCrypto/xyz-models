@@ -7,51 +7,10 @@
     cluster_by = ['block_timestamp::DATE'],
     tags = ['silver_blocks']
 ) }}
-WITH node_calls AS (
-    -- generate a list of URLs for API calls and assign a batch number to each
-    SELECT
-        '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
-        block_height,
-        CEIL(ROW_NUMBER() OVER(ORDER BY block_height DESC) / 10.0) AS batch_number
-    FROM
-        (
-            SELECT
-                block_number AS block_height
-            FROM
-                {{ ref('streamline__aptos_blocks') }}
-            EXCEPT
-            SELECT
-                block_number
-            FROM
-                aptos.streamline.complete_blocks_tx
-        )
-    ORDER BY block_height DESC
-),
-batches AS (
-    -- group URLs by batch number and calculate the partition key
-    SELECT
-        batch_number,
-        ARRAY_AGG(calls) AS calls,
-        ROUND(AVG(block_height),-3) AS partition_key
-    FROM
-        node_calls
-    GROUP BY
-        batch_number
-),
-lq_calls AS (
-    SELECT
-        CURRENT_TIMESTAMP(3) AS _inserted_timestamp,
-        partition_key,
-        {{ target.database }}.live.udf_api(
-            'GET', -- request method
-            t.VALUE, -- request url
-            {}, -- request headers
-            {}, -- request body
-            'vault/dev/aptos/node/mainnet'
-        ) AS request
-    FROM
-        batches,
-        TABLE(FLATTEN(input => calls)) AS t(VALUE)
+
+WITH ephemeral_model AS (
+    SELECT *
+    FROM {{ ref('streamline__aptos_blocks_tx_ephemeral') }}
 ),
 parsed_responses AS (
     SELECT
@@ -70,7 +29,7 @@ parsed_responses AS (
         '{{ invocation_id }}' AS _invocation_id,
         'LQ' AS source
     FROM
-        lq_calls
+        ephemeral_model
 )
 SELECT * FROM (
     SELECT
