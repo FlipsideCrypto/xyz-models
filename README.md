@@ -42,8 +42,64 @@ make quantum-poc
 
 ### Understanding the `POC` quantum model
 
-Invoking `make silver` will run the `POC` quantum dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model with the following CTEs:
+#### Bronze Layer
 
+The [streamline__aptos_blocks_tx](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx.sql) model follows the desgn pattern of a `streamline` dbt model for ingesting data from a blockchain node, in this case the `Aptos Node API`. It uses a reusable [ephemeral model](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql) that is designed to fetch data from the `Aptos Node API` endpoint for specific block heights that have not been fetched yet. Here's what the model does in more detail:
+
+[node_calls CTE](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql#L6): This `CTE` generates `REST` requests for the `Aptos Node API` endpoint based on block heights that have not been fetched yet. It does this by comparing the `block_number` from the `streamline__aptos_blocks` table and the `block_number` from the `aptos.streamline.complete_blocks_tx` table. The `EXCEPT` clause returns all `block_number` values that are in the `streamline__aptos_blocks` table but not in the `aptos.streamline.complete_blocks_tx` table. These are the block heights that have not been fetched yet. For each of these block heights, it generates a `REST` request `URL` and stores it in the `calls` column.
+
+[Final SELECT Statement](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql#L26): This statement fetches data from the API endpoint for each `REST` request URL generated in the `node_calls` CTE. It does this by calling the `live.udf_api` function with the `GET` method and the `calls` URL. The `live.udf_api` function is expected to return the response from the API endpoint. The final result includes the current timestamp as created_at and _inserted_timestamp, the block_height rounded to the nearest thousand as partition_key, and the API response as request.
+
+**NOTE:** This model is intended to always run in `streamline mode` as it's purpose is to batch ingest data from the `Aptos Node`, as such being a quantum model, the mode is set based on who the "observer" is( in this case the `user` invoking the `livequery` AWS lambda ). Since this model is not schedule to run on a GHA cron, we spoof the user by setting the the user for this model through the a `dbt pre-hook` to set the session based context in the [dbt_project.yml file here](/dbt_project.yml#L40-46).
+
+##### Invoking the bronze model
+
+There is a make directive for invoking the bronze model. To invoke the model, ensure you have your `~/.dbt/profiles.yml` setup according to the [profile setup](#profile-setup) instructions and run the following make command:
+
+```sh
+make bronze
+```
+To view the results of the model (the work "pushed" to a streamline backend), run the following SQL query:
+
+```sql
+-- Set the snowflake console session context to the user invoking table
+SET LIVEQUERY_CONTEXT = '{"userId":"aws_lambda_datascience_api"}';
+
+SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
+...
+
+
+```
+
+#### Silver Layer
+
+Invoking `make silver` will run the `POC` quantum dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model. 
+
+### Quantum Synergy
+
+Once the `make silver` invocation is complete, this resulting `datascience_dev.silver__blocks` view will contain all the data from the `Aptos Node API` calls from the bronze layer and the delta `block_heights` that were not present at the time of model invocation in the `aptos.streamline.complete_blocks_tx` table pulled in via the `quantum state` livequery mode.
+
+```sql 
+SELECT * FROM DATASCIENCE_DEV.SILVER.BLOCKS;
+```
+
+### Enabling batching for Quantum models
+
+When in `livequery` mode, you can enable batching for your quantum models by setting the [MAX_BATCH_ROWS](https://docs.snowflake.com/en/sql-reference/sql/create-external-function) param for the `live.udf_api` function. This will allow you to control the number of rows that are sent to the `livequery` backend via the `_live.udf_api` UDF.
+
+This UDF is installed a part of the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions). The default behaivor for `livequery function` setup is not to set `MAX_BATCH_ROWS` for the `live.udf_api` function. When it is not set Snowflake estimates the optimal batch size and uses that, this can cause timeouts from the livequery backend if the result set rows are too large to process for a AWS LAMBA.
+
+To set the `MAX_BATCH_ROWS` for the `live.udf_api` function, you can run the following SQL command:
+
+
+```sql
+CREATE OR REPLACE EXTERNAL FUNCTION DATASCIENCE_DEV._LIVE.UDF_API("METHOD" VARCHAR(16777216), "URL" VARCHAR(16777216), "HEADERS" OBJECT, "DATA" VARIANT, "USER_ID" VARCHAR(16777216), "SECRET" VARCHAR(16777216))
+RETURNS VARIANT
+STRICT
+API_INTEGRATION = "AWS_DATASCIENCE_API_STG"
+MAX_BATCH_ROWS = 30
+AS 'https://65sji95ax3.execute-api.us-east-1.amazonaws.com/stg/udf_api';
+```
 1. **node_calls CTE**: This CTE generates a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
 
    It starts by selecting block numbers from the `streamline__aptos_blocks` table that are not already present in the `aptos.streamline.complete_blocks_tx` table. For each of these block numbers, it constructs a `URL` for an `Aptos Node API` call to get information about the block. 
@@ -84,15 +140,20 @@ The `TABLE(FLATTEN(input => calls))` AS `t(VALUE)` part of the query would unnes
 | url5  | 2000          |
 | url6  | 2000          |
 
+The other part of the model is creating a SQL `SELECT` statement to extract data from a source table, transform it, and load it into a target table. Here's a breakdown of what this part of the model does:
 
+1. `SELECT * FROM (...)`: This is the outer query that selects all columns from the result of the inner query.
 
-### Quantum Synergy
+2. The inner query selects several columns from a source table. The source table is either `bronze__streamline_blocks_tx` or `bronze__streamline_FR_blocks_tx`, depending on whether the model is being run in incremental mode.
 
-Once the `make silver` invocation is complete, this resulting `datascience_dev.silver__blocks` view will contain all the data from the `Aptos Node API` calls from the bronze layer and the delta `block_heights` that were not present in the `aptos.streamline.complete_blocks_tx` table pulled in via the `quantum state` livequery mode.
+3. `partition_key`, `block_number`, `block_hash`, `block_timestamp_num`, `block_timestamp`, `first_version`, `last_version`, `inserted_timestamp`, `modified_timestamp`, `_inserted_timestamp`, `_invocation_id`, and `source` are the columns being selected. Some of these columns are derived from the `DATA` column in the source table, which appears to be a JSON object.
 
-```sql
-SELECT * FROM DATASCIENCE_DEV.SILVER.BLOCKS;
-```
+4. `TO_TIMESTAMP(block_timestamp_num :: STRING) AS block_timestamp`: This line is converting the `block_timestamp_num` column to a string and then converting that string to a timestamp.
+
+5. `{% if is_incremental() %}`: This is a dbt conditional that checks if the model is being run in incremental mode. If it is, the model selects from `bronze__streamline_blocks_tx` and only includes rows where `_inserted_timestamp` is greater than the maximum `_inserted_timestamp` in the target table. If the model is not being run in incremental mode, it selects from `bronze__streamline_FR_blocks_tx` without any additional filtering.
+
+6. `qualify(ROW_NUMBER() over(PARTITION BY block_number ORDER BY _inserted_timestamp DESC)) = 1`: This line is a window function that partitions the data by `block_number` and orders it by `_inserted_timestamp` in descending order. The `QUALIFY` clause then filters the result to only include the first row in each partition (i.e., the row with the most recent `_inserted_timestamp` for each `block_number`).
+
 
 **Note:** For more details on using the `udf params` used in streamline mode `post_hooks` refer to the following: 
  - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  

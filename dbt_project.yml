@@ -66,6 +66,7 @@ vars:
   UPDATE_UDFS_AND_SPS: true
   DROP_UDFS_AND_SPS: false
   START_GHA_TASKS: false
+  STREAMLINE_INVOKE_STREAMS: false
 
   # Setup variables in dbt_project.yml
   API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] }}' 

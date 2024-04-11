@@ -3,8 +3,6 @@
     tags = ['quantum_poc_ephemeral']
 ) }}
 
-
-
 WITH node_calls AS (
     -- Generate the REST requests to the APTOS node
     -- based on the blocks that have not been fetched yet
