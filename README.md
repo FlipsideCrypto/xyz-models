@@ -42,7 +42,7 @@ make quantum-poc
 
 ### Understanding the `POC` quantum model
 
-Invoking `make silver` will run the `POC` quantum model dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model with the following CTEs:
+Invoking `make silver` will run the `POC` quantum dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model with the following CTEs:
 
 1. **node_calls CTE**: This CTE is generats a list of `URLs` for `Aptos Node API` calls and assigns a batch number to each URL.
 
