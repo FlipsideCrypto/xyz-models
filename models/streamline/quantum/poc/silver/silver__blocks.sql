@@ -7,7 +7,6 @@
     cluster_by = ['block_timestamp::DATE'],
     tags = ['silver_blocks']
 ) }}
-
 WITH node_calls AS (
     -- generate a list of URLs for API calls and assign a batch number to each
     SELECT
