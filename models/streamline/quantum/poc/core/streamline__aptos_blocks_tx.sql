@@ -14,12 +14,14 @@
     tags = ['quantum_poc']
 ) }}
 
+
+
 WITH node_calls AS (
-    -- generate a list of URLs for API calls and assign a batch number to each
+    -- Generate the REST requests to the APTOS node
+    -- based on the blocks that have not been fetched yet
     SELECT
         '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
-        block_height,
-        CEIL(ROW_NUMBER() OVER(ORDER BY block_height DESC) / 10.0) AS batch_number
+        block_height
     FROM
         (
             SELECT
@@ -33,29 +35,23 @@ WITH node_calls AS (
                 aptos.streamline.complete_blocks_tx
         )
     ORDER BY block_height DESC
-    LIMIT 1000
-),
-batches AS (
-    -- group URLs by batch number and calculate the partition key
-    SELECT
-        batch_number,
-        ARRAY_AGG(calls) AS calls,
-        ROUND(AVG(block_height),-3) AS partition_key
-    FROM
-        node_calls
-    GROUP BY
-        batch_number
 )
 SELECT
+    -- Push work to streamline lambdas to fetch the data from APTOS nodes
+    -- NOTE: The `fsc-quantum-state` request header is only being  set since 
+    -- this POC is only invoked via the make directive that makes the user 
+    -- (or observer from a quantum models perspective) the one defined in your local
+    -- ~/.db/profiles.yml file. This will let the livequery backend know to run in batch "push"
+    -- streamline mode. In non POC models streamline mode will automagically be enabled based on the user
+    -- invoking the model (i.e. aws_lambda_* user via the GHA DBT profile)
     DATE_PART('EPOCH', CURRENT_TIMESTAMP())::INTEGER AS created_at,
-    partition_key,
+    ROUND(block_height,-3) AS partition_key,
     {{ target.database }}.live.udf_api(
-        'GET', -- request method
-        t.VALUE, -- request url
-        {}, -- request headers
-        {}, -- request body
+        'GET', 
+        calls, 
+        {'fsc-quantum-state':'streamline'}, 
+        {}, -- request body 
         'vault/dev/aptos/node/mainnet'
     ) AS request
 FROM
-    batches,
-    TABLE(FLATTEN(input => calls)) AS t(VALUE)
+    node_calls
