@@ -6,6 +6,14 @@ quantum-poc:
 		--target dev \
 		--profiles-dir ~/.dbt
 
+ephemeral:
+	@dbt run \
+		--vars '{"UPDATE_UDFS_AND_SPS": false, STREAMLINE_INVOKE_STREAMS: false}' \
+		-m tag:quantum_poc_ephemeral \
+		--profile datascience \
+		--target dev \
+		--profiles-dir ~/.dbt
+
 bronze:
 	@dbt run \
 		--vars '{"UPDATE_UDFS_AND_SPS": false, STREAMLINE_INVOKE_STREAMS: true}' \
