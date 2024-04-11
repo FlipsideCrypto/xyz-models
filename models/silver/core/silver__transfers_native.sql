@@ -52,6 +52,28 @@ dep AS (
     xfer
   WHERE
     transfer_event = 'DepositEvent'
+),
+reg AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    version,
+    success,
+    event_index
+  FROM
+    {{ ref('silver__events') }}
+  WHERE
+    event_type = '0x1::account::CoinRegisterEvent'
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+  SELECT
+    MAX(_inserted_timestamp)
+  FROM
+    {{ this }}
+)
+{% endif %}
 )
 SELECT
   wth.block_number,
@@ -73,9 +95,15 @@ SELECT
   '{{ invocation_id }}' AS _invocation_id
 FROM
   wth
+  LEFT JOIN reg
+  ON wth.tx_hash = reg.tx_hash
+  AND wth.event_index + 1 = reg.event_index
   JOIN dep
   ON wth.tx_hash = dep.tx_hash
-  AND wth.event_index + 1 = dep.event_index
   AND wth.amount = dep.amount
 WHERE
   wth.account_address <> dep.account_address
+  AND (
+    wth.event_index + 1 = dep.event_index
+    OR reg.event_index + 1 = dep.event_index
+  )
