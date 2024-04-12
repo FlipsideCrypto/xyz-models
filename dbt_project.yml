@@ -37,13 +37,14 @@ models:
     deploy:
       core:
         +materialized: ephemeral
-  streamline:
-    quantum:
-      poc:
-        core:
-          streamline__aptos_blocks_tx.sql:
-            pre-hook:
-              - "SET LIVEQUERY_CONTEXT = '{\"userId\":\"aws_lambda_datascience_api\"}'"
+  datascience_models:
+    streamline:
+      quantum:
+        poc:
+          core:
+            streamline__aptos_blocks_tx:
+              pre-hook:
+                - "SET LIVEQUERY_CONTEXT = '{\"userId\":\"aws_lambda_datascience_api\"}'"
   +copy_grants: true
   +persist_docs:
     relation: true
