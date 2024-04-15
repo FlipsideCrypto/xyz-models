@@ -5,7 +5,7 @@
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['entity_cluster'],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
-    full_refresh = False
+    full_refresh = True
 ) }}
 
 {% if is_incremental() %}
