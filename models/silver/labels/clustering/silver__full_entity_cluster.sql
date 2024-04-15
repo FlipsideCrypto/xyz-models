@@ -117,6 +117,6 @@ SELECT
 FROM
     {{ source(
         "bitcoin_bronze",
-        "entity_clusters"
+        "ENTITY_CLUSTERS_20240414_132013"
     ) }}
 {% endif %}

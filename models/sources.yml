@@ -35,6 +35,7 @@ sources:
     schema: bronze
     tables:
       - name: entity_clusters
+      - name: ENTITY_CLUSTERS_20240414_132013
   - name: bitcoin_core
     database: bitcoin
     schema: core
