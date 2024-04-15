@@ -1,0 +1,27 @@
+title Aptos Block TX View
+
+note over DBT blocks_tx model: Get current chainhead \nand generate block spine
+DBT blocks_tx model->Snowflake UDF: live.udf_api() [get chainhead]
+Snowflake UDF->Streamline: invoke REST request
+Streamline-->>Snowflake UDF: chainhead @t0
+Snowflake UDF-->>DBT blocks_tx model: chainhead #t0
+note over DBT blocks_tx model: Create Block Spine CTE logical table
+create Block Spine CTE table
+DBT blocks_tx model->>Block Spine CTE table:<<Create CTE Logical Table>>
+note over Block Spine CTE table: Generate spine of blocks to ingest\n(chainhead - max block ingested in complete table)
+destroyafter Block Spine CTE table
+create aptos_block_tx view
+DBT blocks_tx model->>aptos_block_tx view:<<Create aptos_block_tx view>>
+note over DBT blocks_tx model:Push work to streamline lambdas\nbased on rows from aptos_block_tx view
+DBT blocks_tx model->Snowflake UDF:udf_bulk_rest_api_v2()
+Snowflake UDF->Streamline:/udf_bulk_rest_api()
+activate Streamline #00ee77
+Streamline-->aptos_block_tx view:select * from ...
+activate aptos_block_tx view #Red
+aptos_block_tx view->(3)Streamline:Result Batches
+deactivate aptos_block_tx view
+create Aptos Node
+Streamline->Aptos Node: get_block_data()
+create S3
+Streamline->S3:
+deactivate Streamline

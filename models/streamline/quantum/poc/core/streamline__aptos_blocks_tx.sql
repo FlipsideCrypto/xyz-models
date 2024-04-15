@@ -13,36 +13,6 @@
     ),
     tags = ['quantum_poc']
 ) }}
-WITH node_calls AS (
 
-    SELECT
-        '{service}/{Authentication}/v1/blocks/by_height/' || block_height || '?with_transactions=true' calls,
-        block_height
-    FROM
-        (
-            SELECT
-                block_number AS block_height
-            FROM
-                {{ ref('streamline__aptos_blocks') }}
-            EXCEPT
-            SELECT
-                block_number
-            FROM
-                aptos.streamline.complete_blocks_tx
-        )
-    ORDER BY block_height DESC
-    LIMIT 20
-)
-SELECT
-    DATE_PART('EPOCH', CURRENT_TIMESTAMP())::INTEGER AS created_at,
-    ROUND(block_height,-3) AS partition_key,
-    {{ target.database }}.live.udf_api(
-        'GET', -- request method
-        calls, -- request url
-        {'fsc-quantum-state':'streamline'}, -- request headers
-        {}, -- request body
-        'vault/dev/aptos/node/mainnet' -- aws secret manager entry, contents of which is used 
-                                       -- to string interpolate the url
-    ) AS request
-FROM
-    node_calls
+SELECT *
+FROM {{ ref('streamline__aptos_blocks_tx_ephemeral') }}
