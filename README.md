@@ -40,58 +40,72 @@ There is a `makefile` [directive](./Makefile#L2) for invoking the `POC` quantum 
 make quantum-poc
 ``` 
 
-Invoking `make quantum-poc` will run the `POC` quantum model and the output will be as follows :
+### Understanding the `POC` quantum model
+
+#### Bronze Layer
+
+The [streamline__aptos_blocks_tx](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx.sql) model follows the desgn pattern of a `streamline` dbt model for ingesting data from a blockchain node, in this case the `Aptos Node API`. It uses a reusable [ephemeral model](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql) that is designed to fetch data from the `Aptos Node API` endpoint for specific block heights that have not been fetched yet. Here's what the model does in more detail:
+
+[node_calls CTE](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql#L6): This `CTE` generates `REST` requests for the `Aptos Node API` endpoint based on block heights that have not been fetched yet. It does this by comparing the `block_number` from the `streamline__aptos_blocks` table and the `block_number` from the `aptos.streamline.complete_blocks_tx` table. The `EXCEPT` clause returns all `block_number` values that are in the `streamline__aptos_blocks` table but not in the `aptos.streamline.complete_blocks_tx` table. These are the block heights that have not been fetched yet. For each of these block heights, it generates a `REST` request `URL` and stores it in the `calls` column.
+
+[Final SELECT Statement](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql#L26): This statement fetches data from the API endpoint for each `REST` request URL generated in the `node_calls` CTE. It does this by calling the `live.udf_api` function with the `GET` method and the `calls` URL. The `live.udf_api` function is expected to return the response from the API endpoint. The final result includes the current timestamp as created_at and _inserted_timestamp, the block_height rounded to the nearest thousand as partition_key, and the API response as request.
+
+#### Sequence Diagram for the Bronze Layer Model
+
+![Aptos POC Model](./models/streamline/quantum/poc/assets/Aptos_POC_Model_Sequence_Diagram.png)
+
+**NOTE:** This model is intended to always run in `streamline mode` as it's purpose is to batch ingest data from the `Aptos Node`, as such being a quantum model, the mode is set based on who the "observer" is( in this case the `user` invoking the `livequery` AWS lambda ). Since this model is not schedule to run on a GHA cron, we spoof the user by setting the the user for this model through the a `dbt pre-hook` to set the session based context in the [dbt_project.yml file here](/dbt_project.yml#L40-47).
+
+##### Invoking the bronze model
+
+There is a make directive for invoking the bronze model. To invoke the model, ensure you have your `~/.dbt/profiles.yml` setup according to the [profile setup](#profile-setup) instructions and run the following make command:
 
 ```sh
-make poc
-
-03:45:36  Running with dbt=1.7.10
-03:45:36  Registered adapter: snowflake=1.7.0
-03:45:37  Found 85 models, 2 seeds, 5 operations, 5 analyses, 130 tests, 9 sources, 0 exposures, 0 metrics, 975 macros, 0 groups, 0 semantic models
-03:45:37  
-03:45:41  
-03:45:41  Running 3 on-run-start hooks
-03:45:41  1 of 3 START hook: datascience_models.on-run-start.0 ........................... [RUN]
-03:45:41  1 of 3 OK hook: datascience_models.on-run-start.0 .............................. [OK in 0.00s]
-03:45:41  2 of 3 START hook: datascience_models.on-run-start.1 ........................... [RUN]
-03:45:41  2 of 3 OK hook: datascience_models.on-run-start.1 .............................. [OK in 0.00s]
-03:45:41  3 of 3 START hook: livequery_models.on-run-start.0 ............................. [RUN]
-03:45:41  3 of 3 OK hook: livequery_models.on-run-start.0 ................................ [OK in 0.00s]
-03:45:41  
-03:45:41  Concurrency: 12 threads (target='dev')
-03:45:41  
-03:45:41  1 of 1 START sql view model streamline.sportsdb_live_scorers ................... [RUN]
-03:45:41  Running macro `if_data_call_function`: Calling udf udf_bulk_rest_api_v2 with params: 
-{
-  "external_table": "external_table",
-  "producer_batch_size": "10",
-  "sql_limit": "10",
-  "sql_source": "{{this.identifier}}",
-  "worker_batch_size": "10"
-}
- on {{this.schema}}.{{this.identifier}}
-03:45:50  1 of 1 OK created sql view model streamline.sportsdb_live_scorers .............. [SUCCESS 1 in 9.13s]
-03:45:50  
-03:45:50  Running 2 on-run-end hooks
-03:45:50  1 of 2 START hook: datascience_models.on-run-end.0 ............................. [RUN]
-03:45:50  1 of 2 OK hook: datascience_models.on-run-end.0 ................................ [OK in 0.00s]
-03:45:50  2 of 2 START hook: livequery_models.on-run-end.0 ............................... [RUN]
-03:45:50  2 of 2 OK hook: livequery_models.on-run-end.0 .................................. [OK in 0.00s]
-03:45:50  
-03:45:50  
-03:45:50  Finished running 1 view model, 5 hooks in 0 hours 0 minutes and 13.73 seconds (13.73s).
-03:45:50  
-03:45:50  Completed successfully
-03:45:50  
-03:45:50  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+make bronze
 ```
-Once the invocation is complete, you can see the ingested data by querying snowflake with:
+To view the results of the model (the work "pushed" to a streamline backend), run the following SQL query:
 
 ```sql
-select * from streamline.datascience_dev.quantum_poc_scorers_v2 limit 10;
+-- Set the snowflake console session context to the user invoking table
+SET LIVEQUERY_CONTEXT = '{"userId":"aws_lambda_datascience_api"}';
+
+SELECT * FROM DATASCIENCE_DEV.STREAMLINE.APTOS_BLOCKS_TX;
+...
+
+
 ```
 
-**Note:** For more details on using the `udf params` in streamline models post hook refer to the following: 
+#### Silver Layer
+
+Invoking `make silver` will run the `POC` quantum dbt [silver__blocks](/models/streamline/quantum/poc/silver/silver__blocks.sql) model. 
+
+### Quantum Synergy
+
+Once the `make silver` invocation is complete, this resulting `datascience_dev.silver__blocks` view will contain all the data from the `Aptos Node API` calls from the bronze layer and the delta `block_heights` that were not present at the time of model invocation in the `aptos.streamline.complete_blocks_tx` table pulled in via the `quantum state` livequery mode.
+
+```sql 
+SELECT * FROM DATASCIENCE_DEV.SILVER.BLOCKS;
+```
+
+### Enabling batching for Quantum models
+
+When in `livequery` mode, you can enable batching for your quantum models by setting the [MAX_BATCH_ROWS](https://docs.snowflake.com/en/sql-reference/sql/create-external-function) param for the `live.udf_api` function. This will allow you to control the number of rows that are sent to the `livequery` backend via the `_live.udf_api` UDF.
+
+This UDF is installed a part of the [livequery setup](https://github.com/FlipsideCrypto/fsc-utils?tab=readme-ov-file#livequery-functions). The default behaivor for `livequery function` setup is not to set `MAX_BATCH_ROWS` for the `live.udf_api` function. When it is not set Snowflake estimates the optimal batch size and uses that, this can cause timeouts from the livequery backend if the result set rows are too large to process for a AWS LAMBA.
+
+To set the `MAX_BATCH_ROWS` for the `live.udf_api` function, you can run the following SQL command:
+
+
+```sql
+CREATE OR REPLACE EXTERNAL FUNCTION DATASCIENCE_DEV._LIVE.UDF_API("METHOD" VARCHAR(16777216), "URL" VARCHAR(16777216), "HEADERS" OBJECT, "DATA" VARIANT, "USER_ID" VARCHAR(16777216), "SECRET" VARCHAR(16777216))
+RETURNS VARIANT
+STRICT
+API_INTEGRATION = "AWS_DATASCIENCE_API_STG"
+MAX_BATCH_ROWS = 30
+AS 'https://65sji95ax3.execute-api.us-east-1.amazonaws.com/stg/udf_api';
+```
+
+**Note:** For more details on using the `udf params` used in streamline mode `post_hooks` refer to the following: 
  - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  
  - [Optimizing backfill tuning Streamline models](https://flipsidecrypto.slack.com/docs/T6F1AJ69E/F05V71L3ZJS)
  - [Streamline architecture overview](https://github.com/flipsideCrypto/streamline?tab=readme-ov-file#architecture-overview) 
@@ -101,8 +115,6 @@ select * from streamline.datascience_dev.quantum_poc_scorers_v2 limit 10;
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
 - Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
 - Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
-
 - Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
 
 ## Applying Model Tags
