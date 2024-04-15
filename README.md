@@ -50,6 +50,10 @@ The [streamline__aptos_blocks_tx](/models/streamline/quantum/poc/core/streamline
 
 [Final SELECT Statement](/models/streamline/quantum/poc/core/streamline__aptos_blocks_tx_ephemeral.sql#L26): This statement fetches data from the API endpoint for each `REST` request URL generated in the `node_calls` CTE. It does this by calling the `live.udf_api` function with the `GET` method and the `calls` URL. The `live.udf_api` function is expected to return the response from the API endpoint. The final result includes the current timestamp as created_at and _inserted_timestamp, the block_height rounded to the nearest thousand as partition_key, and the API response as request.
 
+#### Sequence Diagram for the Bronze Layer Model
+
+![Aptos POC Model](./models/streamline/quantum/poc/assets/Aptos_POC_Model_Sequence_Diagram.png)
+
 **NOTE:** This model is intended to always run in `streamline mode` as it's purpose is to batch ingest data from the `Aptos Node`, as such being a quantum model, the mode is set based on who the "observer" is( in this case the `user` invoking the `livequery` AWS lambda ). Since this model is not schedule to run on a GHA cron, we spoof the user by setting the the user for this model through the a `dbt pre-hook` to set the session based context in the [dbt_project.yml file here](/dbt_project.yml#L40-47).
 
 ##### Invoking the bronze model
