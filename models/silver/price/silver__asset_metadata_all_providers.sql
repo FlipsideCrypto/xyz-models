@@ -33,10 +33,10 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-    p._inserted_timestamp >= (
+    p.modified_timestamp >= (
         SELECT
             MAX(
-                _inserted_timestamp
+                modified_timestamp
             )
         FROM
             {{ this }}

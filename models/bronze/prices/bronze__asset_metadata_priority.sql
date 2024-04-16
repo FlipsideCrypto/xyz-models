@@ -8,7 +8,9 @@ SELECT
     symbol,
     provider,
     id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    modified_timestamp,
+    inserted_timestamp
 FROM
     {{ source(
         'crosschain_silver',
