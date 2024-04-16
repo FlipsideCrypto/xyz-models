@@ -10,7 +10,9 @@ SELECT
     blockchain,
     provider,
     _unique_key,
-    _inserted_timestamp
+    _inserted_timestamp,
+    modified_timestamp,
+    inserted_timestamp
 FROM
     {{ source(
         'crosschain_silver',

@@ -8,7 +8,7 @@
 
 SELECT
     p.hour,
-    p.token_address,
+    COALESCE(LOWER(b.token_address), p.token_address) AS token_address,
     p.price,
     p.is_imputed,
     COALESCE(
@@ -26,6 +26,13 @@ SELECT
 FROM
     {{ ref('bronze__hourly_prices_priority') }}
     p
+    LEFT JOIN {{ ref('bronze__manual_token_price_metadata') }}
+    b
+    ON LOWER(
+        p.token_address
+    ) = LOWER(
+        b.token_address_raw
+    )
     LEFT JOIN {{ ref('silver__asset_metadata_priority') }}
     m
     ON LOWER(
@@ -36,16 +43,34 @@ FROM
     LEFT JOIN {{ ref('silver__coin_info') }} C
     ON LOWER(
         C.coin_type
-    ) = LOWER(p.token_address)
+    ) = LOWER(
+        p.token_address
+    )
+WHERE
+    (
+        (
+            p.blockchain = 'aptos'
+            AND p.token_address LIKE '%:%'
+        )
+        OR (
+            p.blockchain = 'ethereum'
+            AND p.token_address IN (
+                '0xdac17f958d2ee523a2206206994597c13d831ec7',
+                '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                '0xd31a59c85ae9d8edefec411d448f90841571b89c',
+                '0x4e15361fd6b4bb609fa63c81a2be19d873717870',
+                '0x7c9f4c87d911613fe9ca58b579f737911aad2d43'
+            )
+        )
+    )
 
 {% if is_incremental() %}
-WHERE
-    p._inserted_timestamp >= (
-        SELECT
-            MAX(
-                _inserted_timestamp
-            ) - INTERVAL '24 hours'
-        FROM
-            {{ this }}
-    )
+AND p.modified_timestamp >= (
+    SELECT
+        MAX(
+            modified_timestamp
+        ) - INTERVAL '24 hours'
+    FROM
+        {{ this }}
+)
 {% endif %}

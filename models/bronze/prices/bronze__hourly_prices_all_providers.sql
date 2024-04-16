@@ -11,12 +11,14 @@ SELECT
     price,
     is_imputed,
     _inserted_timestamp,
-    _unique_key
+    _unique_key,
+    modified_timestamp,
+    inserted_timestamp
 FROM
     {{ source(
         'crosschain_silver',
         'token_prices_all_providers_hourly'
     ) }}
-WHERE
+    {# WHERE
     blockchain = 'aptos'
-    AND token_address LIKE '%:%'
+    AND token_address LIKE '%:%' #}
