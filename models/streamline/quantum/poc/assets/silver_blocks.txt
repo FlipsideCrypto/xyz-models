@@ -1,0 +1,20 @@
+title Silver Blocks Model
+
+note over DBT silver_blocks model: Generate ephemeral_model using aptos_blocks_tx\nto live ingest the delta of blocks not present in the datalake
+DBT silver_blocks model->DBT aptos_blocks_tx model: Generate ephemeral_model
+DBT aptos_blocks_tx model->Snowflake UDF: live.udf_api() [get_block_data]
+Snowflake UDF->Streamline: invoke REST request
+Streamline-->>Snowflake UDF: block data
+Snowflake UDF-->>DBT aptos_blocks_tx model: block data
+DBT aptos_blocks_tx model-->>DBT silver_blocks model: ephemeral_model
+
+note over DBT silver_blocks model: Parse responses from ephemeral_model
+DBT silver_blocks model->parsed_responses: Parse JSON responses
+parsed_responses-->>DBT silver_blocks model: Parsed responses
+
+note over DBT silver_blocks model: Merge parsed_responses with existing data
+DBT silver_blocks model->DBT silver_blocks model: Merge parsed_responses with existing data
+note over DBT silver_blocks model: This step involves a UNION ALL operation between\n the existing data and the parsed_responses. It also includes\na QUALIFY clause to ensure only the latest record for each\nblock_number is included based on the _inserted_timestamp.
+DBT silver_blocks model->Snowflake: UNION ALL parsed_responses
+Snowflake-->>DBT silver_blocks model: Final model
+note over DBT silver_blocks model: The final model includes all the fields from \nthe existing data and parsed_responses. \nIt also includes additional fields like \n`_invocation_id` and source [LQ / DL].
