@@ -46,7 +46,7 @@ SELECT * FROM (
         SYSDATE() AS modified_timestamp,
         _inserted_timestamp,
         '{{ invocation_id }}' AS _invocation_id,
-        'APTOS' AS source
+        'DL' AS source
     FROM
     {% if is_incremental() %}
     {{ ref('bronze__streamline_blocks_tx') }}
