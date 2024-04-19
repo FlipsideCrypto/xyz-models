@@ -125,8 +125,9 @@ wormhole_transfers AS (
         22 AS source_chain_id,
         'aptos' AS source_chain_name,
         CASE
-            WHEN A.block_number < 165050375
-            AND A.block_timestamp :: DATE <= '2024-04-04' THEN payload :arguments [1]
+            WHEN TRY_CAST(
+                payload :arguments [1] :: STRING AS INT
+            ) IS NOT NULL THEN payload :arguments [1]
             ELSE utils.udf_hex_to_int(RTRIM(payload :arguments [1] :: STRING, '0'))
         END :: INT AS destination_chain_id,
         chain_name AS destination_chain_name,
