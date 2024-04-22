@@ -4,29 +4,12 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['entity_cluster'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    full_refresh = False
 ) }}
 
 {% if is_incremental() %}
-WITH set_inserted_timestamp AS (
-    {% if var(
-            "INCREMENTAL_CLUSTER_BACKFILL",
-            False
-        ) %}
-
-        SELECT
-            DATEADD(
-                'hours',
-                '{{ var("INCREMENTAL_CLUSTER_INTERVAL", 24 ) }}',
-                MAX(inserted_timestamp) :: DATE :: timestamp_ntz
-            ) AS inserted_timestamp
-        FROM
-            {{ this }}
-        {% else %}
-            select SYSDATE() AS inserted_timestamp
-        {% endif %}
-),
-clusters_changelog AS (
+WITH clusters_changelog AS (
     SELECT
         clusters :: ARRAY AS clusters,
         addresses :: ARRAY AS addresses,
@@ -89,19 +72,17 @@ base AS (
         merges_full
 )
 SELECT
-    A.address,
-    A.address_group,
+    address,
+    address_group,
     NULL AS project_name,
     {{ dbt_utils.generate_surrogate_key(
         ['address']
     ) }} AS full_entity_cluster_id,
-    ts.inserted_timestamp,
+    SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS invocation_id
 FROM
-    base A
-    LEFT JOIN set_inserted_timestamp ts
-    ON 1 = 1
+    base
 {% else %}
 SELECT
     address,

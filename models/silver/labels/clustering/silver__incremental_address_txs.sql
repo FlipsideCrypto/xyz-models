@@ -26,19 +26,29 @@ base AS (
     ) AS max_index
   FROM
     {{ ref('silver__inputs_final') }}
-  WHERE
-    _inserted_timestamp BETWEEN (
-      SELECT
-        max_inserted_timestamp
-      FROM
-        date_range
-    )
-    AND (
-      SELECT
-        max_inserted_timestamp_interval
-      FROM
-        date_range
-    )
+
+    {% if var(
+        'INCREMENTAL_CLUSTER_BACKFILL',
+        False
+      ) %}
+    WHERE
+      _inserted_timestamp BETWEEN '{{ var('INCREMENTAL_CLUSTER_BACKFILL_START') }}' :: timestamp_ntz
+      AND '{{ var('INCREMENTAL_CLUSTER_BACKFILL_END') }}' :: timestamp_ntz
+    {% else %}
+    WHERE
+      _inserted_timestamp BETWEEN (
+        SELECT
+          max_inserted_timestamp
+        FROM
+          date_range
+      )
+      AND (
+        SELECT
+          max_inserted_timestamp_interval
+        FROM
+          date_range
+      )
+    {% endif %}
 ),
 base2 AS (
   SELECT
