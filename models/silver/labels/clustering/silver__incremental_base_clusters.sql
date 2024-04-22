@@ -28,6 +28,14 @@ WHERE
       pubkey_script_address
     FROM
       {{ ref('silver__inputs_final') }}
+    {% if var(
+        'INCREMENTAL_CLUSTER_BACKFILL',
+        False
+      ) %}
+    WHERE
+      _inserted_timestamp BETWEEN '{{ var('INCREMENTAL_CLUSTER_BACKFILL_START') }}' :: timestamp_ntz
+      AND '{{ var('INCREMENTAL_CLUSTER_BACKFILL_END') }}' :: timestamp_ntz
+    {% else %}
     WHERE
       _inserted_timestamp BETWEEN (
         SELECT
@@ -41,6 +49,7 @@ WHERE
         FROM
           date_range
       )
+    {% endif %}
   )
 GROUP BY
   address_group
