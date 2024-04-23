@@ -56,8 +56,9 @@ get_inscription_count AS (
                 'Accept',
                 'application/json',
                 'x-hiro-api-key',
-                'db2c8f0f3262113265682c15636bc775' -- TODO move to vault
-            )
+                '{x-hiro-api-key}'
+            ),
+            'vault/prod/bitcoin/hiro'
         ) AS response
     FROM
         blocks
