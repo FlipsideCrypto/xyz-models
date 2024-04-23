@@ -12,10 +12,7 @@ WITH blocks AS (
     SELECT
         block_number,
         block_hash,
-        COALESCE(
-            modified_timestamp,
-            _inserted_timestamp
-        ) AS _modified_timestamp
+        _inserted_timestamp
     FROM
         {{ ref('silver__blocks') }}
     WHERE
@@ -24,9 +21,9 @@ WITH blocks AS (
 
 {% if is_incremental() %}
 AND (
-    _modified_timestamp >= (
+    _inserted_timestamp >= (
         SELECT
-            MAX(_modified_timestamp)
+            MAX(_inserted_timestamp)
         FROM
             {{ this }}
     )
