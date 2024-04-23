@@ -1,0 +1,99 @@
+name: dbt_run_inscription_count
+run-name: dbt_run_inscription_count
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs every 15 minutes
+    - cron: '*/15 * * * *'
+
+env:
+  USE_VARS: "${{ vars.USE_VARS }}"
+  DBT_PROFILES_DIR: "${{ vars.DBT_PROFILES_DIR }}"
+  DBT_VERSION: "${{ vars.DBT_VERSION }}"
+  ACCOUNT: "${{ vars.ACCOUNT }}"
+  ROLE: "${{ vars.ROLE }}"
+  USER: "${{ vars.USER }}"
+  PASSWORD: "${{ secrets.PASSWORD }}"
+  REGION: "${{ vars.REGION }}"
+  DATABASE: "${{ vars.DATABASE }}"
+  WAREHOUSE: "${{ vars.WAREHOUSE }}"
+  SCHEMA: "${{ vars.SCHEMA }}"
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+    environment:
+      name: workflow_prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: install dependencies
+        run: |
+          pip install -r requirements.txt
+          dbt deps
+
+      - name: Block Inscription Count Request 1
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 2
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 3
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 4
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 5
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 6
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 7
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 8
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 9
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Block Inscription Count Request 10
+        run: >
+          dbt run -s dbt_run_inscription_count
+        continue-on-error: true
+
+      - name: Store logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dbt-logs
+          path: |
+            logs
+            target
