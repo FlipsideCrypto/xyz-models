@@ -12,7 +12,10 @@ WITH blocks AS (
     SELECT
         block_number,
         block_hash,
-        modified_timestamp AS _modified_timestamp
+        COALESCE(
+            modified_timestamp,
+            _inserted_timestamp
+        ) AS _modified_timestamp
     FROM
         {{ ref('silver__blocks') }}
     WHERE
@@ -27,9 +30,9 @@ AND (
         FROM
             {{ this }}
     )
-    OR block_number >= (
+    OR block_number IN (
         SELECT
-            MIN(block_number)
+            block_number
         FROM
             {{ this }}
         WHERE
@@ -39,8 +42,6 @@ AND (
 {% endif %}
 ORDER BY
     block_number ASC
-LIMIT
-    100
 ),
 get_inscription_count AS (
     SELECT
@@ -56,6 +57,17 @@ get_inscription_count AS (
         ) AS response
     FROM
         blocks
+    WHERE
+        block_number NOT IN (
+            SELECT
+                block_number
+            FROM
+                {{ this }}
+            WHERE
+                status_code = 200
+        )
+    LIMIT
+        100
 )
 SELECT
     block_number,

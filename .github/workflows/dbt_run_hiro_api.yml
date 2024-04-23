@@ -1,5 +1,5 @@
-name: dbt_run_inscription_count
-run-name: dbt_run_inscription_count
+name: dbt_run_hiro_api
+run-name: dbt_run_hiro_api
 
 on:
   workflow_dispatch:
