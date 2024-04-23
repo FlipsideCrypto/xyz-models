@@ -27,13 +27,13 @@ AND (
         FROM
             {{ this }}
     )
-    OR block_number > (
+    OR block_number >= (
         SELECT
-            MAX(block_number)
+            MIN(block_number)
         FROM
             {{ this }}
         WHERE
-            status_code = 200
+            status_code != 200
     )
 )
 {% endif %}
