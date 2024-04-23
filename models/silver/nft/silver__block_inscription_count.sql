@@ -40,7 +40,7 @@ AND (
 ORDER BY
     block_number ASC
 LIMIT
-    100 -- rpm limit
+    100
 ),
 get_inscription_count AS (
     SELECT
