@@ -40,7 +40,7 @@ AND (
 ORDER BY
     block_number ASC
 LIMIT
-    100
+    100 -- rpm limit
 ),
 get_inscription_count AS (
     SELECT
@@ -52,13 +52,7 @@ get_inscription_count AS (
             'GET',
             'https://api.hiro.so/ordinals/v1/inscriptions/transfers?block=' || block_hash || '&limit=1',
             {},
-            OBJECT_CONSTRUCT(
-                'Accept',
-                'application/json',
-                'x-hiro-api-key',
-                '{x-hiro-api-key}'
-            ),
-            'vault/prod/bitcoin/hiro'
+            {}
         ) AS response
     FROM
         blocks
@@ -68,6 +62,8 @@ SELECT
     block_hash,
     response :data :total :: NUMBER AS inscription_count,
     response :status_code :: NUMBER AS status_code,
+    response,
+    response :headers ::VARIANT as headers,
     _request_timestamp,
     _modified_timestamp,
     SYSDATE() AS inserted_timestamp,
