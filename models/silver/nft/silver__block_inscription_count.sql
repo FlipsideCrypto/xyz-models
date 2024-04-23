@@ -62,8 +62,6 @@ SELECT
     block_hash,
     response :data :total :: NUMBER AS inscription_count,
     response :status_code :: NUMBER AS status_code,
-    response,
-    response :headers ::VARIANT as headers,
     _request_timestamp,
     _modified_timestamp,
     SYSDATE() AS inserted_timestamp,
