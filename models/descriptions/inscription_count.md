@@ -2,4 +2,4 @@
 
 Number of inscriptions revealed in the block.
 
-{% enddocs %
+{% enddocs %}

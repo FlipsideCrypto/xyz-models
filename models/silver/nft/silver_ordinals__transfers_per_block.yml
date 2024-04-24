@@ -20,7 +20,7 @@ models:
         description: "{{ doc('_request_timestamp') }}"
       
       - name: _inserted_timestamp
-        description: "{{ doc('_inserted_timestamp') }}"
+        description: "{{ doc('inserted_timestamp') }}"
 
       - name: inserted_timestamp
         description: "{{ doc('inserted_timestamp') }}"
@@ -29,4 +29,3 @@ models:
         description: "{{ doc('modified_timestamp') }}"
 
       - name: _invocation_id
-        description: "{{ doc('_invocation_id') }}"
