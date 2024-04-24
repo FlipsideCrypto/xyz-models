@@ -44,7 +44,7 @@ get_inscription_count AS (
     SELECT
         block_number,
         block_hash,
-        _modified_timestamp,
+        _inserted_timestamp,
         SYSDATE() AS _request_timestamp,
         {{ target.database }}.live.udf_api(
             'GET',
@@ -54,17 +54,20 @@ get_inscription_count AS (
         ) AS response
     FROM
         blocks
-    WHERE
-        block_number NOT IN (
-            SELECT
-                block_number
-            FROM
-                {{ this }}
-            WHERE
-                status_code = 200
-        )
-    LIMIT
-        100
+
+{% if is_incremental() %}
+WHERE
+    block_number NOT IN (
+        SELECT
+            block_number
+        FROM
+            {{ this }}
+        WHERE
+            status_code = 200
+    )
+{% endif %}
+LIMIT
+    100
 )
 SELECT
     block_number,
@@ -72,7 +75,7 @@ SELECT
     response :data :total :: NUMBER AS inscription_count,
     response :status_code :: NUMBER AS status_code,
     _request_timestamp,
-    _modified_timestamp,
+    _inserted_timestamp,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
