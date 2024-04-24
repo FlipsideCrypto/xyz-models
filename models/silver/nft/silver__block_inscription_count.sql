@@ -21,9 +21,9 @@ WITH blocks AS (
 
 {% if is_incremental() %}
 AND (
-    _inserted_timestamp >= (
+    block_number >= (
         SELECT
-            MAX(_inserted_timestamp)
+            MAX(block_number)
         FROM
             {{ this }}
     )
@@ -39,6 +39,8 @@ AND (
 {% endif %}
 ORDER BY
     block_number ASC
+LIMIT
+    100
 ),
 get_inscription_count AS (
     SELECT
@@ -54,20 +56,6 @@ get_inscription_count AS (
         ) AS response
     FROM
         blocks
-
-{% if is_incremental() %}
-WHERE
-    block_number NOT IN (
-        SELECT
-            block_number
-        FROM
-            {{ this }}
-        WHERE
-            status_code = 200
-    )
-{% endif %}
-LIMIT
-    100
 )
 SELECT
     block_number,
