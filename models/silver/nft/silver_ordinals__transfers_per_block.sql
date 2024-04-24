@@ -4,7 +4,7 @@
     merge_exclude_columns = ["inserted_timestamp"],
     unique_key = 'block_hash',
     cluster_by = ["block_number"],
-    tags = ["ordhook"]
+    tags = ["hiro_api"]
 ) }}
 
 WITH blocks AS (

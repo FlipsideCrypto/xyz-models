@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: silver_ordinals__inscriptions_per_block
+    description: Logs output of Hiro API - GET /ordinals/v1/stats/inscriptions
+
+    columns:
+      - name: block_number
+        description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
+
