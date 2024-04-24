@@ -4,7 +4,7 @@
     merge_exclude_columns = ["inserted_timestamp"],
     unique_key = 'block_hash',
     cluster_by = ["block_number"],
-    tags = ["ordhook"]
+    tags = ["hiro_api"]
 ) }}
 
 WITH blocks AS (
@@ -20,28 +20,20 @@ WITH blocks AS (
         AND NOT is_pending
 
 {% if is_incremental() %}
-AND (
-    block_number >= (
-        SELECT
-            MAX(block_number)
-        FROM
-            {{ this }}
-    )
-    OR block_number IN (
-        SELECT
-            block_number
-        FROM
-            {{ this }}
-        WHERE
-            status_code != 200
-    )
+AND block_number NOT IN (
+    SELECT
+        DISTINCT block_number
+    FROM
+        {{ this }}
+    WHERE
+        status_code = 200
 )
 {% endif %}
 ORDER BY
     block_number ASC
 LIMIT
     100
-),
+), 
 get_inscription_count AS (
     SELECT
         block_number,
@@ -60,7 +52,7 @@ get_inscription_count AS (
 SELECT
     block_number,
     block_hash,
-    response :data :total :: NUMBER AS inscription_count,
+    response :data :total :: NUMBER AS transfer_count,
     response :status_code :: NUMBER AS status_code,
     _request_timestamp,
     _inserted_timestamp,
