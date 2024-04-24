@@ -20,28 +20,20 @@ WITH blocks AS (
         AND NOT is_pending
 
 {% if is_incremental() %}
-AND (
-    block_number >= (
-        SELECT
-            MAX(block_number)
-        FROM
-            {{ this }}
-    )
-    OR block_number IN (
-        SELECT
-            block_number
-        FROM
-            {{ this }}
-        WHERE
-            status_code != 200
-    )
+AND block_number NOT IN (
+    SELECT
+        DISTINCT block_number
+    FROM
+        {{ this }}
+    WHERE
+        status_code = 200
 )
 {% endif %}
 ORDER BY
     block_number ASC
 LIMIT
     100
-),
+), 
 get_inscription_count AS (
     SELECT
         block_number,
