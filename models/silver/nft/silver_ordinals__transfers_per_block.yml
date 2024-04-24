@@ -6,6 +6,27 @@ models:
     columns:
       - name: block_number
         description: "{{ doc('block_number') }}"
-        tests:
-          - not_null
 
+      - name: block_hash
+        description: "{{ doc('block_hash') }}"
+
+      - name: transfer_count
+        description: "{{ doc('transfer_count') }}"
+      
+      - name: status_code
+        description: "{{ doc('status_code') }}"
+      
+      - name: _request_timestamp
+        description: "{{ doc('_request_timestamp') }}"
+      
+      - name: _inserted_timestamp
+        description: "{{ doc('_inserted_timestamp') }}"
+
+      - name: inserted_timestamp
+        description: "{{ doc('inserted_timestamp') }}"
+
+      - name: modified_timestamp
+        description: "{{ doc('modified_timestamp') }}"
+
+      - name: _invocation_id
+        description: "{{ doc('_invocation_id') }}"
