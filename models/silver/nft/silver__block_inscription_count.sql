@@ -54,17 +54,20 @@ get_inscription_count AS (
         ) AS response
     FROM
         blocks
-    WHERE
-        block_number NOT IN (
-            SELECT
-                block_number
-            FROM
-                {{ this }}
-            WHERE
-                status_code = 200
-        )
-    LIMIT
-        100
+
+{% if is_incremental() %}
+WHERE
+    block_number NOT IN (
+        SELECT
+            block_number
+        FROM
+            {{ this }}
+        WHERE
+            status_code = 200
+    )
+{% endif %}
+LIMIT
+    100
 )
 SELECT
     block_number,
