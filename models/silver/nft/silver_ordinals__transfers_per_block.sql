@@ -52,7 +52,7 @@ get_inscription_count AS (
 SELECT
     block_number,
     block_hash,
-    response :data :total :: NUMBER AS inscription_count,
+    response :data :total :: NUMBER AS transfer_count,
     response :status_code :: NUMBER AS status_code,
     _request_timestamp,
     _inserted_timestamp,
