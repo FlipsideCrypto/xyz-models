@@ -42,52 +42,52 @@ jobs:
 
       - name: Block Inscription Count Request 1
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 2
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 3
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 4
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 5
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 6
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 7
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 8
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 9
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Block Inscription Count Request 10
         run: >
-          dbt run -s dbt_run_inscription_count
+          dbt run -s silver__block_inscription_count
         continue-on-error: true
 
       - name: Store logs
