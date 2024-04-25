@@ -106,12 +106,15 @@ MAX_BATCH_ROWS = 30
 AS 'https://65sji95ax3.execute-api.us-east-1.amazonaws.com/stg/udf_api';
 ```
 
-**Note:** For more details on using the `udf params` used in streamline mode `post_hooks` refer to the following: 
+### Tuning Streamline Models
+
+For more details on using the `udf params` used in streamline mode `post_hooks` refer to the following: 
  - [Lessons learned tuning backfills ](https://github.com/FlipsideCrypto/streamline-flow/discussions/10#discussioncomment-7194378)  
  - [Optimizing backfill tuning Streamline models](https://flipsidecrypto.slack.com/docs/T6F1AJ69E/F05V71L3ZJS)
  - [Streamline architecture overview](https://github.com/flipsideCrypto/streamline?tab=readme-ov-file#architecture-overview) 
 
 ### Resources:
+
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
 - Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
