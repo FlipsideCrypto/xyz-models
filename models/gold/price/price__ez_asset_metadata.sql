@@ -12,6 +12,7 @@ SELECT
     decimals,
     blockchain,
     FALSE AS is_native,
+    is_deprecated,
     inserted_timestamp,
     modified_timestamp,
     complete_token_asset_metadata_id AS ez_asset_metadata_id
@@ -26,6 +27,7 @@ SELECT
     decimals,
     blockchain,
     TRUE AS is_native,
+    is_deprecated,
     inserted_timestamp,
     modified_timestamp,
     complete_native_asset_metadata_id AS ez_asset_metadata_id
