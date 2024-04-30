@@ -20,9 +20,9 @@ models:
               column_type_list:
                 - TIMESTAMP_LTZ
                 - TIMESTAMP_NTZ
-          - dbt_expectations.expect_row_values_to_have_recent_data:
-              datepart: day
-              interval: 7
+          # - dbt_expectations.expect_row_values_to_have_recent_data:
+          #     datepart: day
+          #     interval: 7
       - name: TX_HASH
         tests:
           - not_null

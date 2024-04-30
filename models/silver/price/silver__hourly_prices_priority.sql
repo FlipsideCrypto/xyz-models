@@ -43,9 +43,7 @@ FROM
     LEFT JOIN {{ ref('silver__coin_info') }} C
     ON LOWER(
         C.coin_type
-    ) = LOWER(
-        p.token_address
-    )
+    ) = LOWER(COALESCE(b.token_address, p.token_address))
 WHERE
     (
         (
