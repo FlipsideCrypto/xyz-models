@@ -8,27 +8,33 @@
 
 SELECT
     p.token_address,
-    p.id,
+    LOWER(
+        p.token_address
+    ) AS token_address_lower,
+    p.asset_id,
     COALESCE(
         C.symbol,
         p.symbol
     ) AS symbol,
     C.name,
     C.decimals,
-    p.provider,
+    blockchain,
+    blockchain_name,
+    blockchain_id,
+    is_deprecated,
+    provider,
+    source,
     CASE
         WHEN p.provider = 'coingecko' THEN 1
         WHEN p.provider = 'coinmarketcap' THEN 2
     END AS priority,
-    {{ dbt_utils.generate_surrogate_key(
-        ['token_address']
-    ) }} AS asset_metadata_priority_id,
+    complete_token_asset_metadata_id AS asset_metadata_priority_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     p._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ ref('bronze__asset_metadata_priority') }}
+    {{ ref('bronze__complete_token_asset_metadata') }}
     p
     LEFT JOIN {{ ref('silver__coin_info') }} C
     ON LOWER(

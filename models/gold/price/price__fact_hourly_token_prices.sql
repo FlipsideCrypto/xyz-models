@@ -6,7 +6,7 @@
 
 SELECT
     HOUR,
-    token_address,
+    token_address_lower AS token_address,
     price,
     is_imputed,
     provider

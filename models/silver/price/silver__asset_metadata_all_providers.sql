@@ -7,24 +7,26 @@
 ) }}
 
 SELECT
+    asset_id,
     token_address,
-    id,
+    LOWER(token_address) AS token_address_lower,
     COALESCE(
         C.symbol,
         p.symbol
     ) AS symbol,
-    NAME,
+    p.name,
     decimals,
-    provider,
-    {{ dbt_utils.generate_surrogate_key(
-        ['token_address','provider','COALESCE( C.symbol, p.symbol ) ','id']
-    ) }} AS asset_metadata_all_providers_id,
+    platform,
+    platform_id,
+    p.provider,
+    source,
+    complete_provider_asset_metadata_id AS asset_metadata_all_providers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     p._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ ref('bronze__asset_metadata_all_providers') }}
+    {{ ref('bronze__complete_provider_asset_metadata') }}
     p
     LEFT JOIN {{ ref('silver__coin_info') }} C
     ON LOWER(
@@ -43,6 +45,6 @@ WHERE
     )
 {% endif %}
 
-qualify(ROW_NUMBER() over (PARTITION BY token_address, id, COALESCE(C.symbol, p.symbol), provider
+qualify(ROW_NUMBER() over (PARTITION BY token_address, asset_id, COALESCE(C.symbol, p.symbol), provider
 ORDER BY
     p._inserted_timestamp DESC)) = 1

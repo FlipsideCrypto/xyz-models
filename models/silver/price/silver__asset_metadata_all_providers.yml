@@ -7,7 +7,7 @@ models:
             - TOKEN_ADDRESS
             - SYMBOL
             - PROVIDER
-            - ID
+            - ASSET_ID
 
     columns:   
       - name: TOKEN_ADDRESS
