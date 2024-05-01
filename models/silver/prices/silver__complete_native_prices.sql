@@ -53,7 +53,7 @@ coinpaprika AS (
         FALSE AS is_imputed,
         TRUE AS is_deprecated,
         provider,
-        NULL AS source,
+        'history' AS source,
         _inserted_timestamp,
         inserted_timestamp,
         modified_timestamp,
