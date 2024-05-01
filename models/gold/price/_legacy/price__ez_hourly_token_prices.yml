@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: price__ez_hourly_token_prices
-    description: A comprehensive fact table holding provider and hourly token prices for Bitcoin, with the difference from the fact table being only one provider is reported per hour. The price provided is the closing price for the hour.
+    description: Deprecating soon! Please use price.ez_prices_hourly or price.fact_prices_ohlc_hourly instead.
     tests:
       - dbt_utils.recency:
           datepart: day
