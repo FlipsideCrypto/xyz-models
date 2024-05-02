@@ -64,3 +64,7 @@ WHERE
             {{ this }}
     )
 {% endif %}
+
+qualify(ROW_NUMBER() over (PARTITION BY COALESCE(b.token_address, m.token_address), HOUR, provider
+ORDER BY
+    A.modified_timestamp DESC)) = 1
