@@ -1,0 +1,3 @@
+workflow_name,workflow_schedule
+dbt_run_datashares,"10 * * * *"
+dbt_run_datashares_v2,"5 * * * *"

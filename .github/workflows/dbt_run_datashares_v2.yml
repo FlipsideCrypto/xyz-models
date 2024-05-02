@@ -1,5 +1,5 @@
-name: dbt_run_datashares
-run-name: dbt_run_datashares
+name: dbt_run_datashares_v2
+run-name: dbt_run_datashares_v2
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
       dbt_command: >
-        dbt run-operation call_sp_grant_share_permissions --args "{args: sysdate() - interval '1 hour'}"
+        dbt run-operation call_sp_grant_share_permissions_v2
       environment: workflow_prod
       warehouse: ${{ vars.WAREHOUSE }}
     secrets: inherit

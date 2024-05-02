@@ -11,6 +11,8 @@
         {{ create_sp_grant_share_permissions_timestamp() }}
         {{ create_sp_grant_share_permissions() }}
         {{ create_sp_grant_share_permissions_string() }}
+        {{create_sp_share_build_and_grant_permissions_db() }}
+        {{create_sp_share_build_and_grant_permissions() }}
 
         CREATE SCHEMA IF NOT EXISTS streamline;
         {{create_sp_create_streamline_users_roles_dev() }}
