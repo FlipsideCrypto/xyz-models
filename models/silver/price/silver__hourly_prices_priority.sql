@@ -8,23 +8,32 @@
 
 SELECT
     p.hour,
-    COALESCE(LOWER(b.token_address), p.token_address) AS token_address,
+    LOWER(COALESCE(b.token_address, p.token_address)) AS token_address_lower,
+    COALESCE(
+        b.token_address,
+        p.token_address
+    ) AS token_address,
     p.price,
     p.is_imputed,
+    p.is_deprecated,
     COALESCE(
         C.symbol,
         m.symbol
     ) AS symbol,
     C.decimals AS decimals,
-    {{ dbt_utils.generate_surrogate_key(
-        ['p.token_address','hour']
-    ) }} AS hourly_prices_priority_id,
+    p.provider,
+    p.source,
+    COALESCE(
+        C.name,
+        m.name
+    ) AS NAME,
+    complete_token_prices_id AS hourly_prices_priority_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     p._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ ref('bronze__hourly_prices_priority') }}
+    {{ ref('bronze__complete_token_prices') }}
     p
     LEFT JOIN {{ ref('bronze__manual_token_price_metadata') }}
     b
