@@ -42,7 +42,10 @@ FROM
 
 {% if is_incremental() %}
 WHERE
-    modified_timestamp >= (
+    GREATEST(
+        A.modified_timestamp,
+        m.modified_timestamp
+    ) >= (
         SELECT
             MAX(
                 modified_timestamp
