@@ -29,8 +29,18 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref('bronze__complete_provider_prices') }} A
-    INNER JOIN {{ ref('bronze__complete_provider_asset_metadata') }}
-    m
+    INNER JOIN (
+        SELECT
+            asset_id,
+            token_address,
+            symbol,
+            modified_timestamp
+        FROM
+            {{ ref('bronze__complete_provider_asset_metadata') }}
+            qualify(ROW_NUMBER() over (PARTITION BY asset_id
+        ORDER BY
+            modified_timestamp DESC) = 1)
+    ) m
     ON A.asset_id = m.asset_id
     LEFT JOIN {{ ref('bronze__manual_token_price_metadata') }}
     b
