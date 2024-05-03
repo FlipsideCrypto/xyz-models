@@ -4,13 +4,7 @@
         db STRING
     ) returns TABLE (
         SQL STRING
-    ) LANGUAGE SQL {% if target.name == "prod" %}
-        EXECUTE AS owner
-    {% else %}
-        EXECUTE AS caller
-    {% endif %}
-
-    AS $$
+    ) LANGUAGE SQL EXECUTE AS caller AS $$
 DECLARE
     all_grants VARCHAR DEFAULT '';
 BEGIN
@@ -190,13 +184,7 @@ END;$$;
     CREATE
     OR REPLACE PROCEDURE datashare.sp_share_build_and_grant_permissions() returns TABLE (
         table_catalog STRING
-    ) LANGUAGE SQL {% if target.name == "prod" %}
-        EXECUTE AS owner
-    {% else %}
-        EXECUTE AS caller
-    {% endif %}
-
-    AS $$
+    ) LANGUAGE SQL EXECUTE AS caller AS $$
 DECLARE
     results resultset;
 BEGIN
