@@ -11,7 +11,7 @@ SELECT
     is_imputed
 FROM
     {{ ref('silver__hourly_prices_priority') }}
-UNION ALL
+    {# UNION ALL
 SELECT
     HOUR,
     '0x1::aptos_coin::aptoscoin' AS token_address,
@@ -21,3 +21,4 @@ SELECT
     is_imputed
 FROM
     {{ ref('silver__complete_native_prices') }}
+    #}
