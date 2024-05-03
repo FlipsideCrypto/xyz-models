@@ -133,7 +133,10 @@ SELECT
     creator_fee_raw,
     total_fees_raw,
     aggregator_name,
-    xfers.token_address AS currency_address,
+    COALESCE(
+        xfers.token_address,
+        '0x1::aptos_coin::AptosCoin'
+    ) AS currency_address,
     nft_sales_combined_view_id AS nft_sales_combined_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
@@ -141,6 +144,6 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     all_nft_platform_sales_with_agg main
-    JOIN associated_transfers xfers
+    LEFT JOIN associated_transfers xfers
     ON main.tx_hash = xfers.tx_hash
     AND main.seller_address = xfers.account_address
