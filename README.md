@@ -96,15 +96,17 @@ This UDF is installed a part of the [livequery setup](https://github.com/Flipsid
 
 To set the `MAX_BATCH_ROWS` for the `live.udf_api` function, you can run the following SQL command:
 
-
 ```sql
 CREATE OR REPLACE EXTERNAL FUNCTION DATASCIENCE_DEV._LIVE.UDF_API("METHOD" VARCHAR(16777216), "URL" VARCHAR(16777216), "HEADERS" OBJECT, "DATA" VARIANT, "USER_ID" VARCHAR(16777216), "SECRET" VARCHAR(16777216))
 RETURNS VARIANT
 STRICT
 API_INTEGRATION = "AWS_DATASCIENCE_API_STG"
-MAX_BATCH_ROWS = 30
+MAX_BATCH_ROWS = 2
+HEADERS = ('fsc-compression-mode' = 'auto')
 AS 'https://65sji95ax3.execute-api.us-east-1.amazonaws.com/stg/udf_api';
 ```
+**NOTE:** You can also set `fsc-compression-mode` to `auto, always or never` to activate compresssion of the resposne payload, this will affect response time as it adds computation.  
+
 
 ### Tuning Streamline Models
 
