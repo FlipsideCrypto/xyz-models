@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = ['asset_metadata_all_providers_id'],
+    unique_key = ['token_address','symbol','provider', 'asset_id', 'name'],
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['core']
