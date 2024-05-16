@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = ['token_address','symbol','provider', 'asset_id', 'name'],
+    unique_key = ['token_address','symbol','provider', 'asset_id'],
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['core']
