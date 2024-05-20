@@ -1,0 +1,51 @@
+version: 2
+models:
+  - name: price__fact_hourly_token_prices
+    description: Deprecating soon! Please use price.ez_prices_hourly or price.fact_prices_ohlc_hourly instead.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - HOUR
+            - PROVIDER
+      - dbt_utils.recency:
+          datepart: day
+          field: hour
+          interval: 1
+
+    columns:
+      - name: HOUR
+        description: "{{ doc('hour') }}"
+        tests:
+          - not_null
+
+      - name: OPEN
+        description: "{{ doc('open') }}"
+        tests:
+          - not_null
+
+      - name: HIGH
+        description: "{{ doc('high') }}"
+        tests:
+          - not_null
+
+      - name: LOW
+        description: "{{ doc('low') }}"
+        tests:
+          - not_null
+
+      - name: CLOSE
+        description: "{{ doc('close') }}"
+        tests:
+          - not_null
+
+      - name: PROVIDER
+        description: "{{ doc('provider') }}"
+
+      - name: FACT_HOURLY_TOKEN_PRICES_ID
+        description: "{{doc('id')}}"
+
+      - name: INSERTED_TIMESTAMP
+        description: "{{doc('inserted_timestamp')}}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{doc('modified_timestamp')}}"

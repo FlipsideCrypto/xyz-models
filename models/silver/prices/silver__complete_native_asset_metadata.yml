@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: silver__complete_native_asset_metadata
+          
+    columns:
+      - name: PROVIDER
+        tests:
+          - not_null
+      - name: SYMBOL
+        tests:
+          - not_null
+          - unique
+      - name: BLOCKCHAIN
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: COMPLETE_NATIVE_ASSET_METADATA_ID
+        tests:
+          - unique

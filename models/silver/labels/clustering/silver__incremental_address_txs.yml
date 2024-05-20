@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: silver__incremental_address_txs
+
+    columns:
+      - name: tx_id
+              
+      - name: address_array

@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: silver__inputs
+    description: |-
+      Parsed data from the `inputs` field in the transaction body, raw inputs only.
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: block_timestamp
+          interval: 1
+      - dbt_utils.recency:
+          datepart: hour
+          field: _INSERTED_TIMESTAMP
+          interval: 24
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: "{{ doc('block_number') }}"
+        tests:
+          - not_null
+
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: TIMESTAMP_NTZ
+
+      - name: BLOCK_HASH
+        description: "{{ doc('block_hash') }}"
+        tests:
+          - not_null
+
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        tests:
+          - not_null
+
+      - name: INPUT_DATA
+        description: "{{ doc('input_data') }}"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: VARIANT
+
+      - name: INDEX
+        description: "{{ doc('index_output') }}"
+        tests:
+          - not_null
+
+      - name: IS_COINBASE
+        description: "{{ doc('is_coinbase') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: BOOLEAN
+
+      - name: COINBASE
+        description: "{{ doc('coinbase') }}"
+        tests:
+          - not_null:
+              where: IS_COINBASE
+
+      - name: SCRIPT_SIG_ASM
+        description: "{{ doc('script_sig_asm') }}"
+        tests:
+          - not_null:
+              where: not IS_COINBASE
+
+      - name: SCRIPT_SIG_HEX
+        description: "{{ doc('script_sig_hex') }}"
+        tests:
+          - not_null:
+              where: not IS_COINBASE
+
+      - name: SEQUENCE
+        description: "{{ doc('sequence') }}"
+        tests:
+          - not_null
+
+      - name: TX_IN_WITNESS
+        description: "{{ doc('tx_in_witness') }}"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: ARRAY
+
+      - name: _PARTITION_BY_BLOCK_ID
+
+      - name: _INSERTED_TIMESTAMP
+
+      - name: INPUT_ID
+        description: "{{ doc('input_id') }}"
+        tests:
+          - unique
+          - not_null
+
+      - name: INSERTED_TIMESTAMP
+        description: "{{doc('inserted_timestamp')}}"
+
+      - name: MODIFIED_TIMESTAMP
+        description: "{{doc('modified_timestamp')}}"
+
+      - name: _INVOCATION_ID
+        description: "{{doc('invocation_id')}}"

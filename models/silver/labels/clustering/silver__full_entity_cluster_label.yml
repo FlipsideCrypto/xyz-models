@@ -1,0 +1,22 @@
+version: 2
+models:
+  - name: silver__full_entity_cluster_label
+
+    columns:
+      - name: address
+        tests:
+          - unique
+
+      - name: address_group
+
+      - name: project_name
+
+      - name: full_entity_cluster_id
+
+      - name: inserted_timestamp,
+
+      - name: modified_timestamp
+
+      - name: invocation_id
+
+      - name: inserted_timestamp_label

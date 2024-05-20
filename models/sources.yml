@@ -2,9 +2,53 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'xyz' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'BITCOIN' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+      - name: dim_labels
+  - name: bronze_streamline
+    database: streamline
+    schema: |
+      {{ "BITCOIN_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "BITCOIN" }}
+    tables:
+      - name: blocks_hash
+      - name: blocks
+      - name: transactions
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'BITCOIN' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence
+      - name: labels_combined
+      - name: hourly_prices_coin_market_cap
+      - name: hourly_prices_coin_gecko
+      - name: complete_token_asset_metadata
+      - name: complete_token_prices
+      - name: complete_provider_asset_metadata
+      - name: complete_provider_prices
+      - name: complete_native_asset_metadata
+      - name: complete_native_prices
+  - name: streamline_crosschain
+    database: streamline
+    schema: crosschain
+    tables:
+      - name: coin_paprika_btc
+  - name: bitcoin_bronze
+    database: bitcoin
+    schema: bronze
+    tables:
+      - name: entity_clusters
+      - name: ENTITY_CLUSTERS_20240414_132013
+  - name: bitcoin_core
+    database: bitcoin
+    schema: core
+    tables:
+      - name: fact_inputs
+  - name: github_actions
+    database: bitcoin
+    schema: github_actions
+    tables:
+      - name: workflows

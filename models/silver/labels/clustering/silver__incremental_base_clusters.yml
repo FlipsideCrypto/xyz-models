@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: silver__incremental_base_clusters 
+
+    columns:
+      - name: address_group
+              
+      - name: address_list

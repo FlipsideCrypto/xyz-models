@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: silver__clusters_changelog_store
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - address
+
+    columns:
+      - name: clusters
+        description: A list of clusters that belong to the addresses pulled. This will indicate what type of change we will need to make
+      - name: addresses
+        description: A list of addresses that have done a tx since the last load. These will be the addresses affected
+      - name: type
+        description: The type of change that has occurred. New, Addition, or Merge
+      - name: new_cluster_id
+        description: An arbitrary group number that identifies addresses within the same group. This is the new group number that we will be changing the addresses to. 
+        tests:
+          - not_null
+      - name: _inserted_date
+        description: Date of changelog run 

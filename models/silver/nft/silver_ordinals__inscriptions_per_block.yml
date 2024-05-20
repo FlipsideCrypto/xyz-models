@@ -1,0 +1,34 @@
+version: 2
+models:
+  - name: silver_ordinals__inscriptions_per_block
+    description: Logs output of Hiro API - GET /ordinals/v1/stats/inscriptions
+
+    columns:
+      - name: block_number
+        description: "{{ doc('block_number') }}"
+
+      - name: block_hash
+        description: "{{ doc('block_hash') }}"
+
+      - name: inscription_count
+        description: "{{ doc('inscription_count') }}"
+      
+      - name: inscription_count_accum
+        description: "{{ doc('inscription_count_accum') }}"
+
+      - name: block_timestamp
+        description: "{{ doc('block_timestamp') }}"
+      
+      - name: _request_timestamp
+        description: "{{ doc('_request_timestamp') }}"
+      
+      - name: _inserted_timestamp
+        description: "{{ doc('inserted_timestamp') }}"
+
+      - name: inserted_timestamp
+        description: "{{ doc('inserted_timestamp') }}"
+
+      - name: modified_timestamp
+        description: "{{ doc('modified_timestamp') }}"
+
+      - name: _invocation_id
