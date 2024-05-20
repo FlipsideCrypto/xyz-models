@@ -114,3 +114,5 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL
+qualify
+    row_number() over (partition by id order by _inserted_timestamp desc) = 1
