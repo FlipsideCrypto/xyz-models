@@ -2,6 +2,7 @@
   materialized = 'incremental',
   unique_key = ['tx_hash','block_timestamp::DATE'],
   incremental_strategy = 'merge',
+  incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
   merge_exclude_columns = ["inserted_timestamp"],
   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','tx_type'],
   tags = ['core','full_test']
@@ -63,7 +64,7 @@ LATERAL FLATTEN (DATA :transactions) b
 WHERE
   _inserted_timestamp >= (
     SELECT
-      DATEADD('hour', -2, MAX(_inserted_timestamp))
+      DATEADD('minute', -15, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -121,7 +122,7 @@ A
 WHERE
   A._inserted_timestamp >= (
     SELECT
-      DATEADD('hour', -2, MAX(_inserted_timestamp))
+      DATEADD('minute', -15, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
