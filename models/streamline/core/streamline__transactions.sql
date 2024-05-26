@@ -43,5 +43,5 @@ FROM
         'number_sequence'
     ) }}
     b
-    ON b._id BETWEEN A.first_version
+    ON b._id BETWEEN A.first_version + 100
     AND A.last_version
