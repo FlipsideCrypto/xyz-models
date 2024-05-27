@@ -65,7 +65,7 @@ LATERAL FLATTEN (DATA :transactions) b
 WHERE
   _inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -60, MAX(_inserted_timestamp))
+      DATEADD('minute', -30, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -123,7 +123,7 @@ A
 WHERE
   A._inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -60, MAX(_inserted_timestamp))
+      DATEADD('minute', -30, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -182,7 +182,7 @@ LATERAL FLATTEN(A.data) b
 WHERE
   A._inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -60, MAX(_inserted_timestamp))
+      DATEADD('minute', -30, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
