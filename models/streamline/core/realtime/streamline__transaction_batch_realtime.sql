@@ -17,7 +17,23 @@ WITH blocks AS (
         {{ ref('silver__blocks') }} A
     WHERE
         tx_count_from_versions > 100
-        AND block_number >= 183074459
+        AND (
+            block_number >= 184014560
+            OR block_number IN (
+                SELECT
+                    VALUE
+                FROM
+                    (
+                        SELECT
+                            top 1 *
+                        FROM
+                            aptos.silver_observability.transactions_completeness
+                        ORDER BY
+                            test_timestamp DESC
+                    ),
+                    LATERAL FLATTEN(blocks_impacted_array)
+            )
+        )
 ),
 numbers AS (
     -- Recursive CTE to generate numbers. We'll use the maximum txcount value to limit our recursion.
