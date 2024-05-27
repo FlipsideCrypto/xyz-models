@@ -59,7 +59,7 @@ numbers AS (
                 ) AS tx_version
             FROM
                 blocks_with_page_numbers A
-                LEFT JOIN {{ ref('streamline__complete_transactions') }}
+                LEFT JOIN {{ ref('streamline__complete_transaction_batch') }}
                 b
                 ON A.block_number = b.block_number
             WHERE
