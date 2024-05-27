@@ -6,7 +6,7 @@
     ),
     tags = ['streamline_core_realtime']
 ) }}
-
+-- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
 WITH blocks AS (
 
     SELECT
@@ -17,6 +17,7 @@ WITH blocks AS (
         {{ ref('silver__blocks') }} A
     WHERE
         tx_count_from_versions > 100
+        AND block_number >= 183074459
 ),
 numbers AS (
     -- Recursive CTE to generate numbers. We'll use the maximum txcount value to limit our recursion.
@@ -57,11 +58,12 @@ numbers AS (
                     100 * multiplier
                 ) AS tx_version
             FROM
-                blocks_with_page_numbers A {# LEFT JOIN {{ ref('streamline__complete_transactions') }}
+                blocks_with_page_numbers A
+                LEFT JOIN {{ ref('streamline__complete_transactions') }}
                 b
                 ON A.block_number = b.block_number
             WHERE
-                b.block_number IS NULL #}
+                b.block_number IS NULL
         ),
         calls AS (
             SELECT
@@ -87,4 +89,4 @@ numbers AS (
     FROM
         calls
     ORDER BY
-        block_number DESC
+        block_number

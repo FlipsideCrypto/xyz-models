@@ -5,6 +5,7 @@
     cluster_by = "ROUND(_partition_by_block_id, -3)",
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(block_number)"
 ) }}
+-- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
 
 SELECT
     block_number,
@@ -26,7 +27,7 @@ AND b.last_version
 
 {% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    A._inserted_timestamp >= (
         SELECT
             COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
         FROM

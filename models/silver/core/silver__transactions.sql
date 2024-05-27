@@ -9,6 +9,7 @@
 ) }}
 -- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
 -- depends_on: {{ ref('bronze__streamline_transactions') }}
+-- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
 WITH from_blocks AS (
 
   SELECT
@@ -64,7 +65,7 @@ LATERAL FLATTEN (DATA :transactions) b
 WHERE
   _inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -15, MAX(_inserted_timestamp))
+      DATEADD('minute', -60, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -122,7 +123,7 @@ A
 WHERE
   A._inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -15, MAX(_inserted_timestamp))
+      DATEADD('minute', -60, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
@@ -131,7 +132,7 @@ WHERE
     SELECT
       {# b.block_number, #}
       TO_TIMESTAMP(
-        b.valiue :timestamp :: STRING
+        b.value :timestamp :: STRING
       ) AS block_timestamp,
       b.value :hash :: STRING AS tx_hash,
       b.value :version :: INT AS version,
@@ -181,7 +182,7 @@ LATERAL FLATTEN(A.data) b
 WHERE
   A._inserted_timestamp >= (
     SELECT
-      DATEADD('minute', -15, MAX(_inserted_timestamp))
+      DATEADD('minute', -60, MAX(_inserted_timestamp))
     FROM
       {{ this }})
     {% endif %}
