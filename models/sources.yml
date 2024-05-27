@@ -41,4 +41,5 @@ sources:
     tables:
       - name: blocks_tx
       - name: transactions
+      - name: transaction_batch
   
