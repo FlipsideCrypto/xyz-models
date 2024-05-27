@@ -20,18 +20,11 @@ WITH blocks AS (
         AND (
             block_number >= 184014560
             OR block_number IN (
-                SELECT
-                    VALUE
-                FROM
-                    (
-                        SELECT
-                            top 1 *
-                        FROM
-                            aptos.silver_observability.transactions_completeness
-                        ORDER BY
-                            test_timestamp DESC
-                    ),
-                    LATERAL FLATTEN(blocks_impacted_array)
+                183537590,
+                183564192,
+                183587755,
+                183587754,
+                183666216
             )
         )
 ),
