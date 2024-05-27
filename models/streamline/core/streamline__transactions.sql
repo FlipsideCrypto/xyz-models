@@ -22,14 +22,7 @@ WITH all_versions AS (
         ) <> tx_count_from_versions
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(
-            _inserted_timestamp
-        )
-    FROM
-        {{ this }}
-)
+AND _inserted_timestamp >= '2024-05-22'
 {% endif %}
 )
 SELECT

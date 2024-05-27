@@ -39,4 +39,4 @@ SELECT
 FROM
     calls
 ORDER BY
-    tx_version DESC
+    tx_version
