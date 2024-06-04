@@ -42,7 +42,7 @@ outputs AS (
     block_number,
     block_timestamp,
     pubkey_script_address,
-    VALUE,
+    VALUE_UNADJ,
     _partition_by_block_id,
     _inserted_timestamp,
     array_max([inserted_timestamp, modified_timestamp]) :: timestamp_ntz AS _modified_timestamp
@@ -104,7 +104,7 @@ label_outputs AS (
       ec.address_group :: VARCHAR,
       o.pubkey_script_address
     ) AS to_entity,
-    VALUE,
+    VALUE_UNADJ,
     IFF(
       ec.address_group IS NOT NULL,
       FLOOR(

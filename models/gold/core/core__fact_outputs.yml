@@ -71,6 +71,13 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
+      - name: VALUE_UNADJ
+        description: "{{ doc('value_unadj') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: INTERGER
+
       - name: OUTPUT_ID
         description: "{{ doc('output_id') }}"
         tests:

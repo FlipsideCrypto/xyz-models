@@ -46,7 +46,7 @@ input_val AS (
     SELECT
         block_number,
         tx_id,
-        SUM(VALUE) AS input_value
+        SUM(VALUE_UNADJ) AS input_value
     FROM
         inputs
     GROUP BY
