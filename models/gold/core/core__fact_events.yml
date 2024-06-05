@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: core__fact_events
+    description: '{{ doc("core__fact_events") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: TX_TYPE
+        description: '{{ doc("tx_type") }}' 
+      - name: PAYLOAD_FUNCTION
+        description: '{{ doc("payload_function") }}' 
+      - name: EVENT_INDEX
+        description: '{{ doc("event_index") }}'  
+      - name: EVENT_TYPE
+        description: '{{ doc("event_type") }}'   
+      - name: EVENT_ADDRESS
+        description: '{{ doc("event_address") }}'  
+      - name: EVENT_MODULE
+        description: '{{ doc("event_module") }}'   
+      - name: EVENT_RESOURCE
+        description: '{{ doc("event_resource") }}'   
+      - name: EVENT_DATA
+        description: '{{ doc("event_data") }}'   
+      - name: ACCOUNT_ADDRESS
+        description: '{{ doc("address_event") }}' 
+      - name: CREATION_NUMBER   
+        description: '{{ doc("creation_number") }}' 
+      - name: SEQUENCE_NUMBER   
+        description: '{{ doc("sequence_number") }}'   
+      - name: FACT_EVENTS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   

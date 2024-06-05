@@ -1,0 +1,26 @@
+version: 2
+models:
+  - name: silver__changes
+          
+    columns:
+      - name: BLOCK_NUMBER
+      - name: BLOCK_TIMESTAMP
+      - name: TX_HASH
+      - name: VERSION
+      - name: SUCCESS
+      - name: TX_TYPE
+      - name: CHANGE_INDEX
+      - name: CHANGE_DATA
+      - name: CHANGE_TYPE
+      - name: ADDRESS
+      - name: HANDLE
+      - name: INNER_CHANGE_TYPE      
+      - name: CHANGE_ADDRESS
+      - name: CHANGE_MODULE
+      - name: CHANGE_RESOURCE
+      - name: KEY
+      - name: VALUE
+      - name: STATE_KEY_HASH
+      - name: CHANGES_ID
+      - name: INSERTED_TIMESTAMP
+      - name: MODIFIED_TIMESTAMP

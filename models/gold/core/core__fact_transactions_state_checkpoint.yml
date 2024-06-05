@@ -1,0 +1,31 @@
+version: 2
+models:
+  - name: core__fact_transactions_state_checkpoint
+    description: '{{ doc("core__fact_transactions_state_checkpoint") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: TX_TYPE
+        description: '{{ doc("tx_type") }}'  
+      - name: VM_STATUS 
+        description: '{{ doc("vm_status") }}'   
+      - name: STATE_CHECKPOINT_HASH
+      - name: ACCUMULATOR_ROOT_HASH
+        description: '{{ doc("accumulator_root_hash") }}'   
+      - name: EVENT_ROOT_HASH
+        description: '{{ doc("event_root_hash") }}'       
+      - name: FACT_TRANSACTIONS_STATE_CHECKPOINT_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   

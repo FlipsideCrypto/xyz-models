@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: core__fact_changes
+    description: '{{ doc("core__fact_changes") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: TX_TYPE
+        description: '{{ doc("tx_type") }}'  
+      - name: PAYLOAD_FUNCTION
+        description: '{{ doc("payload_function") }}' 
+      - name: CHANGE_INDEX
+        description: '{{ doc("change_index") }}'  
+      - name: CHANGE_DATA
+        description: '{{ doc("change_data") }}'   
+      - name: CHANGE_TYPE
+        description: '{{ doc("change_type") }}'  
+      - name: ADDRESS
+        description: '{{ doc("address_change") }}'   
+      - name: HANDLE
+        description: '{{ doc("handle_change") }}'   
+      - name: INNER_CHANGE_TYPE
+        description: '{{ doc("inner_change_type") }}'   
+      - name: CHANGE_ADDRESS
+        description: '{{ doc("change_address") }}' 
+      - name: CHANGE_MODULE   
+        description: '{{ doc("change_module") }}' 
+      - name: CHANGE_RESOURCE   
+        description: '{{ doc("change_resource") }}'   
+      - name: KEY 
+        description: '{{ doc("key_change") }}' 
+      - name: VALUE 
+        description: '{{ doc("value_change") }}'          
+      - name: STATE_KEY_HASH
+      - name: FACT_CHANGES_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   

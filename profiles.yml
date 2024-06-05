@@ -1,4 +1,4 @@
-xyz:
+m1:
   target: dev
   outputs:
     dev:
