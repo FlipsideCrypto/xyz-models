@@ -36,7 +36,11 @@ WHERE
     inserted_timestamp >= (
         SELECT
             MAX(
-                modified_timestamp
+                DATEADD(
+                    'minute',
+                    -5,
+                    modified_timestamp
+                )
             )
         FROM
             {{ this }}
