@@ -24,8 +24,6 @@ WITH blocks AS (
         {{ ref('streamline__blocks_tx_complete') }}
     ORDER BY
         block_number DESC
-    LIMIT
-        50000
 )
 SELECT
     block_number,
@@ -46,4 +44,4 @@ SELECT
 FROM
     blocks
 ORDER BY
-    block_number DESC
+    block_number
