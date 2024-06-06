@@ -1,17 +1,17 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "xyz_models"
+name: "m1_models"
 version: "1.0.0"
 config-version: 2
 
-require-dbt-version: ">=1.4.0"
+require-dbt-version: ">=1.7.0"
 
 # This setting configures which "profile" dbt uses for this project.
-profile: "xyz"
+profile: "m1"
 
 # These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
+# The `source-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -26,29 +26,69 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_modules"
   - "dbt_packages"
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In this example config, we tell dbt to build all models in the example/ directory
-# as tables. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
-models:
-  +copy_grants: true
-  +persist_docs:
-    relation: true
-    columns: true
-  +on_schema_change: "append_new_columns"
-
-vars:
-  "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
-
 tests:
   +store_failures: true # all tests
 
 on-run-start:
-  - '{{create_sps()}}'
-  - '{{create_udfs()}}'
+  - "{{ create_sps() }}"
+  - "{{ create_udfs() }}"
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'
+
+dispatch:
+  - macro_namespace: dbt
+    search_order:
+      - m1-models
+      - dbt_snowflake_query_tags
+      - dbt
+
+query-comment:
+  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  append: true # Snowflake removes prefixed comments.
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+models:
+  +copy_grants: true
+  +on_schema_change: "append_new_columns"
+  
+# In this example config, we tell dbt to build all models in the example/ directory
+# as tables. These settings can be overridden in the individual model files
+# using the `{{ config(...) }}` macro.
+
+vars:
+  "dbt_date:time_zone": GMT
+  STREAMLINE_INVOKE_STREAMS: false
+  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: false
+  UPDATE_UDFS_AND_SPS: false
+  UPDATE_SNOWFLAKE_TAGS: True
+  OBSERV_FULL_TEST: false
+  START_GHA_TASKS: false
+  BRONZE_LOOKBACK_DAYS: '{{ env_var("BRONZE_LOOKBACK_DAYS", 3) }}'
+
+#### STREAMLINE 2.0 BEGIN ####
+
+  API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}'
+  EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
+  ROLES: '{{ var("config")[target.name]["ROLES"] }}'
+
+  config:
+  # The keys correspond to dbt profiles and are case sensitive
+    dev:
+      API_INTEGRATION: aws_m1_api_dev
+      EXTERNAL_FUNCTION_URI: z2wyjkp9r7.execute-api.us-east-1.amazonaws.com/stg/
+      ROLES:
+        - AWS_LAMBDA_M1_API
+        - INTERNAL_DEV
+
+    prod:
+      API_INTEGRATION: aws_m1_api_prod
+      EXTERNAL_FUNCTION_URI: ks3xadgzg3.execute-api.us-east-1.amazonaws.com/prod/
+      ROLES:
+        - AWS_LAMBDA_M1_API
+        - INTERNAL_DEV
+        - DBT_CLOUD_M1
+
+#### STREAMLINE 2.0 END ####

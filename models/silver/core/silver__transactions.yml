@@ -1,0 +1,37 @@
+version: 2
+models:
+  - name: silver__transactions
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: TRANSACTIONS_ID
+
+
+    columns:
+      - name: BLOCK_TIMESTAMP
+        tests:
+          - not_null
+      - name: TX_HASH
+        tests:
+          - not_null
+      - name: VERSION
+        tests:
+          - not_null
+      - name: TX_TYPE
+        tests:
+          - not_null
+      - name: TRANSACTIONS_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__transactions_INVOCATION_ID
+            test_name: not_null
+      
