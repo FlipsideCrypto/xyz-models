@@ -75,6 +75,7 @@ transactions_final AS (
         outputs,
         output_count,
         output_value,
+        output_value_sats,
         virtual_size,
         weight,
         IFF(

@@ -100,7 +100,7 @@ models:
               column_type: FLOAT
 
       - name: INPUT_VALUE_SATS
-        description: "{{ doc('input_value_sats') }}"
+        description: "{{ doc('value_sats') }}"
         tests:
           - not_null:
               where: not IS_COINBASE
@@ -120,6 +120,13 @@ models:
 
       - name: OUTPUT_VALUE
         description: "{{ doc('output_value') }}"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
+      - name: OUTPUT_VALUE_SATS
+        description: "{{ doc('value_sats') }}"
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
