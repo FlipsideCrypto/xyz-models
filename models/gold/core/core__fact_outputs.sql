@@ -18,6 +18,7 @@ WITH outputs AS (
         pubkey_script_type,
         pubkey_script_desc,
         VALUE,
+        VALUE_SATS,
         output_id,
         output_id AS fact_outputs_id,
         COALESCE(inserted_timestamp, _inserted_timestamp, '2000-01-01' :: TIMESTAMP_NTZ) as inserted_timestamp,

@@ -26,6 +26,7 @@ WITH inputs AS (
         pubkey_script_type,
         pubkey_script_desc,
         VALUE,
+        VALUE_SATS,
         tx_in_witness,
         input_id,
         input_id AS fact_inputs_id,

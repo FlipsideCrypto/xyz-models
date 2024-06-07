@@ -43,6 +43,7 @@ outputs AS (
     block_timestamp,
     pubkey_script_address,
     VALUE,
+    VALUE_SATS,
     _partition_by_block_id,
     _inserted_timestamp,
     array_max([inserted_timestamp, modified_timestamp]) :: timestamp_ntz AS _modified_timestamp
@@ -105,6 +106,7 @@ label_outputs AS (
       o.pubkey_script_address
     ) AS to_entity,
     VALUE,
+    VALUE_SATS,
     IFF(
       ec.address_group IS NOT NULL,
       FLOOR(
@@ -122,7 +124,8 @@ label_outputs AS (
     2,
     3,
     4,
-    5
+    5,
+    6
 ),
 sum_value AS (
   SELECT
@@ -131,7 +134,8 @@ sum_value AS (
     to_entity,
     _partition_by_address_group_from_entity,
     _partition_by_address_group_to_entity,
-    SUM(VALUE) AS transfer_amount
+    SUM(VALUE) AS transfer_amount,
+    SUM(VALUE_SATS) AS transfer_amount_sats
   FROM
     label_outputs o
     LEFT JOIN label_inputs i
@@ -154,6 +158,7 @@ FINAL AS (
     v.from_entity,
     v.to_entity,
     v.transfer_amount,
+    v.transfer_amount_sats,
     v._partition_by_address_group_from_entity,
     v._partition_by_address_group_to_entity,
     i._partition_by_block_id,
@@ -181,6 +186,7 @@ SELECT
   from_entity,
   to_entity,
   transfer_amount,
+  transfer_amount_sats,
   _partition_by_address_group_from_entity,
   _partition_by_address_group_to_entity,
   _partition_by_block_id,
