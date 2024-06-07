@@ -41,6 +41,11 @@ models:
         tests:
           - not_null
 
+      - name: TRANSFER_AMOUNT_SATS
+        description: "{{ doc('transfer_amount_sats') }}"
+        tests:
+          - not_null
+
       - name: _PARTITION_BY_ADDRESS_GROUP_FROM_ENTITY
         description: "Partition group for column FROM_ENTITY"
 

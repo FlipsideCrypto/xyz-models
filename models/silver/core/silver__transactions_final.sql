@@ -46,7 +46,8 @@ input_val AS (
     SELECT
         block_number,
         tx_id,
-        SUM(VALUE_SATS) AS input_value
+        SUM(VALUE) AS input_value,
+        SUM(VALUE_SATS) AS input_value_sats
     FROM
         inputs
     GROUP BY
@@ -70,6 +71,7 @@ transactions_final AS (
         inputs,
         input_count,
         i.input_value,
+        i.input_value_sats,
         outputs,
         output_count,
         output_value,
