@@ -81,12 +81,12 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
-      - name: VALUE_UNADJ
-        description: "{{ doc('value_unadj') }}"
+      - name: VALUE_SATS
+        description: "{{ doc('VALUE_SATS') }}"
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: INTERGER
+              column_type: INTEGER
 
       - name: _PARTITION_BY_BLOCK_ID
 

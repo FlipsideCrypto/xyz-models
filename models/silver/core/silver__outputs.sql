@@ -40,7 +40,7 @@ FINAL AS (
         o.value :scriptPubKey :hex :: STRING AS pubkey_script_hex,
         o.value :scriptPubKey :type :: STRING AS pubkey_script_type,
         o.value :value :: FLOAT AS VALUE,
-        o.value :value :: INTEGER AS VALUE_UNADJ,
+        to_decimal(outputs[0]:value, 17, 8) as VALUE_SATS,
         t._inserted_timestamp,
         t._partition_by_block_id,
         {{ dbt_utils.generate_surrogate_key(['t.block_number', 't.tx_id', 'o.value :n :: NUMBER']) }} AS output_id

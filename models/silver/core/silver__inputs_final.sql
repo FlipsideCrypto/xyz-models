@@ -54,7 +54,7 @@ FINAL AS (
         o.pubkey_script_type,
         o.pubkey_script_desc,
         o.value,
-        o.value_unadj,
+        o.VALUE_SATS,
         i.tx_in_witness,
         i._inserted_timestamp,
         i._partition_by_block_id,
