@@ -67,6 +67,14 @@ models:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: FLOAT
 
+      - name: INPUT_VALUE_SATS
+        description: "{{ doc('input_value_sats') }}"
+        tests:
+          - not_null:
+              where: not IS_COINBASE
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: FLOAT
+
       - name: OUTPUTS
         description: "{{ doc('outputs') }}"
 
