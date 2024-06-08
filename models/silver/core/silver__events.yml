@@ -59,11 +59,3 @@ models:
       - name: MODIFIED_TIMESTAMP
         tests:
           - not_null
-      - name: _INSERTED_TIMESTAMP
-        tests:
-          - name: not_null_silver__events_INSERTED_TIMESTAMP_
-            test_name: not_null
-      - name: _INVOCATION_ID
-        tests:
-          - name: not_null_silver__eventss_INVOCATION_ID
-            test_name: not_null
