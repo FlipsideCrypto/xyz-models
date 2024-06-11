@@ -3,9 +3,9 @@ run-name: dbt_run_streamline_blocks_tx_realtime
 
 on:
   workflow_dispatch:
-  schedule:
-    # Runs "hourly a 5 past the hour" (see https://crontab.guru)
-    - cron: '5 * * * *'
+  # schedule:
+  #   # Runs "hourly a 5 past the hour" (see https://crontab.guru)
+  #   - cron: '5 * * * *'
 
 env:
   DBT_PROFILES_DIR: ./
