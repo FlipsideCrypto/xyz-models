@@ -1,6 +1,10 @@
 {{ config(
-    materialized = 'view',
-    tags = ['core']
+    materialized = 'incremental',
+    unique_key = "block_number",
+    incremental_strategy = 'merge',
+    merge_exclude_columns = ["inserted_timestamp"],
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['core','full_test']
 ) }}
 
 SELECT
@@ -17,3 +21,13 @@ FROM
     {{ ref(
         'silver__blocks'
     ) }}
+
+{% if is_incremental() %}
+WHERE
+    modified_timestamp >= (
+        SELECT
+            MAX(modified_timestamp)
+        FROM
+            {{ this }}
+    )
+{% endif %}

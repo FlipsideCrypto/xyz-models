@@ -168,13 +168,6 @@ models:
               column_type_list:
                 - STRING
                 - VARCHAR
-      - name: TIMESTAMP
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT  
       - name: VM_STATUS 
         tests:
           - not_null
@@ -182,7 +175,7 @@ models:
               column_type_list:
                 - STRING
                 - VARCHAR
-      - name: TRANSACTIONS_ID
+      - name: FACT_TRANSACTIONS_ID
         tests:
           - not_null
       - name: INSERTED_TIMESTAMP
