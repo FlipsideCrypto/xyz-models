@@ -4,7 +4,7 @@
         func = 'streamline.udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"blocks_tx",
-        "sql_limit" :"100000",
+        "sql_limit" :"50000",
         "producer_batch_size" :"1000",
         "worker_batch_size" :"500",
         "sql_source" :"{{this.identifier}}" }
@@ -23,7 +23,7 @@ WITH blocks AS (
     FROM
         {{ ref('streamline__blocks_tx_complete') }}
     ORDER BY
-        block_number DESC
+        block_number
 )
 SELECT
     block_number,
