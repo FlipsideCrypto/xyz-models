@@ -31,7 +31,7 @@ SELECT
 FROM
     {{ ref('silver__core_metrics_hourly') }}
     s
-    LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
+    LEFT JOIN {{ ref('silver__hourly_prices_priority') }}
     p
     ON s.block_timestamp_hour = p.hour
     AND p.token_address = '0x1::aptos_coin::aptoscoin'

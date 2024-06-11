@@ -4,7 +4,6 @@
 
 SELECT
     token_address_lower AS token_address,
-    asset_id AS id,
     asset_id,
     symbol,
     NAME,

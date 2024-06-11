@@ -1,15 +1,15 @@
 version: 2
 models:
   - name: price__ez_asset_metadata
-    description: Deprecating soon! Note, only the ID column is changing. The ez_asset_metadata table itself is not being deprecated. '{{ doc("prices_ez_asset_metadata_table_doc") }}'
+    description: '{{ doc("prices_ez_asset_metadata_table_doc") }}'
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - TOKEN_ADDRESS
             
     columns:
-      - name: ID
-        description: The unique identifier representing the asset.
+      - name: ASSET_ID
+        description: '{{ doc("prices_asset_id") }}'
       - name: NAME
         description: The name of asset.
       - name: SYMBOL

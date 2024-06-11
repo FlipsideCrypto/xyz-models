@@ -44,7 +44,7 @@ WITH base AS (
         LEFT JOIN {{ ref('core__dim_tokens') }}
         b
         ON A.currency_address = b.token_address
-        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }} C
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }} C
         ON LOWER(
             A.currency_address
         ) = C.token_address
