@@ -23,8 +23,6 @@ sources:
     tables:
       - name: number_sequence
       - name: labels_combined
-      - name: hourly_prices_coin_market_cap
-      - name: hourly_prices_coin_gecko
       - name: complete_token_asset_metadata
       - name: complete_token_prices
       - name: complete_provider_asset_metadata
