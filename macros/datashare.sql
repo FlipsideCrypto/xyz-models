@@ -96,7 +96,8 @@ DECLARE
     FROM snowflake.account_usage.tables
     WHERE table_name in ('_CREATE_GOLD','_CREATE_UDFS')
     and table_schema = '_DATASHARE'
-    AND TABLE_CATALOG NOT LIKE '%_DEV';
+    AND TABLE_CATALOG NOT LIKE '%_DEV'
+    AND TABLE_CATALOG NOT IN ('PRODUCT_ANALYTICS');
 BEGIN
     create or replace temporary table results as
     SELECT ''::STRING AS db
