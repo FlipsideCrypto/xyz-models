@@ -54,7 +54,7 @@ SELECT
     COUNT(
         DISTINCT payload_function
     ) AS unique_payload_function_count,
-    SUM(gas_used) AS total_fees,
+    SUM(gas_unit_price * gas_used) AS total_fees,
     -- in Octa = 10^-8 Aptos
     MAX(_inserted_timestamp) AS _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
