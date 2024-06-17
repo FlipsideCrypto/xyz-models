@@ -85,6 +85,12 @@ vars:
       ROLES:
         - AWS_LAMBDA_M1_API
         - INTERNAL_DEV
+    dev-2xl:
+      API_INTEGRATION: aws_m1_api_dev
+      EXTERNAL_FUNCTION_URI: z2wyjkp9r7.execute-api.us-east-1.amazonaws.com/stg/
+      ROLES:
+        - AWS_LAMBDA_M1_API
+        - INTERNAL_DEV
 
     prod:
       API_INTEGRATION: aws_m1_api_prod
