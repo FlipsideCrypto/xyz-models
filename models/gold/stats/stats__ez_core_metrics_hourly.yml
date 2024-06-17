@@ -26,6 +26,8 @@ models:
         description: '{{ doc("total_fees_native") }}'
       - name: TOTAL_FEES_USD
         description: '{{ doc("total_fees_usd") }}'
+        tests:
+          - not_null
       - name: EZ_CORE_METRICS_HOURLY_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP
