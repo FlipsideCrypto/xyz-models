@@ -34,4 +34,4 @@ FROM
     LEFT JOIN {{ ref('silver__hourly_prices_priority') }}
     p
     ON s.block_timestamp_hour = p.hour
-    AND p.token_address = '0x1::aptos_coin::aptoscoin'
+    AND p.token_address_lower = '0x1::aptos_coin::aptoscoin'
