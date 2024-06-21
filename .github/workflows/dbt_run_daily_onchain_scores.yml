@@ -1,0 +1,26 @@
+name: dbt_run_scheduled_onchain_daily
+run-name: dbt_run_scheduled_onhcain_daily
+
+on:
+  workflow_dispatch:
+    
+env:
+  DBT_PROFILES_DIR: "${{ vars.DBT_PROFILES_DIR }}"
+  DBT_VERSION: "${{ vars.DBT_VERSION }}"
+  ACCOUNT: "${{ vars.ACCOUNT }}"
+  ROLE: "${{ vars.ROLE }}"
+  USER: "${{ vars.USER }}"
+  PASSWORD: "${{ secrets.PASSWORD }}"
+  REGION: "${{ vars.REGION }}"
+  DATABASE: "${{ vars.DATABASE }}"
+  WAREHOUSE: "${{ vars.WAREHOUSE }}"
+  SCHEMA: "${{ vars.SCHEMA }}"
+
+jobs:
+  called_workflow_template:
+    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
+    with:
+      dbt_command: dbt run -m "tag:onchain_scores"
+      environment: ${{ github.ref == 'refs/heads/main' && 'workflow_dev' || 'workflow_dev' }}
+      warehouse: ${{ vars.WAREHOUSE }}
+    secrets: inherit 
