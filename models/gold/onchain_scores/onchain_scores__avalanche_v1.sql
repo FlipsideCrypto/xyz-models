@@ -350,7 +350,7 @@ scores AS (
 total_scores AS (
     SELECT 
         
-        {{ dbt_utils.generate_surrogate_key(['user_address', "'avalanche'",'{{ current_date_var }}']) }} AS id,
+        {{ dbt_utils.generate_surrogate_key(['user_address', "'avalanche'", "'" ~ current_date_var ~ "'"]) }} AS id,
         'avalanche' AS blockchain,
         user_address,
         CURRENT_TIMESTAMP AS calculation_time,
