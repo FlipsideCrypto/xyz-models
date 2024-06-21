@@ -28,28 +28,17 @@ FROM
 WHERE
     "granted_on" = 'DATABASE'
     AND db_name IN (
-        -- This will soon be replaced by the table that will drive the frontend
-        'APTOS',
-        'ARBITRUM',
-        'AURORA',
-        'AVALANCHE',
-        'AXELAR',
-        'BASE',
-        'BITCOIN',
-        'BLAST',
-        'BSC',
-        'COSMOS',
-        'ETHEREUM',
-        'FLOW',
-        'GNOSIS',
-        'NEAR',
-        'OPTIMISM',
-        'OSMOSIS',
-        'POLYGON',
-        'SEI',
-        'SOLANA',
-        'TERRA',
-        'THORCHAIN'
+        SELECT
+            database
+        FROM
+            {{ source(
+                'studio',
+                'active_databases'
+            ) }}
+    )
+    AND db_name NOT IN (
+        'CROSSCHAIN',
+        'EXTERNAL'
     );
 CREATE
     OR REPLACE temporary TABLE schs AS
@@ -74,23 +63,14 @@ FROM
         '.',
         1
     ) = b.db_name
+    JOIN {{ source(
+        'studio',
+        'active_schemas'
+    ) }} C
+    ON b.db_name = C.database
+    AND schema_name = C.database || '.' || C.schema
 WHERE
-    "granted_on" = 'SCHEMA'
-    AND "name" NOT LIKE '%DBT%' -- There will soon be replaced by the table that will drive the frontend
-    AND "name" NOT LIKE '%DEV%'
-    AND "name" NOT LIKE '%NOT_NULL%'
-    AND "name" NOT LIKE '%_INTERNAL%'
-    AND "name" NOT LIKE '%UNIQUE%'
-    AND "name" NOT LIKE '%SILVER%'
-    AND "name" NOT LIKE 'LIVEQUERY%'
-    AND "name" NOT LIKE '%TEST%'
-    AND "name" NOT LIKE '%PUBLIC%'
-    AND "name" NOT LIKE '%UTILS%'
-    AND "name" NOT LIKE '%GITHUB%'
-    AND "name" NOT LIKE '%STREAMLINE%'
-    AND "name" NOT LIKE '%BRONZE%'
-    AND "name" NOT LIKE '%.LIVE%'
-    AND "name" NOT LIKE '%.BETA%';
+    "granted_on" = 'SCHEMA';
 CREATE
     OR REPLACE temporary TABLE vws AS
 SELECT
@@ -110,13 +90,24 @@ FROM
         '.',
         2
     ) = b.schema_name
+    JOIN (
+        SELECT
+            database,
+            schema,
+            OBJECT
+        FROM
+            {{ source(
+                'studio',
+                'objects'
+            ) }}
+        WHERE
+            active
+    ) C
+    ON b.db_name = C.database
+    AND b.schema_name = C.database || '.' || C.schema
+    AND table_name = C.database || '.' || C.schema || '.' || C.object
 WHERE
-    "granted_on" IN ('VIEW')
-    AND SPLIT_PART(
-        "name",
-        '.',
-        3
-    ) NOT LIKE 'SV%';
+    "granted_on" IN ('VIEW');
 WITH share_grants AS (
         SELECT
             share_cmd AS cmd,

@@ -12,3 +12,11 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  - name: studio
+    database: bi_analytics
+    schema: silver_studio
+    tables:
+      - name: active_databases
+      - name: active_schemas
+      - name: objects
+
