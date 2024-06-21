@@ -1,5 +1,7 @@
 {{ config (
     materialized = "incremental",
+    unique_key = "id",
+    cluster_by = "score_date::date",
     tags = ['gold', 'onchain_scores', 'avalanche_scores']
 ) }}
 
