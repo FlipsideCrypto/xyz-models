@@ -25,5 +25,5 @@ jobs:
     with:
       dbt_command: dbt run -m "tag:onchain_scores"
       environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
-      warehouse: ${{ vars.WAREHOUSE }}
+      warehouse: DBT_CLOUD
     secrets: inherit 
