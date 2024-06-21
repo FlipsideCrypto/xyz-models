@@ -37,6 +37,7 @@ from_bridge_daily AS (
     AND receiver NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
     GROUP BY receiver, activity_day
 ),
+
 -- tx from bridge
 from_bridge AS (
     SELECT
@@ -70,6 +71,7 @@ from_cex_daily AS (
     AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
     GROUP BY TO_ADDRESS, activity_day
 ),
+
 -- total cex
 from_cex AS (
     SELECT
@@ -78,6 +80,7 @@ from_cex AS (
     FROM from_cex_daily
     GROUP BY user_address
 ),
+
 -- count days across the three sources
 combined_days AS (
     SELECT user_address, activity_day FROM activity
@@ -86,6 +89,7 @@ combined_days AS (
     UNION
     SELECT user_address, activity_day FROM from_cex_daily
 ),
+
 -- count days across the 3 sources
 user_activity_summary AS (
     SELECT 
@@ -94,6 +98,7 @@ user_activity_summary AS (
     FROM combined_days
     GROUP BY user_address
 ),
+
 -- count txn across the 3 sources
 complex_transactions_and_contracts AS (
     SELECT 
@@ -180,6 +185,7 @@ nft_mints AS (
         decoded_log:to NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
     group by user_address
 ),
+
 -- governance (just liquid staking on avalanche)
 gov_mints AS (
     SELECT
@@ -216,6 +222,7 @@ gov_restakes AS (
     AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
     GROUP BY origin_from_address
 ),
+
 -- defi
 swaps_in AS (
     SELECT 
@@ -239,6 +246,7 @@ lp_adds AS (
     AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
     GROUP BY FROM_ADDRESS
 ),
+
 -- list of lp and swap transactions to exclude from other defi below
 lps_swaps AS (
     SELECT 
@@ -250,6 +258,7 @@ lps_swaps AS (
         block_timestamp >= current_date - 90
     GROUP BY tx_hash
 ),
+
 -- other defi is a broad category
 other_defi AS (
     SELECT
@@ -278,6 +287,7 @@ other_defi AS (
     )
     GROUP BY origin_from_address
 ),
+
 -- put it all together!
 final_output AS (
     SELECT 
