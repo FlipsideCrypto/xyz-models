@@ -29,3 +29,11 @@ silver:
 		--profile datascience \
 		--target dev \
 		--profiles-dir ~/.dbt
+
+onchain_scores:
+	@dbt run \
+		-m tag:onchain_scores \
+		--profile datascience \
+		--target dev \
+		--profiles-dir ~/.dbt \
+		--full-refresh

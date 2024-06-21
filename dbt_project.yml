@@ -38,6 +38,10 @@ models:
       core:
         +materialized: ephemeral
   datascience_models:
+    gold:
+      onchain_scores:
+        +copy_grants: true
+
     streamline:
       quantum:
         poc:
