@@ -363,7 +363,12 @@ total_scores AS (
         gov_score
     FROM scores
     {% if is_incremental() %}
-    WHERE score_date > (SELECT MAX(score_date) FROM {{ this }})
+        WHERE score_date = (
+            CASE 
+                WHEN {{ current_date_var }} < date(sysdate()) THEN {{ current_date_var }} 
+                ELSE (SELECT MAX(score_date) FROM {{ this }})
+            END
+        )
     {% endif %}
 
 )
