@@ -35,5 +35,4 @@ onchain_scores:
 		-m tag:onchain_scores \
 		--profile datascience \
 		--target dev \
-		--profiles-dir ~/.dbt \
-		--full-refresh
+		--profiles-dir ~/.dbt 
