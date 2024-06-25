@@ -6,7 +6,15 @@
     tags = ['gold', 'onchain_scores', 'avalanche_scores']
 ) }}
 
-{% set current_date_var = var('current_date_var', "date(sysdate())") %}
+{% set current_date_query %}
+  SELECT date(sysdate()) as current_date
+{% endset %}
+
+{% set results = run_query(current_date_query) %}
+
+{% if execute %}
+  {% set current_date_var = var('current_date_var', results.columns[0].values()[0]) %}
+{% endif %}
 
 -- set aside centralized exchange addresses for two later cte's
 WITH cex_addresses AS (
@@ -362,13 +370,13 @@ total_scores AS (
         nfts_score,
         gov_score
     FROM scores
-    {% if is_incremental() %}
-        WHERE score_date = (
-            CASE 
-                WHEN CAST( '{{ current_date_var }}' AS DATE) < date(sysdate()) THEN CAST( '{{ current_date_var }}' AS DATE) 
-                ELSE (SELECT MAX(score_date) FROM {{ this }})
-            END
-        )
+    {% if is_incremental() %}        
+        WHERE 
+        {% if current_date_var == modules.datetime.datetime.utcnow().date() %}
+            score_date > (SELECT MAX(score_date) FROM {{ this }})
+        {% else %}
+            score_date = CAST('{{ current_date_var }}' AS DATE)
+        {% endif %}
     {% endif %}
 
 )
