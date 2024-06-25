@@ -38,6 +38,10 @@ models:
       core:
         +materialized: ephemeral
   datascience_models:
+    gold:
+      onchain_scores:
+        +copy_grants: true
+
     streamline:
       quantum:
         poc:
@@ -53,10 +57,6 @@ models:
 
 tests:
   +store_failures: true # all tests
-
-on-run-start:
-  - '{{create_sps()}}'
-  - '{{create_udfs()}}'
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'

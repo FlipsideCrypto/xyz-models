@@ -24,3 +24,27 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  - name: avalanche_gold_core
+    database: "{{ 'avalanche' if target.database == 'datascience' else 'avalanche_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_token_transfers
+      - name: ez_native_transfers
+      - name: ez_decoded_event_logs
+  - name: avalanche_gold_defi
+    database: "{{ 'avalanche' if target.database == 'datascience' else 'avalanche_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+  - name: avalanche_gold_nft
+    database: "{{ 'avalanche' if target.database == 'datascience' else 'avalanche_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+
+
