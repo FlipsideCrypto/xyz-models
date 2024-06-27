@@ -3,7 +3,8 @@
     unique_key = "id",
     cluster_by = "score_date::date",
     full_refresh = false,
-    tags = ['gold', 'onchain_scores', 'avalanche_scores']
+    tags = ['gold', 'onchain_scores', 'avalanche_scores'],
+    version = 2
 ) }}
 
 {% set current_date_query %}
@@ -360,6 +361,7 @@ total_scores AS (
         
         {{ dbt_utils.generate_surrogate_key(['user_address', "'avalanche'", "'" ~ current_date_var ~ "'"]) }} AS id,
         'avalanche' AS blockchain,
+        '{{ model.config.version }}' AS score_version,
         user_address,
         CURRENT_TIMESTAMP AS calculation_time,
         CAST( '{{ current_date_var }}' AS DATE) AS score_date,
