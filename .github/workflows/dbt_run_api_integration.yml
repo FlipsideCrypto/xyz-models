@@ -6,15 +6,15 @@ on:
     inputs:
       project_name:
         type: string
-        description: Name of the project to create the stage and external table for.
+        description: Name of the project to create the api integation for.
         required: true
-      s3_url:
+      snowflake_role_arn:
         type: string
-        description: URL of the S3 Bucket for the stage to be created with.
+        description: Snowflake role arn used to invoke the api as.
         required: true
-      target:
+      endpoint_url:
         type: string
-        description: Environment.
+        description: Endpoint url for the api.
         required: true
 
 env:
@@ -34,11 +34,26 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  called_workflow_template:
-    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
-    with:
-      dbt_command: >
-        dbt run-operation call_sp_grant_share_permissions --args "{args: sysdate() - interval '1 hour'}"
-      environment: workflow_prod
-      warehouse: ${{ vars.WAREHOUSE }}
-    secrets: inherit
+  run_dbt_jobs:
+    runs-on: ubuntu-latest
+    environment:
+      name: workflow_${{ inputs.target }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: install dependencies
+        run: |
+          pip install -r requirements.txt
+          dbt deps
+
+      - name: Create API Integration
+        run: |
+          dbt run-operation create_api_integration \
+          --args '{ "project_name": "${{ inputs.project_name }}", "snowflake_role_arn": "${{ inputs.snowflake_role_arn }}", "endpoint_url": ["${{ inputs.endpoint_url}}"] }'
+
