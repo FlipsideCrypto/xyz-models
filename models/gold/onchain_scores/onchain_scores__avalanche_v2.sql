@@ -3,8 +3,7 @@
     unique_key = "id",
     cluster_by = "score_date::date",
     full_refresh = false,
-    tags = ['gold', 'onchain_scores', 'avalanche_scores'],
-    version='1'
+    tags = ['gold', 'onchain_scores', 'avalanche_scores']
 ) }}
 
 {% set current_date_query %}
@@ -340,7 +339,7 @@ scores AS (
         user_address,
         (CASE WHEN n_days_active > 2 THEN 1 ELSE 0 END
          + CASE WHEN n_complex_txn > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_contracts >= 5 THEN 1 ELSE 0 END) AS activity_score,
+         + CASE WHEN n_contracts > 5 THEN 1 ELSE 0 END) AS activity_score,
         (CASE WHEN n_bridge_in > 3 THEN 1 ELSE 0 END
          + CASE WHEN n_cex_withdrawals > 0 THEN 1 ELSE 0 END
          + CASE WHEN net_token_accumulate > 0 THEN 1 ELSE 0 END) AS tokens_score,
@@ -360,7 +359,6 @@ total_scores AS (
     SELECT 
         
         {{ dbt_utils.generate_surrogate_key(['user_address', "'avalanche'", "'" ~ current_date_var ~ "'"]) }} AS id,
-        '{{ get_model_version() }}' AS score_version,
         'avalanche' AS blockchain,
         user_address,
         CURRENT_TIMESTAMP AS calculation_time,
