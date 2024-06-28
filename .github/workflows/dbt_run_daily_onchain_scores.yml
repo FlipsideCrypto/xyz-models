@@ -20,10 +20,26 @@ env:
   SCHEMA: "${{ vars.SCHEMA }}"
 
 jobs:
-  called_workflow_template:
+  avalanche_scores:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
-      dbt_command: dbt run -m "tag:onchain_scores"
+      dbt_command: dbt run -s onchain_scores__avalanche,version:latest
       environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
       warehouse: DBT_CLOUD
     secrets: inherit 
+
+  ethereum_scores:
+    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
+    with:
+      dbt_command: dbt run -s onchain_scores__ethereum,version:latest
+      environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
+      warehouse: DBT_CLOUD
+    secrets: inherit 
+  
+  base_scores:
+    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
+    with:
+      dbt_command: dbt run -s onchain_scores__base,version:latest
+      environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
+      warehouse: DBT_CLOUD
+    secrets: inherit
