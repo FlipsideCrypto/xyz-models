@@ -46,5 +46,49 @@ sources:
     schema: nft
     tables:
       - name: ez_nft_sales
+  - name: ethereum_gold_core
+    database: "{{ 'ethereum' if target.database == 'datascience' else 'ethereum_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_token_transfers
+      - name: ez_decoded_event_logs
+  - name: ethereum_gold_defi
+    database: "{{ 'ethereum' if target.database == 'datascience' else 'ethereum_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+  - name: ethereum_gold_nft
+    database: "{{ 'ethereum' if target.database == 'datascience' else 'ethereum_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+  - name: base_gold_core
+    database: "{{ 'base' if target.database == 'datascience' else 'base_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_token_transfers
+      - name: ez_decoded_event_logs
+  - name: base_gold_defi
+    database: "{{ 'base' if target.database == 'datascience' else 'base_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+  - name: base_gold_nft
+    database: "{{ 'base' if target.database == 'datascience' else 'base_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
 
 
