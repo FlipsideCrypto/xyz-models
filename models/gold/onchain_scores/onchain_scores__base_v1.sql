@@ -363,6 +363,14 @@ total_scores AS (
         nfts_score,
         gov_score
     FROM scores
+    {% if is_incremental() %}        
+        WHERE 
+        {% if current_date_var == modules.datetime.datetime.utcnow().date() %}
+            score_date > (SELECT MAX(score_date) FROM {{ this }})
+        {% else %}
+            score_date = CAST('{{ current_date_var }}' AS DATE)
+        {% endif %}
+    {% endif %}
 )
 
 SELECT * FROM total_scores
