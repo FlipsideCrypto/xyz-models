@@ -55,5 +55,5 @@ jobs:
       - name: Create API Integration
         run: |
           dbt run-operation create_api_integration \
-          --args '{ "project_name": "${{ inputs.project_name }}", "snowflake_role_arn": "${{ inputs.snowflake_role_arn }}", "endpoint_url": ["${{ inputs.endpoint_url}}"] }'
+          --args '{ "project_name": "${{ inputs.project_name }}", "snowflake_role_arn": "${{ inputs.snowflake_role_arn }}", "endpoint_urls": ["${{ inputs.endpoint_url}}"] }'
 
