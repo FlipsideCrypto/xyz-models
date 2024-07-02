@@ -12,9 +12,9 @@ on:
         type: string
         description: Snowflake role arn used to invoke the api as.
         required: true
-      endpoint_url:
+      endpoint_urls:
         type: string
-        description: Endpoint url for the api.
+        description: Array of allowed prefixes ex. ["https://xyz.execute-api.us-west-2.amazonaws.com/prod","https://xyz.execute-api.us-west-2.amazonaws.com/prod"]
         required: true
 
 env:
@@ -55,5 +55,5 @@ jobs:
       - name: Create API Integration
         run: |
           dbt run-operation create_api_integration \
-          --args '{ "project_name": "${{ inputs.project_name }}", "snowflake_role_arn": "${{ inputs.snowflake_role_arn }}", "endpoint_urls": ["${{ inputs.endpoint_url}}"] }'
+          --args '{ "project_name": "${{ inputs.project_name }}", "snowflake_role_arn": "${{ inputs.snowflake_role_arn }}", "endpoint_urls": ["${{ inputs.endpoint_urls}}"] }'
 
