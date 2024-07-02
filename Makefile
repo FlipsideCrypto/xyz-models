@@ -32,7 +32,7 @@ silver:
 
 onchain_scores:
 	@dbt run \
-		-s onchain_scores__avalanche,version:latest \
+		-s onchain_scores__arbitrum,version:latest \
 		--profile datascience \
 		--target dev \
 		--profiles-dir ~/.dbt 

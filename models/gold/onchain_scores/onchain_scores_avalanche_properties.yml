@@ -10,9 +10,14 @@ models:
     columns:
       - name: id 
         description: MD5 of blockchain, user_address & score_date
-        
+
     versions:
       - v: 1 
         defined_in: onchain_scores__avalanche_v1
         description: Initial version of the model
       
+      - v: 2
+        defined_in: onchain_scores__avalanche_v2
+        description: Added new cutoff logic for activite_scores
+        config:
+          alias: avalanche
