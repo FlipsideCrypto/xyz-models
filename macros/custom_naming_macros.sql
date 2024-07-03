@@ -15,18 +15,12 @@
 
     {%- if custom_alias_name -%}
 
-        {% do log("Creating custom alias for " ~ custom_alias_name, info=true)%}
-
         {% set node_name = node.name %}
         {% set split_name = node_name.split('__') %}
-
-        {% do log("Split name: " ~ split_name, info=true)%}
 
         {{ split_name [1] | trim }}
 
     {%- elif node.version -%}
-
-        {% do log("Setting node version " ~ node.version ~ " for " ~ node.name, info=true)%}
 
         {{ return(node.name ~ "_v" ~ (node.version | replace(".", "_"))) }}
 
