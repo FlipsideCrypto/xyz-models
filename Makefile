@@ -1,6 +1,6 @@
 # set default target
 DBT_TARGET ?= dev
-
+SOURCE_EVM_DB ?= 'avalanche'
 ephemeral:
 	@dbt run \
 		--vars '{"UPDATE_UDFS_AND_SPS": false, STREAMLINE_INVOKE_STREAMS: false}' \
@@ -42,7 +42,7 @@ onchain_scores:
 
 source_evm_privileges:
 	@dbt run-operation grant_evm_source_privileges \
-		--args '{ "database": "avalanche"}' \
+		--args '{ "database": $(SOURCE_EVM_DB)}' \
 		--profile datascience \
 		--target $(DBT_TARGET) \
 		--profiles-dir ~/.dbt 
