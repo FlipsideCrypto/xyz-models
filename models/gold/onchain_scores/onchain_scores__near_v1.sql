@@ -1,7 +1,25 @@
+{{ config (
+    materialized = "incremental",
+    unique_key = "id",
+    cluster_by = "score_date::date",
+    full_refresh = false,
+    version = 1
+) }}
+
+{% set current_date_query %}
+  SELECT date(sysdate()) as current_date
+{% endset %}
+
+{% set results = run_query(current_date_query) %}
+
+{% if execute %}
+  {% set current_date_var = var('current_date_var', results.columns[0].values()[0]) %}
+{% endif %}
+
 -- set aside centralized exchange addresses for two later cte's
 WITH cex_addresses AS (
     SELECT ADDRESS, LABEL_TYPE, project_name AS label
-    FROM near.CORE.dim_address_labels
+    FROM {{ source('near_gold_core','dim_address_labels') }} 
     WHERE LABEL_TYPE = 'cex'
 ),
 
@@ -14,7 +32,7 @@ activity AS (
     COALESCE(contr.n_contracts, 0) AS n_contracts, -- using COALESCE to handle NULLs from the LEFT JOIN
     count(distinct tx_hash) AS n_txn
     
-  FROM near.core.fact_transactions txns
+  FROM {{ source('near_gold_core','fact_transactions')}} txns
   LEFT JOIN (
     SELECT
       signer_id,
@@ -23,17 +41,17 @@ activity AS (
     FROM
       near.CORE.FACT_actions_events
     WHERE
-      block_timestamp >= current_date - 90
+      block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     GROUP BY
       signer_id, activity_day
   ) contr ON contr.signer_id = txns.TX_SIGNER AND contr.activity_day = DATE(txns.block_timestamp)
   WHERE 
-    block_timestamp >= current_date - 90
+    block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND
-    user_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    user_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     AND
-    user_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    GROUP BY user_address, activity_day
+    user_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }} )
+    GROUP BY 1,2,3
 ),
 
 -- count transactions from bridges daily
@@ -43,10 +61,10 @@ from_bridge_daily AS (
         DATE(block_timestamp) AS activity_day,
         COUNT(*) AS n_bridge_in,
         COUNT(DISTINCT platform) AS n_contracts
-    FROM near.defi.ez_bridge_activity
-    WHERE block_timestamp >= current_date - 90
-    AND destination_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND destination_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    FROM {{ source('near_gold_defi','ez_bridge_activity') }} 
+    WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
+    AND destination_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND destination_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     GROUP BY destination_address, activity_day
 ),
 -- tx from bridge
@@ -66,11 +84,11 @@ from_cex_daily AS (
         to_address AS user_address,
         DATE(block_timestamp) AS activity_day,
         COUNT(*) AS n_cex_withdrawals
-    FROM near.CORE.ez_token_transfers
-    WHERE block_timestamp >= current_date - 90
+    FROM {{ source('near_gold_core','ez_token_transfers')}} 
+    WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND from_address IN (SELECT ADDRESS FROM cex_addresses)
-    AND to_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND to_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    AND to_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     GROUP BY to_address, activity_day
 ),
 -- total cex
@@ -103,6 +121,7 @@ user_activity_summary AS (
 complex_transactions_and_contracts AS (
     SELECT 
         user_address,
+        sum(n_complex_txn) as n_complex_txn,
         SUM(n_contracts) AS n_contracts
     FROM (
         SELECT user_address, 0 as n_complex_txn, n_contracts FROM activity
@@ -118,20 +137,20 @@ complex_transactions_and_contracts AS (
 xfer_in AS (
     SELECT TO_ADDRESS AS user_address, 
         COUNT(*) AS n_xfer_in
-    FROM near.core.ez_token_transfers
-    WHERE block_timestamp >= current_date - 90
-    AND to_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND to_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    FROM {{ source('near_gold_core','ez_token_transfers')}}
+    WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
+    AND to_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     GROUP BY TO_ADDRESS
 ), 
 
 xfer_out AS (
     SELECT FROM_ADDRESS AS user_address,
         COUNT(*) AS n_xfer_out
-    FROM near.core.ez_token_transfers
-    WHERE block_timestamp >= current_date - 90
-    AND from_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND from_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    FROM {{ source('near_gold_core','ez_token_transfers')}}
+    WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
+    AND from_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND from_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     GROUP BY FROM_ADDRESS
 ),
 
@@ -148,10 +167,10 @@ nft_buys AS (
         buyer_address AS user_address, 
         COUNT(distinct(NFT_ADDRESS)) AS n_nft_collections,
         COUNT(*) AS n_nft_trades
-    FROM near.nft.ez_nft_sales
-    WHERE BLOCK_TIMESTAMP >= current_date - 90
-    AND buyer_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND buyer_address NOT IN (SELECT address FROM near.core.dim_address_labels)
+    FROM {{ source('near_gold_nft','ez_nft_sales') }}
+    WHERE BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
+    AND buyer_address NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND buyer_address NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     GROUP BY buyer_address
 ),
 
@@ -160,11 +179,11 @@ nft_mints AS (
 select 
 owner_id as user_address,
 count(distinct (tx_hash) ) as n_nft_mints
-FROM near.nft.fact_nft_mints
+FROM {{ source('near_gold_nft','fact_nft_mints')}}
 WHERE
-owner_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
+owner_id NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
 AND 
-owner_id NOT IN (SELECT address FROM near.core.dim_address_labels)
+owner_id NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
 group by user_address
 ),
 
@@ -176,27 +195,27 @@ delegation as (
   signer_id AS user_address,
   COUNT(*) AS n_delegations,
   COUNT(DISTINCT address) AS n_validators,
-  from near.gov.fact_staking_actions
-  where block_timestamp >= current_date - 90
+  from  {{ source('near_gold_gov','fact_staking_actions') }}
+  where block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
   and action in ('staking', 'deposited')
   AND
-  signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
+  signer_id NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
   AND 
-  signer_id NOT IN (SELECT address FROM near.core.dim_address_labels)
+  signer_id NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
   group by 1
 ),
 
 undelegation as (
   select 
-  signer_id AS user_address,
-  COUNT(*) AS n_undelegations
-  from near.gov.fact_staking_actions
-  where block_timestamp >= current_date - 90
+  signer_id AS user_address
+  , COUNT(*) AS n_undelegations
+  from  {{ source('near_gold_gov','fact_staking_actions') }}
+  where block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
   and action in ('unstaking', 'withdrawing')
   AND
-  signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
+  signer_id NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
   AND 
-  signer_id NOT IN (SELECT address FROM near.core.dim_address_labels)
+  signer_id NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
   group by 1
 ),
 
@@ -215,10 +234,10 @@ swaps_in AS (
     SELECT 
         trader AS user_address, 
         COUNT(*) AS n_swap_tx
-    FROM near.defi.ez_dex_swaps
-    WHERE BLOCK_TIMESTAMP >= current_date - 90
-    AND trader NOT IN (SELECT address FROM near.core.dim_address_labels)
-    AND trader NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
+    FROM {{ source('near_gold_defi','ez_dex_swaps') }}
+    WHERE BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
+    AND trader NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
+    AND trader NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
     GROUP BY trader
 ),
 
@@ -226,11 +245,11 @@ lp_adds AS (
     SELECT 
         FROM_ADDRESS AS USER_ADDRESS, 
         COUNT(*) AS n_lp_adds
-    FROM near.core.ez_token_transfers
-    WHERE TO_ADDRESS IN (SELECT platform FROM near.defi.ez_dex_swaps WHERE block_timestamp >= current_date - 90)
-    AND TX_HASH NOT IN (SELECT TX_HASH FROM near.defi.ez_dex_swaps WHERE block_timestamp >= current_date - 90)
-    AND FROM_ADDRESS NOT IN (SELECT address FROM near.core.dim_address_labels)
-    AND FROM_ADDRESS NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
+    FROM {{ source('near_gold_core','ez_token_transfers')}}
+    WHERE TO_ADDRESS IN (SELECT platform FROM {{ source('near_gold_defi','ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
+    AND TX_HASH NOT IN (SELECT TX_HASH FROM {{ source('near_gold_defi','ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
+    AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
+    AND FROM_ADDRESS NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
     GROUP BY FROM_ADDRESS
 ),
 -- list of lp and swap transactions to exclude from other defi below
@@ -238,11 +257,11 @@ lps_swaps AS (
 SELECT 
 tx_hash
 FROM
-near.core.ez_token_transfers
+{{ source('near_gold_core','ez_token_transfers')}}
 WHERE
 to_address IN (SELECT platform FROM near.defi.ez_dex_swaps)
 AND
-block_timestamp >= current_date - 90
+block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
 GROUP BY tx_hash
 ),
 -- other defi is a broad category
@@ -251,10 +270,10 @@ other_defi AS (
         sender_id AS user_address,
         COUNT(distinct(tx_hash)) AS n_other_defi
     FROM near.defi.ez_lending
-    WHERE block_timestamp >= current_date - 90
+    WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND tx_hash NOT IN (SELECT tx_hash FROM lps_swaps)
-    AND sender_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND sender_id NOT IN (SELECT address FROM near.core.dim_address_labels)
+    AND sender_id NOT IN (SELECT contract_address FROM {{ source('near_gold_core','dim_ft_contract_metadata') }})
+    AND sender_id NOT IN (SELECT address FROM {{ source('near_gold_core','dim_address_labels') }})
     and actions in ('deposit','deposit_to_reserve', 'increase_collateral', 'borrow', 'repay')
     GROUP BY sender_id
 ),
@@ -313,10 +332,12 @@ scores AS (
 
 total_scores AS (
     SELECT 
+        {{ dbt_utils.generate_surrogate_key(['user_address', "'near'", "'" ~ current_date_var ~ "'"]) }} AS id,        
         'near' AS blockchain,
+        '{{ model.config.version }}' AS score_version, 
         user_address,
         CURRENT_TIMESTAMP AS calculation_time,
-        CURRENT_DATE AS score_date,
+        CAST( '{{ current_date_var }}' AS DATE) AS score_date,
         activity_score + tokens_score + defi_score + nfts_score + gov_score AS total_score,
         activity_score,
         tokens_score,
@@ -324,6 +345,14 @@ total_scores AS (
         nfts_score,
         gov_score
     FROM scores
+    {% if is_incremental() %}        
+        WHERE 
+        {% if current_date_var == modules.datetime.datetime.utcnow().date() %}
+            score_date > (SELECT MAX(score_date) FROM {{ this }})
+        {% else %}
+            score_date = CAST('{{ current_date_var }}' AS DATE)
+        {% endif %}
+    {% endif %}
 )
 
-SELECT * FROM total_scores;
+SELECT * FROM total_scores
