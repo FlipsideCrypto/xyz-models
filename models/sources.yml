@@ -134,3 +134,20 @@ sources:
     schema: nft
     tables:
       - name: ez_nft_sales
+  - name: arbitrum_gold_core
+    database: "{{ 'arbitrum' if target.database == 'datascience' else 'arbitrum_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_token_transfers
+  - name: arbitrum_gold_defi
+    database: "{{ 'arbitrum' if target.database == 'datascience' else 'arbitrum_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+      - name: ez_decoded_event_logs

@@ -3,7 +3,6 @@
     unique_key = "id",
     cluster_by = "score_date::date",
     full_refresh = false,
-    tags = ['gold', 'onchain_scores', 'avalanche_scores'],
     version = 1
 ) }}
 
@@ -17,10 +16,11 @@
   {% set current_date_var = var('current_date_var', results.columns[0].values()[0]) %}
 {% endif %}
 
+
 -- set aside centralized exchange addresses for two later cte's
 WITH cex_addresses AS (
     SELECT ADDRESS, LABEL_TYPE, project_name AS label
-    FROM {{ source('avalanche_gold_core', 'dim_labels') }}
+    FROM {{ source('arbitrum_gold_core', 'dim_labels') }} 
     WHERE LABEL_TYPE = 'cex'
 ),
 
@@ -31,10 +31,10 @@ activity AS (
         DATE(block_timestamp) AS activity_day,
         COUNT(DISTINCT CASE WHEN input_data != '0x' THEN to_address END) AS n_contracts,
         sum(CASE WHEN input_data != '0x' THEN 1 ELSE 0 END) AS n_complex_txn
-    FROM {{ source('avalanche_gold_core', 'fact_transactions') }}
+    FROM {{ source('arbitrum_gold_core', 'fact_transactions') }} 
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY from_address, activity_day
 ),
 
@@ -45,20 +45,21 @@ from_bridge_daily AS (
         DATE(block_timestamp) AS activity_day,
         COUNT(*) AS n_bridge_in,
         COUNT(DISTINCT platform) AS n_contracts
-    FROM {{ source('avalanche_gold_defi', 'ez_bridge_activity') }}
+    FROM {{ source('arbitrum_gold_defi','ez_bridge_activity') }} 
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND receiver NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND receiver NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND receiver NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND receiver NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY receiver, activity_day
 ),
-
 -- tx from bridge
 from_bridge AS (
-    SELECT
-        user_address,
-        sum(n_bridge_in) AS n_bridge_in
-    FROM from_bridge_daily
-    GROUP BY user_address
+SELECT
+user_address,
+sum(n_bridge_in) AS n_bridge_in
+FROM
+from_bridge_daily
+GROUP BY 
+user_address
 ),
 
 -- count withdrawals from centralized exchanges daily
@@ -67,34 +68,34 @@ from_cex_daily AS (
         to_address AS user_address,
         DATE(block_timestamp) AS activity_day,
         COUNT(*) AS n_cex_withdrawals
-    FROM {{ source('avalanche_gold_core', 'ez_native_transfers') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_native_transfers') }} 
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND from_address IN (SELECT ADDRESS FROM cex_addresses)
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY to_address, activity_day
     UNION
     SELECT 
         TO_ADDRESS AS user_address,
         DATE(block_timestamp) AS activity_day,
         COUNT(*) AS n_cex_withdrawals
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_token_transfers') }}
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND FROM_ADDRESS IN (SELECT ADDRESS FROM cex_addresses)
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY TO_ADDRESS, activity_day
 ),
-
 -- total cex
 from_cex AS (
-    SELECT
-        user_address,
-        sum(n_cex_withdrawals) AS n_cex_withdrawals
-    FROM from_cex_daily
-    GROUP BY user_address
+SELECT
+user_address,
+sum(n_cex_withdrawals) AS n_cex_withdrawals
+FROM
+from_cex_daily
+GROUP BY 
+user_address
 ),
-
 -- count days across the three sources
 combined_days AS (
     SELECT user_address, activity_day FROM activity
@@ -103,7 +104,6 @@ combined_days AS (
     UNION
     SELECT user_address, activity_day FROM from_cex_daily
 ),
-
 -- count days across the 3 sources
 user_activity_summary AS (
     SELECT 
@@ -112,7 +112,6 @@ user_activity_summary AS (
     FROM combined_days
     GROUP BY user_address
 ),
-
 -- count txn across the 3 sources
 complex_transactions_and_contracts AS (
     SELECT 
@@ -133,20 +132,20 @@ complex_transactions_and_contracts AS (
 xfer_in AS (
     SELECT TO_ADDRESS AS user_address, 
         COUNT(*) AS n_xfer_in
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_token_transfers') }}
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY TO_ADDRESS
 ), 
 
 xfer_out AS (
     SELECT FROM_ADDRESS AS user_address,
         COUNT(*) AS n_xfer_out
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_token_transfers') }}
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY FROM_ADDRESS
 ),
 
@@ -163,59 +162,56 @@ nft_buys AS (
         buyer_address AS user_address, 
         COUNT(distinct(NFT_ADDRESS)) AS n_nft_collections,
         COUNT(*) AS n_nft_trades
-    FROM {{ source('avalanche_gold_nft', 'ez_nft_sales') }}
+    FROM arbitrum.nft.ez_nft_sales
     WHERE BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND buyer_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND buyer_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND buyer_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND buyer_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     GROUP BY buyer_address
 ),
 
 rawmints as (
-    select
-        *,
-        case when topics[0] = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' then 'erc-1155'
-            when (topics[0] = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
-            and topics[3] IS NOT NULL) then 'erc-721'
-            else 'erc-20' end as token_standard
-        from {{ source('avalanche_gold_core', 'ez_decoded_event_logs') }}
-    where topics[0] in (
-        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-        '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
-        )
-    AND 
-        block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND decoded_log:from = '0x0000000000000000000000000000000000000000'
-    having token_standard IN ('erc-721','erc-1155')
+select
+*,
+case when topics[0] = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62' then 'erc-1155'
+     when (topics[0] = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' 
+       and topics[3] IS NOT NULL) then 'erc-721'
+     else 'erc-20' end as token_standard
+from {{ source('arbitrum_gold_core', 'ez_decoded_event_logs') }}
+where topics[0] in (
+  '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+  '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
+)
+AND 
+block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
+AND decoded_log:from = '0x0000000000000000000000000000000000000000'
+having token_standard IN ('erc-721','erc-1155')
 ),
 
 nft_mints AS (
-    SELECT 
-        decoded_log:to :: string as user_address,
-        count(distinct (tx_hash) ) as n_nft_mints
-    FROM rawmints
-    WHERE
-        decoded_log:to NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND 
-        decoded_log:to NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
-    group by user_address
+select 
+decoded_log:to :: string as user_address,
+count(distinct (tx_hash) ) as n_nft_mints
+FROM rawmints
+WHERE
+decoded_log:to NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+AND 
+decoded_log:to NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
+group by user_address
 ),
-
--- governance (just liquid staking on avalanche)
+-- governance (just liquid staking on arbitrum)
 gov_mints AS (
     SELECT
         to_address AS user_address,
         COUNT(distinct(contract_address)) AS n_validators,
         COUNT(tx_hash) AS n_stake_tx
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_token_transfers') }}
     WHERE 
-        contract_address IN ('0x2b2c81e08f1af8835a78bb2a90ae924ace0ea4be',
-                     '0xc3344870d52688874b06d844e0c36cc39fc727f6',
-                     '0xa25eaf2906fa1a3a13edac9b9657108af7b703e3',
-                     '0xf7d9281e8e363584973f946201b82ba72c965d27',
-                     '0x6026a85e11bd895c934af02647e8c7b4ea2d9808')
+        contract_address IN (lower('0x178412e79c25968a32e89b11f63B33F733770c2A'),
+                      lower('0x95aB45875cFFdba1E5f451B950bC2E42c0053f39'),
+                      lower('0xfac38532829fdd744373fdcd4708ab90fa0c4078'))
     AND BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
-    AND to_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
+    AND to_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
     AND from_address = '0x0000000000000000000000000000000000000000'
     GROUP BY to_address
 ),
@@ -224,28 +220,25 @@ gov_restakes AS (
     SELECT 
         origin_from_address AS user_address,
         COUNT(tx_hash) AS n_restakes
-    FROM {{ source('avalanche_gold_core', 'ez_decoded_event_logs') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_decoded_event_logs') }} 
     WHERE BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND contract_address IN ('0x2b2c81e08f1af8835a78bb2a90ae924ace0ea4be',
-                     '0xc3344870d52688874b06d844e0c36cc39fc727f6',
-                     '0xa25eaf2906fa1a3a13edac9b9657108af7b703e3',
-                     '0xf7d9281e8e363584973f946201b82ba72c965d27',
-                     '0x6026a85e11bd895c934af02647e8c7b4ea2d9808')
+    AND contract_address IN (lower('0x178412e79c25968a32e89b11f63B33F733770c2A'),
+                      lower('0x95aB45875cFFdba1E5f451B950bC2E42c0053f39'),
+                      lower('0xfac38532829fdd744373fdcd4708ab90fa0c4078'))
     AND event_name IN ('Deposit', 'Submitted', 'DepositedFromStaking')
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
     GROUP BY origin_from_address
 ),
-
 -- defi
 swaps_in AS (
     SELECT 
         origin_from_address AS user_address, 
         COUNT(*) AS n_swap_tx
-    FROM {{ source('avalanche_gold_defi', 'ez_dex_swaps') }}
+    FROM {{ source('arbitrum_gold_defi','ez_dex_swaps') }} 
     WHERE BLOCK_TIMESTAMP >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
     GROUP BY origin_from_address
 ),
 
@@ -253,42 +246,39 @@ lp_adds AS (
     SELECT 
         FROM_ADDRESS AS USER_ADDRESS, 
         COUNT(*) AS n_lp_adds
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
-    WHERE TO_ADDRESS IN (SELECT contract_address FROM {{ source('avalanche_gold_defi', 'ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
-    AND TX_HASH NOT IN (SELECT TX_HASH FROM {{ source('avalanche_gold_defi', 'ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
-    AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
-    AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
+    FROM {{ source('arbitrum_gold_core', 'ez_token_transfers') }}
+    WHERE TO_ADDRESS IN (SELECT contract_address FROM {{ source('arbitrum_gold_defi','ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
+    AND TX_HASH NOT IN (SELECT TX_HASH FROM {{ source('arbitrum_gold_defi','ez_dex_swaps') }} WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90)
+    AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
+    AND FROM_ADDRESS NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
     GROUP BY FROM_ADDRESS
 ),
-
 -- list of lp and swap transactions to exclude from other defi below
 lps_swaps AS (
-    SELECT 
-        tx_hash
-    FROM {{ source('avalanche_gold_core', 'ez_token_transfers') }}
-    WHERE
-        to_address IN (SELECT pool_address FROM {{ source('avalanche_gold_defi', 'dim_dex_liquidity_pools') }})
-    AND
-        block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    GROUP BY tx_hash
+SELECT 
+tx_hash
+FROM
+{{ source('arbitrum_gold_core', 'ez_token_transfers') }}
+WHERE
+to_address IN (SELECT pool_address FROM {{ source('arbitrum_gold_defi','dim_dex_liquidity_pools') }} )
+AND
+block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
+GROUP BY tx_hash
 ),
-
 -- other defi is a broad category
 other_defi AS (
     SELECT
         origin_from_address AS user_address,
         COUNT(distinct(tx_hash)) AS n_other_defi
-    FROM {{ source('avalanche_gold_core', 'ez_decoded_event_logs') }}
+    FROM {{ source('arbitrum_gold_core', 'ez_decoded_event_logs') }}
     WHERE block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
-    AND contract_address NOT IN ('0x2b2c81e08f1af8835a78bb2a90ae924ace0ea4be',
-                     '0xc3344870d52688874b06d844e0c36cc39fc727f6',
-                     '0xa25eaf2906fa1a3a13edac9b9657108af7b703e3',
-                     '0xf7d9281e8e363584973f946201b82ba72c965d27',
-                     '0x6026a85e11bd895c934af02647e8c7b4ea2d9808')
+    AND contract_address NOT IN (lower('0x178412e79c25968a32e89b11f63B33F733770c2A'),
+                      lower('0x95aB45875cFFdba1E5f451B950bC2E42c0053f39'),
+                      lower('0xfac38532829fdd744373fdcd4708ab90fa0c4078'))
 
     AND tx_hash NOT IN (SELECT tx_hash FROM lps_swaps)
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_contracts') }})
-    AND origin_from_address NOT IN (SELECT address FROM {{ source('avalanche_gold_core', 'dim_labels') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_contracts') }})
+    AND origin_from_address NOT IN (SELECT address FROM {{ source('arbitrum_gold_core', 'dim_labels') }})
     AND (
         lower(event_name) LIKE '%claim%' OR
         lower(event_name) LIKE '%deposit%' OR
@@ -301,7 +291,6 @@ other_defi AS (
     )
     GROUP BY origin_from_address
 ),
-
 -- put it all together!
 final_output AS (
     SELECT 
@@ -338,30 +327,29 @@ final_output AS (
 scores AS (
     SELECT
         user_address,
-        (CASE WHEN n_days_active > 2 THEN 1 ELSE 0 END
+        (CASE WHEN n_days_active > 1 THEN 1 ELSE 0 END
          + CASE WHEN n_complex_txn > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_contracts >= 5 THEN 1 ELSE 0 END) AS activity_score,
-        (CASE WHEN n_bridge_in > 3 THEN 1 ELSE 0 END
-         + CASE WHEN n_cex_withdrawals > 0 THEN 1 ELSE 0 END
+         + CASE WHEN n_contracts > 3 THEN 1 ELSE 0 END) AS activity_score,
+        (CASE WHEN n_bridge_in > 4 THEN 1 ELSE 0 END
+         + CASE WHEN n_cex_withdrawals > 3 THEN 1 ELSE 0 END
          + CASE WHEN net_token_accumulate > 0 THEN 1 ELSE 0 END) AS tokens_score,
-        (CASE WHEN n_other_defi > 1 THEN 1 ELSE 0 END
-         + CASE WHEN n_swap_tx > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_lp_adds > 0 THEN 1 ELSE 0 END) AS defi_score,
+        (CASE WHEN n_other_defi > 2 THEN 1 ELSE 0 END
+         + CASE WHEN n_swap_tx > 2 THEN 1 ELSE 0 END
+         + CASE WHEN n_lp_adds > 2 THEN 1 ELSE 0 END) AS defi_score,
         (CASE WHEN n_nft_mints > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_nft_collections > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_nft_trades > 0 THEN 1 ELSE 0 END) AS nfts_score,
+         + CASE WHEN n_nft_collections > 2 THEN 1 ELSE 0 END
+         + CASE WHEN n_nft_trades > 2 THEN 1 ELSE 0 END) AS nfts_score,
         (CASE WHEN n_stake_tx > 0 THEN 1 ELSE 0 END
          + CASE WHEN n_validators > 0 THEN 1 ELSE 0 END
-         + CASE WHEN n_restakes > 1 THEN 1 ELSE 0 END) AS gov_score
+         + CASE WHEN n_restakes > 0 THEN 1 ELSE 0 END) AS gov_score
     FROM final_output
 ),
 
 total_scores AS (
-    SELECT 
-        
-        {{ dbt_utils.generate_surrogate_key(['user_address', "'avalanche'", "'" ~ current_date_var ~ "'"]) }} AS id,
-        'avalanche' AS blockchain,
-        '{{ model.config.version }}' AS score_version,
+    SELECT
+        {{ dbt_utils.generate_surrogate_key(['user_address', "'ethereum'", "'" ~ current_date_var ~ "'"]) }} AS id,        
+        'arbitrum' AS blockchain,
+        '{{ model.config.version }}' AS score_version, 
         user_address,
         CURRENT_TIMESTAMP AS calculation_time,
         CAST( '{{ current_date_var }}' AS DATE) AS score_date,
@@ -380,7 +368,6 @@ total_scores AS (
             score_date = CAST('{{ current_date_var }}' AS DATE)
         {% endif %}
     {% endif %}
-
 )
 
 SELECT * FROM total_scores
