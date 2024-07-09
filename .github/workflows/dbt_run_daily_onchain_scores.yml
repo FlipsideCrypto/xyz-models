@@ -44,6 +44,14 @@ jobs:
       warehouse: DBT_CLOUD
     secrets: inherit
   
+  aptos_scores:
+    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
+    with:
+      dbt_command: dbt run -s onchain_scores__aptos,version:latest
+      environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
+      warehouse: DBT_CLOUD
+    secrets: inherit
+
   polygon_scores:
     uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt_run_template.yml@main
     with:
@@ -59,3 +67,4 @@ jobs:
         environment: ${{ github.ref == 'refs/heads/main' && 'workflow_prod' || 'workflow_dev' }}
         warehouse: DBT_CLOUD
       secrets: inherit
+

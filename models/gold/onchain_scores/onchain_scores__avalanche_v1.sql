@@ -3,7 +3,6 @@
     unique_key = "id",
     cluster_by = "score_date::date",
     full_refresh = false,
-    tags = ['gold', 'onchain_scores', 'avalanche_scores'],
     version = 1
 ) }}
 

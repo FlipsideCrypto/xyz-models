@@ -347,7 +347,7 @@ scores AS (
 
 total_scores AS (
     SELECT
-        {{ dbt_utils.generate_surrogate_key(['user_address', "'ethereum'", "'" ~ current_date_var ~ "'"]) }} AS id,        
+        {{ dbt_utils.generate_surrogate_key(['user_address', "'arbitrum'", "'" ~ current_date_var ~ "'"]) }} AS id,        
         'arbitrum' AS blockchain,
         '{{ model.config.version }}' AS score_version, 
         user_address,

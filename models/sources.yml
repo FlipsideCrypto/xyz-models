@@ -152,3 +152,23 @@ sources:
       - name: ez_dex_swaps
       - name: dim_dex_liquidity_pools
       - name: ez_decoded_event_logs
+  - name: aptos_gold_core
+    database: "{{ 'aptos' if target.database == 'datascience' else 'aptos_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_tokens
+      - name: fact_transactions
+      - name: fact_transfers
+      - name: fact_events
+  - name: aptos_gold_defi
+    database: "{{ 'aptos' if target.database == 'datascience' else 'aptos_dev' }}"
+    schema: defi
+    tables:
+      - name: fact_bridge_activity
+  - name: aptos_gold_nft
+    database: "{{ 'aptos' if target.database == 'datascience' else 'aptos_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+
