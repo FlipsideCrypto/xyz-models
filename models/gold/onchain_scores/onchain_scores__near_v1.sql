@@ -1,7 +1,7 @@
 -- set aside centralized exchange addresses for two later cte's
 WITH cex_addresses AS (
     SELECT ADDRESS, LABEL_TYPE, project_name AS label
-    FROM near.CORE.DIM_LABELS
+    FROM near.CORE.dim_address_labels
     WHERE LABEL_TYPE = 'cex'
 ),
 
@@ -46,7 +46,7 @@ from_bridge_daily AS (
     FROM near.defi.ez_bridge_activity
     WHERE block_timestamp >= current_date - 90
     AND destination_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND destination_address NOT IN (SELECT address FROM near.core.dim_labels)
+    AND destination_address NOT IN (SELECT address FROM near.core.dim_address_labels)
     GROUP BY destination_address, activity_day
 ),
 -- tx from bridge
@@ -70,7 +70,7 @@ from_cex_daily AS (
     WHERE block_timestamp >= current_date - 90
     AND from_address IN (SELECT ADDRESS FROM cex_addresses)
     AND to_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND to_address NOT IN (SELECT address FROM near.core.dim_labels)
+    AND to_address NOT IN (SELECT address FROM near.core.dim_address_labels)
     GROUP BY to_address, activity_day
 ),
 -- total cex
@@ -121,7 +121,7 @@ xfer_in AS (
     FROM near.core.ez_token_transfers
     WHERE block_timestamp >= current_date - 90
     AND to_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND to_address NOT IN (SELECT address FROM near.core.dim_labels)
+    AND to_address NOT IN (SELECT address FROM near.core.dim_address_labels)
     GROUP BY TO_ADDRESS
 ), 
 
@@ -131,7 +131,7 @@ xfer_out AS (
     FROM near.core.ez_token_transfers
     WHERE block_timestamp >= current_date - 90
     AND from_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND from_address NOT IN (SELECT address FROM near.core.dim_labels)
+    AND from_address NOT IN (SELECT address FROM near.core.dim_address_labels)
     GROUP BY FROM_ADDRESS
 ),
 
@@ -151,7 +151,7 @@ nft_buys AS (
     FROM near.nft.ez_nft_sales
     WHERE BLOCK_TIMESTAMP >= current_date - 90
     AND buyer_address NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND buyer_address NOT IN (SELECT address FROM near.core.dim_labels)
+    AND buyer_address NOT IN (SELECT address FROM near.core.dim_address_labels)
     GROUP BY buyer_address
 ),
 
@@ -164,7 +164,7 @@ FROM near.nft.fact_nft_mints
 WHERE
 owner_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
 AND 
-owner_id NOT IN (SELECT address FROM near.core.dim_labels)
+owner_id NOT IN (SELECT address FROM near.core.dim_address_labels)
 group by user_address
 ),
 
@@ -175,14 +175,14 @@ delegation as (
   select 
   signer_id AS user_address,
   COUNT(*) AS n_delegations,
-  COUNT(DISTINCT address) AS n_validators
+  COUNT(DISTINCT address) AS n_validators,
   from near.gov.fact_staking_actions
   where events.block_timestamp >= current_date - 90
   and action in ('staking', 'deposited')
   AND
   signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
   AND 
-  signer_id NOT IN (SELECT address FROM near.core.dim_labels)
+  signer_id NOT IN (SELECT address FROM near.core.dim_address_labels)
   group by 1
 ),
 
@@ -196,7 +196,7 @@ undelegation as (
   AND
   signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
   AND 
-  signer_id NOT IN (SELECT address FROM near.core.dim_labels)
+  signer_id NOT IN (SELECT address FROM near.core.dim_address_labels)
   group by 1
 ),
 
@@ -217,7 +217,7 @@ swaps_in AS (
         COUNT(*) AS n_swap_tx
     FROM near.defi.ez_dex_swaps
     WHERE BLOCK_TIMESTAMP >= current_date - 90
-    AND trader NOT IN (SELECT address FROM near.core.dim_labels)
+    AND trader NOT IN (SELECT address FROM near.core.dim_address_labels)
     AND trader NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
     GROUP BY trader
 ),
@@ -229,7 +229,7 @@ lp_adds AS (
     FROM near.core.ez_token_transfers
     WHERE TO_ADDRESS IN (SELECT platform FROM near.defi.ez_dex_swaps WHERE block_timestamp >= current_date - 90)
     AND TX_HASH NOT IN (SELECT TX_HASH FROM near.defi.ez_dex_swaps WHERE block_timestamp >= current_date - 90)
-    AND FROM_ADDRESS NOT IN (SELECT address FROM near.core.dim_labels)
+    AND FROM_ADDRESS NOT IN (SELECT address FROM near.core.dim_address_labels)
     AND FROM_ADDRESS NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
     GROUP BY FROM_ADDRESS
 ),
@@ -254,7 +254,7 @@ other_defi AS (
     WHERE block_timestamp >= current_date - 90
     AND tx_hash NOT IN (SELECT tx_hash FROM lps_swaps)
     AND sender_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
-    AND sender_id NOT IN (SELECT address FROM near.core.dim_labels)
+    AND sender_id NOT IN (SELECT address FROM near.core.dim_address_labels)
     and actions in ('deposit','deposit_to_reserve', 'increase_collateral', 'borrow', 'repay')
     GROUP BY sender_id
 ),
