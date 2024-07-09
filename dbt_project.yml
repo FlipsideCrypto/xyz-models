@@ -86,3 +86,11 @@ vars:
           _live.udf_api: MAX_BATCH_ROWS = 30
         ROLES:
           - INTERNAL_DEV
+    prod:
+      API_INTEGRATION: AWS_LIVE_QUERY
+      EXTERNAL_FUNCTION_URI: bqco8lkjsb.execute-api.us-east-1.amazonaws.com/prod/
+      ROLES:
+        - VELOCITY_INTERNAL
+        - VELOCITY_ETHEREUM
+        - INTERNAL_DEV
+        - BI_ANALYTICS_READER

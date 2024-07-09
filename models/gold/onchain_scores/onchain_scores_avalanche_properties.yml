@@ -5,7 +5,7 @@ version: 2
 models:
   - name: onchain_scores__avalanche
     description: Onchain scores for Avalanche user addresses 
-    latest_version: 1
+    latest_version: 2
 
     columns:
       - name: id 

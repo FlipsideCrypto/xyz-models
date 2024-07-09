@@ -1,0 +1,12 @@
+{% macro grant_evm_source_privileges(database) %}
+    
+    GRANT USAGE ON DATABASE {{ database }} TO ROLE DBT_CLOUD_DATASCIENCE;
+    GRANT USAGE ON SCHEMA {{ database }}.CORE TO ROLE DBT_CLOUD_DATASCIENCE;
+    GRANT SELECT ON ALL VIEWS IN SCHEMA {{ database }}.CORE TO ROLE DBT_CLOUD_DATASCIENCE;
+    GRANT USAGE  ON SCHEMA {{ database }}.DEFI TO ROLE DBT_CLOUD_DATASCIENCE;
+    GRANT SELECT ON ALL VIEWS IN SCHEMA {{ database }}.DEFI TO ROLE DBT_CLOUD_DATASCIENCE;
+    GRANT USAGE  ON SCHEMA {{ database }}.NFT TO ROLE DBT_CLOUD_DATASCIENCE;    
+    GRANT SELECT ON ALL VIEWS IN SCHEMA {{ database }}.NFT TO ROLE DBT_CLOUD_DATASCIENCE;
+
+    {% do log('Granted EVM source db privileges', info=True) %}
+{% endmacro %}
