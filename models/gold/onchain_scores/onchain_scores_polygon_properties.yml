@@ -15,4 +15,5 @@ models:
       - v: 1 
         defined_in: onchain_scores__polygon_v1
         description: Initial version of the model
-      
+        config:
+          alias: polygon

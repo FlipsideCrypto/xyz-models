@@ -143,6 +143,7 @@ sources:
       - name: fact_transactions
       - name: ez_native_transfers
       - name: ez_token_transfers
+      - name: ez_decoded_event_logs
   - name: arbitrum_gold_defi
     database: "{{ 'arbitrum' if target.database == 'datascience' else 'arbitrum_dev' }}"
     schema: defi
