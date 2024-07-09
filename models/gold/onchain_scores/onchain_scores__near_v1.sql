@@ -177,7 +177,7 @@ delegation as (
   COUNT(*) AS n_delegations,
   COUNT(DISTINCT address) AS n_validators,
   from near.gov.fact_staking_actions
-  where events.block_timestamp >= current_date - 90
+  where block_timestamp >= current_date - 90
   and action in ('staking', 'deposited')
   AND
   signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
@@ -191,7 +191,7 @@ undelegation as (
   signer_id AS user_address,
   COUNT(*) AS n_undelegations
   from near.gov.fact_staking_actions
-  where events.block_timestamp >= current_date - 90
+  where block_timestamp >= current_date - 90
   and action in ('unstaking', 'withdrawing')
   AND
   signer_id NOT IN (SELECT contract_address FROM NEAR.CORE.DIM_FT_CONTRACT_METADATA)
