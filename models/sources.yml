@@ -90,6 +90,50 @@ sources:
     schema: nft
     tables:
       - name: ez_nft_sales
+  - name: polygon_gold_core
+    database: "{{ 'polygon' if target.database == 'datascience' else 'polygon_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_decoded_event_logs
+      - name: ez_token_transfers
+  - name: polygon_gold_defi
+    database: "{{ 'polygon' if target.database == 'datascience' else 'polygon_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+  - name: polygon_gold_nft
+    database: "{{ 'polygon' if target.database == 'datascience' else 'polygon_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+  - name: optimism_gold_core
+    database: "{{ 'optimism' if target.database == 'datascience' else 'optimism_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_token_transfers
+      - name: ez_decoded_event_logs
+  - name: optimism_gold_defi
+    database: "{{ 'optimism' if target.database == 'datascience' else 'optimism_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+      - name: dim_dex_liquidity_pools
+  - name: optimism_gold_nft
+    database: "{{ 'optimism' if target.database == 'datascience' else 'optimism_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
   - name: arbitrum_gold_core
     database: "{{ 'arbitrum' if target.database == 'datascience' else 'arbitrum_dev' }}"
     schema: core
@@ -107,6 +151,7 @@ sources:
       - name: ez_bridge_activity
       - name: ez_dex_swaps
       - name: dim_dex_liquidity_pools
+      - name: ez_decoded_event_logs
   - name: aptos_gold_core
     database: "{{ 'aptos' if target.database == 'datascience' else 'aptos_dev' }}"
     schema: core
