@@ -171,4 +171,30 @@ sources:
     schema: nft
     tables:
       - name: ez_nft_sales
+  - name: near_gold_core
+    database: "{{ 'near' if target.database == 'datascience' else 'near_dev' }}"
+    schema: core
+    tables:
+      - name: dim_address_labels
+      - name: fact_transactions
+      - name: dim_ft_contract_metadata
+      - name: ez_token_transfers
+  - name: near_gold_defi
+    database: "{{ 'near' if target.database == 'datascience' else 'near_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_activity
+      - name: ez_dex_swaps
+  - name: near_gold_nft
+    database: "{{ 'near' if target.database == 'datascience' else 'near_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+      - name: fact_nft_mints
+  - name: near_gold_gov
+    database: "{{ 'near' if target.database == 'datascience' else 'near_dev' }}"
+    schema: gov
+    tables:
+      - name: fact_staking_actions
+
 
