@@ -2,7 +2,7 @@
     materialized = 'table',
     unique_key = "full_entity_cluster_id",
     tags = ['entity_cluster'],
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address,address_group);"
 ) }}
 
 WITH labels AS (
