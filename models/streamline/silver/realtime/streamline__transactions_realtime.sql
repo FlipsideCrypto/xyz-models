@@ -5,8 +5,8 @@
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"transactions",
         "sql_limit" :"1000",
-        "producer_batch_size" :"100",
-        "worker_batch_size" :"100",
+        "producer_batch_size" :"50",
+        "worker_batch_size" :"50",
         "sql_source" :"{{this.identifier}}" }
     )
 ) }}
