@@ -206,6 +206,11 @@ sources:
       - name: ez_native_transfers
       - name: ez_token_transfers
       - name: ez_decoded_event_logs
+  - name: blast_gold_blitz
+    database: "{{ 'blast' if target.database == 'datascience' else 'blast_dev' }}"
+    schema: blitz
+    tables:
+      - name: ez_perp_trades
   - name: flow_gold_core
     database: "{{ 'flow' if target.database == 'datascience' else 'flow_dev' }}"
     schema: core

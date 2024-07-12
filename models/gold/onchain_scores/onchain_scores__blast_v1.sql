@@ -456,7 +456,7 @@ other_defi_base AS (
     
     select trader as user_address,
     tx_hash
-    from blast.blitz.ez_perp_trades
+    from {{ source('blast_gold_blitz','ez_perp_trades') }} 
     where block_timestamp >= CAST( '{{ current_date_var }}' AS DATE) - 90
     AND trader NOT IN (SELECT address FROM {{ source('blast_gold_core','dim_contracts') }})
     AND trader NOT IN (SELECT address FROM {{ source('blast_gold_core','dim_labels') }})
