@@ -196,5 +196,29 @@ sources:
     schema: gov
     tables:
       - name: fact_staking_actions
-
-
+  - name: flow_gold_core
+    database: "{{ 'flow' if target.database == 'datascience' else 'flow_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: dim_contract_labels
+      - name: ez_token_transfers
+      - name: fact_events
+      - name: fact_transactions
+  - name: flow_gold_defi
+    database: "{{ 'flow' if target.database == 'datascience' else 'flow_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_transactions
+      - name: ez_swaps
+  - name: flow_gold_nft
+    database: "{{ 'flow' if target.database == 'datascience' else 'flow_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+  - name: flow_gold_gov
+    database: "{{ 'flow' if target.database == 'datascience' else 'flow_dev' }}"
+    schema: gov
+    tables:
+      - name: ez_staking_actions
