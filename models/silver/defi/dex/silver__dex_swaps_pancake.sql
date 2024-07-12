@@ -67,7 +67,7 @@ SELECT
     tx_hash,
     event_index,
     event_address,
-    A.event_data :user :: STRING AS swapper,
+    COALESCE(NULLIF(A.event_data :user :: STRING, '0x0'), b.sender) AS swapper,
     CASE
         WHEN A.event_data :amount_x_in :: INT = 0 THEN TRIM(SPLIT_PART(SPLIT(A.event_type, ',') [1], '>', 1) :: STRING, ' ')
         WHEN A.event_data :amount_x_in :: INT != 0 THEN TRIM(SPLIT_PART(SPLIT(A.event_type, ',') [0], '<', 2) :: STRING, ' ')

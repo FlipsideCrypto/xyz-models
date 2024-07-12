@@ -7,7 +7,7 @@
     ('anieswap', ref('silver__dex_swaps_animeswap')),
     ('auxexchange', ref('silver__dex_swaps_auxexchange')),
     ('batswap', ref('silver__dex_swaps_batswap')),
-    ('cellan', ref('silver__dex_swaps_cellana')),
+    ('cellana', ref('silver__dex_swaps_cellana')),
     ('cetus', ref('silver__dex_swaps_cetus')),
     ('hippo', ref('silver__dex_swaps_hippo')),
     ('liquidswap', ref('silver__dex_swaps_liquidswap')),
@@ -15,9 +15,10 @@
     ('sushi', ref('silver__dex_swaps_sushi')),
     ('thala', ref('silver__dex_swaps_thala')),
     ('tsunami', ref('silver__dex_swaps_tsunami'))
-    ,    ('aires', ref('silver__dex_swaps_aires'))
+
 ]
  %}
+     {# ,    ('aires', ref('silver__dex_swaps_aires')) #}
 
 SELECT
     block_number,

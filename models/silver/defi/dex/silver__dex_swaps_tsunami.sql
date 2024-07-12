@@ -47,8 +47,33 @@ SELECT
     event_index,
     event_address,
     A.event_data :user AS swapper,
-    A.event_data :deposit_coin_type_info :account_address || ':' || A.event_data :deposit_coin_type_info :module_name || ':' || A.event_data :deposit_coin_type_info :struct_name AS token_in,
+    {# A.event_data :deposit_coin_type_info :account_address || ':' || A.event_data :deposit_coin_type_info :module_name || ':' || A.event_data :deposit_coin_type_info :struct_name AS token_in,
     A.event_data :withdraw_coin_type_info :account_address || ':' || A.event_data :withdraw_coin_type_info :module_name || ':' || A.event_data :withdraw_coin_type_info :struct_name AS token_out,
+    #}
+    REPLACE(
+        REPLACE(
+            utils.udf_hex_to_string(
+                SUBSTRING(
+                    A.event_data :deposit_coin_type_info :struct_name,
+                    3
+                )
+            ),
+            'Coin<'
+        ),
+        '>'
+    ) AS token_in,
+    REPLACE(
+        REPLACE(
+            utils.udf_hex_to_string(
+                SUBSTRING(
+                    A.event_data :withdraw_coin_type_info :struct_name,
+                    3
+                )
+            ),
+            'Coin<'
+        ),
+        '>'
+    ) AS token_out,
     A.event_data :deposit_amount :: INT AS amount_in_raw,
     A.event_data :withdraw_amount :: INT AS amount_out_raw,
     {{ dbt_utils.generate_surrogate_key(

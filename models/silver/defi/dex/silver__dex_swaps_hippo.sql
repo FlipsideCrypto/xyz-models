@@ -74,8 +74,30 @@ SELECT
         A.event_data :user,
         b.sender
     ) AS swapper,
-    A.event_data :x_type_info :account_address || ':' || A.event_data :x_type_info :module_name || ':' || A.event_data :x_type_info :struct_name AS token_in,
-    A.event_data :y_type_info :account_address || ':' || A.event_data :y_type_info :module_name || ':' || A.event_data :y_type_info :struct_name AS token_out,
+    REPLACE(
+        REPLACE(
+            utils.udf_hex_to_string(
+                SUBSTRING(
+                    A.event_data :x_type_info :struct_name,
+                    3
+                )
+            ),
+            'Coin<'
+        ),
+        '>'
+    ) AS token_in,
+    REPLACE(
+        REPLACE(
+            utils.udf_hex_to_string(
+                SUBSTRING(
+                    A.event_data :y_type_info :struct_name,
+                    3
+                )
+            ),
+            'Coin<'
+        ),
+        '>'
+    ) AS token_out,
     A.event_data :input_amount :: INT AS amount_in_raw,
     A.event_data :output_amount :: INT AS amount_out_raw,
     {{ dbt_utils.generate_surrogate_key(

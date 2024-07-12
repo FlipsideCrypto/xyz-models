@@ -7,8 +7,29 @@
     tags = ['noncore']
 ) }}
 
-WITH evnts AS (
+WITH tx AS (
 
+    SELECT
+        tx_hash,
+        block_timestamp,
+        sender
+    FROM
+        {{ ref(
+            'silver__transactions'
+        ) }}
+    WHERE
+        success
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp)
+    FROM
+        {{ this }}
+)
+{% endif %}
+),
+evnts AS (
     SELECT
         block_number,
         block_timestamp,
@@ -38,6 +59,72 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
+),
+pre_final AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        version,
+        tx_hash,
+        event_index,
+        event_address,
+        COALESCE(NULLIF(A.event_data :account :: STRING, '0x0'), b.sender) AS swapper,
+        {# event_data, #}
+        A.event_data :coin_b_info :account_address :: STRING AS coin_b_info_account_address,
+        utils.udf_hex_to_string(
+            SUBSTRING(
+                A.event_data :coin_b_info :module_name,
+                3
+            )
+        ) AS coin_b_info_module_name,
+        utils.udf_hex_to_string(
+            SUBSTRING(
+                A.event_data :coin_b_info :struct_name,
+                3
+            )
+        ) AS coin_b_info_struct_name,
+        A.event_data :coin_a_info :account_address :: STRING AS coin_a_info_account_address,
+        utils.udf_hex_to_string(
+            SUBSTRING(
+                A.event_data :coin_a_info :module_name,
+                3
+            )
+        ) AS coin_a_info_module_name,
+        utils.udf_hex_to_string(
+            SUBSTRING(
+                A.event_data :coin_a_info :struct_name,
+                3
+            )
+        ) AS coin_a_info_struct_name,
+        A.event_data :a_in :: INT AS a_in,
+        A.event_data :b_in :: INT AS b_in,
+        A.event_data :a_out :: INT AS a_out,
+        A.event_data :b_out :: INT AS b_out,
+        coin_b_info_account_address || '::' || coin_b_info_module_name || '::' || coin_b_info_struct_name AS coin_b_token,
+        coin_a_info_account_address || '::' || coin_a_info_module_name || '::' || coin_a_info_struct_name AS coin_a_token,
+        CASE
+            WHEN a_in = 0 THEN coin_b_token
+            WHEN a_in != 0 THEN coin_a_token
+        END AS token_in,
+        CASE
+            WHEN a_out = 0 THEN coin_b_token
+            WHEN a_out != 0 THEN coin_a_token
+        END AS token_out,
+        CASE
+            WHEN a_in = 0 THEN b_in
+            ELSE a_in
+        END AS amount_in_raw,
+        CASE
+            WHEN a_out = 0 THEN b_out
+            ELSE a_out
+        END AS amount_out_raw,
+        _inserted_timestamp
+    FROM
+        evnts A
+        JOIN tx b USING(
+            tx_hash,
+            block_timestamp
+        )
 )
 SELECT
     block_number,
@@ -46,23 +133,11 @@ SELECT
     tx_hash,
     event_index,
     event_address,
-    A.event_data :account AS swapper,
-    CASE
-        WHEN A.event_data :a_in :: INT = 0 THEN A.event_data :coin_b_info :account_address || ':' || A.event_data :coin_b_info :module_name || ':' || A.event_data :coin_b_info :struct_name
-        WHEN A.event_data :a_in :: INT != 0 THEN A.event_data :coin_a_info :account_address || ':' || A.event_data :coin_a_info :module_name || ':' || A.event_data :coin_a_info :struct_name
-    END AS token_in,
-    CASE
-        WHEN A.event_data :a_out :: INT = 0 THEN A.event_data :coin_b_info :account_address || ':' || A.event_data :coin_b_info :module_name || ':' || A.event_data :coin_b_info :struct_name
-        WHEN A.event_data :a_out :: INT != 0 THEN A.event_data :coin_a_info :account_address || ':' || A.event_data :coin_a_info :module_name || ':' || A.event_data :coin_a_info :struct_name
-    END AS token_out,
-    CASE
-        WHEN A.event_data: a_in :: INT = 0 THEN A.event_data: b_in :: INT
-        ELSE A.event_data: a_in :: INT
-    END AS amount_in_raw,
-    CASE
-        WHEN A.event_data: a_out :: INT = 0 THEN A.event_data: b_out :: INT
-        ELSE A.event_data: a_out :: INT
-    END AS amount_out_raw,
+    swapper,
+    token_in,
+    token_out,
+    amount_in_raw,
+    amount_out_raw,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_cetus_id,
@@ -71,4 +146,4 @@ SELECT
     _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    evnts A
+    pre_final

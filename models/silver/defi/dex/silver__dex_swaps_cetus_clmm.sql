@@ -4,9 +4,10 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
-    tags = ['noncore']
+    tags = ['noncore'],
+    enabled = false
 ) }}
-
+--not 100% sure what these are for cetus
 WITH evnts AS (
 
     SELECT
@@ -46,6 +47,7 @@ SELECT
     tx_hash,
     event_index,
     A.event_data :swap_from AS swapper,
+    event_data,
     {# CASE
     WHEN A.event_data :a_in :: INT = 0 THEN A.event_data :coin_b_info :account_address || ':' || A.event_data :coin_b_info :module_name || ':' || A.event_data :coin_b_info :struct_name
     WHEN A.event_data :a_in :: INT != 0 THEN A.event_data :coin_a_info :account_address || ':' || A.event_data :coin_a_info :module_name || ':' || A.event_data :coin_a_info :struct_name
