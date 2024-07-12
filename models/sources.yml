@@ -196,5 +196,16 @@ sources:
     schema: gov
     tables:
       - name: fact_staking_actions
+  - name: blast_gold_core
+    database: "{{ 'blast' if target.database == 'datascience' else 'blast_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: ez_native_transfers
+      - name: ez_token_transfers
+      - name: ez_decoded_event_logs
+
 
 
