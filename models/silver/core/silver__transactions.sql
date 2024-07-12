@@ -5,6 +5,7 @@
   incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
   merge_exclude_columns = ["inserted_timestamp"],
   cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','tx_type'],
+  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash,version,sender);",
   tags = ['core','full_test']
 ) }}
 -- depends_on: {{ ref('bronze__streamline_blocks_tx') }}

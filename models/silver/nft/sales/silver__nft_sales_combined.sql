@@ -4,6 +4,7 @@
     incremental_strategy = 'merge',
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, buyer_address, seller_address, nft_address);",
     tags = ['noncore']
 ) }}
 

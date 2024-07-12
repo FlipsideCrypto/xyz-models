@@ -4,6 +4,7 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['_inserted_timestamp::DATE'],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(domain,domain_with_suffix,owner_address,registered_address,token_name);",
     tags = ['noncore']
 ) }}
 

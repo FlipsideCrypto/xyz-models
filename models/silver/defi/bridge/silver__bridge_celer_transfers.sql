@@ -4,6 +4,7 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, sender, receiver);",
     tags = ['noncore']
 ) }}
 
@@ -85,16 +86,19 @@ SELECT
         WHEN event_data :to_chain :: INT = 12360001 THEN 'Aptos'
         WHEN event_data :to_chain :: INT = 1 THEN 'Ethereum'
         WHEN event_data :to_chain :: INT = 56 THEN 'BSC'
-        WHEN left(event_data :to_chain,2) = '56' THEN 'BSC'
+        WHEN LEFT(
+            event_data :to_chain,
+            2
+        ) = '56' THEN 'BSC'
     END AS destination_chain_name,
     event_data :coin_id :: STRING AS token_address,
     event_data :amt :: INT AS amount_unadj,
-     {{ dbt_utils.generate_surrogate_key(
+    {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_celer_transfers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    a._inserted_timestamp,
+    A._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     evnts A
@@ -122,19 +126,21 @@ SELECT
         WHEN event_data :ref_chain_id :: INT = 12360001 THEN 'Aptos'
         WHEN event_data :ref_chain_id :: INT = 1 THEN 'Ethereum'
         WHEN event_data :ref_chain_id :: INT = 56 THEN 'BSC'
-        WHEN left(event_data :ref_chain_id,2) = '56' THEN 'BSC'
-        
+        WHEN LEFT(
+            event_data :ref_chain_id,
+            2
+        ) = '56' THEN 'BSC'
     END AS source_chain_name,
     12360001 AS destination_chain_id,
     'Aptos' AS destination_chain_name,
     event_data :coin_id :: STRING AS token_address,
     event_data :amt :: INT AS amount_unadj,
-     {{ dbt_utils.generate_surrogate_key(
+    {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_celer_transfers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    a._inserted_timestamp,
+    A._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     evnts A
