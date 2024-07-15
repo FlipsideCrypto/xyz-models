@@ -3,7 +3,8 @@
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
   unique_key = 'transfer_id',
-  cluster_by = ["_partition_by_address_group_from_entity", "_partition_by_address_group_to_entity", "_modified_timestamp"],
+  cluster_by = ["block_timestamp::DATE","_partition_by_address_group_from_entity", "_partition_by_address_group_to_entity", "_modified_timestamp"],
+  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_id,from_entity,to_entity);"
   snowflake_warehouse = "DBT_EMERGENCY"
 ) }}
 

@@ -2,7 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
-    cluster_by = ["block_number", "block_timestamp::DATE"],
+    cluster_by = ["block_timestamp::DATE","round(block_number,-3)'"],
     tags = ["core", "ez", "scheduled_non_core" ],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
