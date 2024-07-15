@@ -35,7 +35,7 @@ silver:
 
 onchain_scores:
 	@dbt run \
-		-s onchain_scores__flow_v1 \
+		-s onchain_scores__blast_v1 \
 		--profile datascience \
 		--target dev \
 		--profiles-dir ~/.dbt 
