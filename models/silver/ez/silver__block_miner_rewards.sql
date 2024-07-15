@@ -2,7 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
-    cluster_by = ["block_timestamp::DATE","round(block_number,-3)'"],
+    cluster_by = ["block_timestamp::DATE","round(block_number,-3)"],
     tags = ["core", "ez", "scheduled_non_core" ],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
 ) }}
@@ -54,7 +54,7 @@ coinbase AS (
         block_number,
         coinbase,
         output_value AS coinbase_value,
-        STREAMLINE.UDF_DECODE_HEX_TO_STRING(coinbase) AS coinbase_decoded
+        streamline.udf_decode_hex_to_string(coinbase) AS coinbase_decoded
     FROM
         transactions
     WHERE
