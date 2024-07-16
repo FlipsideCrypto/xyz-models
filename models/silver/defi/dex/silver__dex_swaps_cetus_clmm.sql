@@ -7,7 +7,7 @@
     tags = ['noncore'],
     enabled = false
 ) }}
---not 100% sure what these are for cetus
+--not 100% sure what these are for cetus, not enabled
 WITH evnts AS (
 
     SELECT
