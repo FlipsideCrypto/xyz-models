@@ -5,9 +5,9 @@
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['noncore','full_test']
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash,version,swapper);",
+    tags = ['noncore']
 ) }}
-{# post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(version,swapper);", #}
 
 SELECT
     block_number,
