@@ -46,33 +46,28 @@ SELECT
     tx_hash,
     event_index,
     event_address,
-    A.event_data :user AS swapper,
-    {# A.event_data :deposit_coin_type_info :account_address || ':' || A.event_data :deposit_coin_type_info :module_name || ':' || A.event_data :deposit_coin_type_info :struct_name AS token_in,
-    A.event_data :withdraw_coin_type_info :account_address || ':' || A.event_data :withdraw_coin_type_info :module_name || ':' || A.event_data :withdraw_coin_type_info :struct_name AS token_out,
-    #}
-    REPLACE(
-        REPLACE(
-            utils.udf_hex_to_string(
-                SUBSTRING(
-                    A.event_data :deposit_coin_type_info :struct_name,
-                    3
-                )
-            ),
-            'Coin<'
-        ),
-        '>'
+    A.event_data :user :: STRING AS swapper,
+    A.event_data :deposit_coin_type_info :account_address || '::' || utils.udf_hex_to_string(
+        SUBSTRING(
+            A.event_data :deposit_coin_type_info :module_name,
+            3
+        )
+    ) || '::' || utils.udf_hex_to_string(
+        SUBSTRING(
+            A.event_data :deposit_coin_type_info :struct_name,
+            3
+        )
     ) AS token_in,
-    REPLACE(
-        REPLACE(
-            utils.udf_hex_to_string(
-                SUBSTRING(
-                    A.event_data :withdraw_coin_type_info :struct_name,
-                    3
-                )
-            ),
-            'Coin<'
-        ),
-        '>'
+    A.event_data :withdraw_coin_type_info :account_address || '::' || utils.udf_hex_to_string(
+        SUBSTRING(
+            A.event_data :withdraw_coin_type_info :module_name,
+            3
+        )
+    ) || '::' || utils.udf_hex_to_string(
+        SUBSTRING(
+            A.event_data :withdraw_coin_type_info :struct_name,
+            3
+        )
     ) AS token_out,
     A.event_data :deposit_amount :: INT AS amount_in_unadj,
     A.event_data :withdraw_amount :: INT AS amount_out_unadj,
