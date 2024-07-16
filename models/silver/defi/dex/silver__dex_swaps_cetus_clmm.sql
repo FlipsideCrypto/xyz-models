@@ -57,8 +57,8 @@ CASE
     WHEN A.event_data :a_out :: INT != 0 THEN A.event_data :coin_a_info :account_address || ':' || A.event_data :coin_a_info :module_name || ':' || A.event_data :coin_a_info :struct_name
 END AS token_out,
 #}
-A.event_data: amount_in :: INT AS amount_in_raw,
-A.event_data: amount_out :: INT AS amount_out_raw,
+A.event_data: amount_in :: INT AS amount_in_unadj,
+A.event_data: amount_out :: INT AS amount_out_unadj,
 {{ dbt_utils.generate_surrogate_key(
     ['tx_hash','event_index']
 ) }} AS dex_swaps_cetus_id,

@@ -81,8 +81,8 @@ SELECT
         WHEN event_data :idx_out :: INT > 0 THEN TRIM(SPLIT(event_type, ',') [1], ' ')
         ELSE TRIM(SPLIT(event_type, ',') [1], ' ')
     END AS token_out,
-    event_data :amount_in :: INT AS amount_in_raw,
-    event_data :amount_out :: INT AS amount_out_raw,
+    event_data :amount_in :: INT AS amount_in_unadj,
+    event_data :amount_out :: INT AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_thala_id,

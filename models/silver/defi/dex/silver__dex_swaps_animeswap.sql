@@ -79,11 +79,11 @@ SELECT
     CASE
         WHEN A.event_data: amount_x_in :: INT = 0 THEN A.event_data: amount_y_in :: INT
         ELSE A.event_data: amount_x_in :: INT
-    END AS amount_in_raw,
+    END AS amount_in_unadj,
     CASE
         WHEN A.event_data: amount_y_out :: INT = 0 THEN A.event_data: amount_x_out :: INT
         ELSE A.event_data: amount_y_out :: INT
-    END AS amount_out_raw,
+    END AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_animeswap_id,

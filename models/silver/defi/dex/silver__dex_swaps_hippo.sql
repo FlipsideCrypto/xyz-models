@@ -98,8 +98,8 @@ SELECT
         ),
         '>'
     ) AS token_out,
-    A.event_data :input_amount :: INT AS amount_in_raw,
-    A.event_data :output_amount :: INT AS amount_out_raw,
+    A.event_data :input_amount :: INT AS amount_in_unadj,
+    A.event_data :output_amount :: INT AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_hippo_id,

@@ -36,13 +36,13 @@ models:
           - not_null
 
 
-      - name: AMOUNT_IN_RAW
+      - name: AMOUNT_IN_unadj
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - NUMBER
                 - FLOAT
-      - name: AMOUNT_OUT_RAW
+      - name: AMOUNT_OUT_unadj
         tests:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:

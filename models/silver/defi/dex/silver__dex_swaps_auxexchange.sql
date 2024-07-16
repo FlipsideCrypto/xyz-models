@@ -70,8 +70,8 @@ SELECT
     b.sender AS swapper,
     event_data: in_coin_type :: STRING AS token_in,
     event_data: out_coin_type :: STRING AS token_out,
-    event_data :in_au :: INT AS amount_in_raw,
-    event_data :out_au :: INT AS amount_out_raw,
+    event_data :in_au :: INT AS amount_in_unadj,
+    event_data :out_au :: INT AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_aux_exchange_id,

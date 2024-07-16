@@ -113,11 +113,11 @@ pre_final AS (
         CASE
             WHEN a_in = 0 THEN b_in
             ELSE a_in
-        END AS amount_in_raw,
+        END AS amount_in_unadj,
         CASE
             WHEN a_out = 0 THEN b_out
             ELSE a_out
-        END AS amount_out_raw,
+        END AS amount_out_unadj,
         _inserted_timestamp
     FROM
         evnts A
@@ -136,8 +136,8 @@ SELECT
     swapper,
     token_in,
     token_out,
-    amount_in_raw,
-    amount_out_raw,
+    amount_in_unadj,
+    amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_cetus_id,

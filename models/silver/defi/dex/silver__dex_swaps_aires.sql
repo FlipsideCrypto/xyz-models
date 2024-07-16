@@ -7,7 +7,7 @@
     tags = ['noncore'],
     enabled = false
 ) }}
--- pretty sure this is an aggregator
+-- pretty sure this is an aggregator (not included for now)
 WITH evnts AS (
 
     SELECT

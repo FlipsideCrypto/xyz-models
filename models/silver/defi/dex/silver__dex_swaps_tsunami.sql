@@ -74,8 +74,8 @@ SELECT
         ),
         '>'
     ) AS token_out,
-    A.event_data :deposit_amount :: INT AS amount_in_raw,
-    A.event_data :withdraw_amount :: INT AS amount_out_raw,
+    A.event_data :deposit_amount :: INT AS amount_in_unadj,
+    A.event_data :withdraw_amount :: INT AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_tsunami_id,

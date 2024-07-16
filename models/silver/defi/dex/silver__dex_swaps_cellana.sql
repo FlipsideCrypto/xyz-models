@@ -71,8 +71,8 @@ SELECT
     {# event_data: pool :: STRING AS pool_address, #}
     event_data: from_token :: STRING AS token_in,
     event_data: to_token :: STRING AS token_out,
-    event_data :amount_in :: INT AS amount_in_raw,
-    event_data :amount_out :: INT AS amount_out_raw,
+    event_data :amount_in :: INT AS amount_in_unadj,
+    event_data :amount_out :: INT AS amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_cellana_id,
