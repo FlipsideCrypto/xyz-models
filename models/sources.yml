@@ -264,3 +264,17 @@ sources:
       - name: fact_stake_pool_actions
       - name: fact_swaps
       - name: fact_bridge_activity
+  - name: thorchain_gold_core
+    database: "{{ 'thorchain' if target.database == 'datascience' else 'thorchain_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: fact_transfers
+  - name: thorchain_gold_defi
+    database: "{{ 'thorchain' if target.database == 'datascience' else 'thorchain_dev' }}"
+    schema: defi
+    tables:
+      - name: fact_swaps_events
+      - name: fact_liquidity_actions
+      - name: fact_loan_open_events
+      - name: fact_loan_repayment_events
