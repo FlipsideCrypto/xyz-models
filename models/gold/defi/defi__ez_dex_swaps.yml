@@ -1,0 +1,77 @@
+version: 2
+models:
+  - name: defi__ez_dex_swaps
+    description: '{{ doc("defi__ez_dex_swaps") }}'
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - TX_HASH
+            - EVENT_INDEX
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+        tests:
+          - not_null
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'  
+        tests:
+          - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 1
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+        tests:
+          - not_null
+      - name: EVENT_INDEX
+        description: '{{ doc("event_index") }}'   
+        tests:
+          - not_null
+      - name: AMOUNT_IN_UNADJ
+        description: '{{ doc("amount_in_unadj") }}'
+        tests:
+          - not_null
+      - name: AMOUNT_OUT_UNADJ
+        description: '{{ doc("amount_out_unadj") }}'
+        tests:
+          - not_null
+      - name: TOKEN_IN
+        description: '{{ doc("token_in") }}'
+        tests:
+          - not_null
+      - name: TOKEN_OUT
+        description: '{{ doc("token_out") }}'
+        tests:
+          - not_null
+      - name: SYMBOL_IN
+        description: '{{ doc("token_out") }}'
+      - name: SYMBOL_OUT
+        description: '{{ doc("token_out") }}'
+      - name: AMOUNT_IN
+        description: '{{ doc("token_out") }}'
+      - name: AMOUNT_OUT
+        description: '{{ doc("token_out") }}'
+      - name: AMOUNT_IN_USD
+        description: '{{ doc("token_out") }}'
+      - name: AMOUNT_OUT_USD
+        description: '{{ doc("token_out") }}'
+      - name: SWAPPER
+        description: '{{ doc("swapper") }}'
+        tests:
+          - not_null
+      - name: PLATFORM
+        description: '{{ doc("swap_platform") }}'
+        tests:
+          - not_null
+      - name: EZ_DEX_SWAPS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
