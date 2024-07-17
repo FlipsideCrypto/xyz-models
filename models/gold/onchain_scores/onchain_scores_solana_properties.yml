@@ -1,0 +1,20 @@
+version: 2
+
+# https://docs.getdbt.com/reference/model-properties
+
+models:
+  - name: onchain_scores__solana
+    description: Onchain scores for solana user addresses 
+    latest_version: 1
+
+    columns:
+      - name: id 
+        description: MD5 of blockchain, user_address & score_date
+        
+    versions:
+      - v: 1 
+        defined_in: onchain_scores__solana_v1
+        description: Initial version of the model
+        config:
+          alias: solana
+      

@@ -237,3 +237,30 @@ sources:
     schema: gov
     tables:
       - name: ez_staking_actions
+  - name: solana_gold_core
+    database: "{{ 'solana' if target.database == 'datascience' else 'solana_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_contracts
+      - name: fact_transactions
+      - name: fact_transfers
+  - name: solana_gold_nft
+    database: "{{ 'solana' if target.database == 'datascience' else 'solana_dev' }}"
+    schema: nft
+    tables:
+      - name: fact_nft_sales
+      - name: fact_nft_mints
+  - name: solana_gold_gov
+    database: "{{ 'solana' if target.database == 'datascience' else 'solana_dev' }}"
+    schema: gov
+    tables:
+      - name: fact_proposal_votes
+  - name: solana_gold_defi
+    database: "{{ 'solana' if target.database == 'datascience' else 'solana_dev' }}"
+    schema: defi
+    tables:
+      - name: fact_liquidity_pool_actions
+      - name: fact_stake_pool_actions
+      - name: fact_swaps
+      - name: fact_bridge_activity
