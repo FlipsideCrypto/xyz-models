@@ -3,7 +3,7 @@
     unique_key = "dex_swaps_animeswap_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+    cluster_by = ['modified_timestamp::DATE'],
     tags = ['noncore']
 ) }}
 
@@ -12,22 +12,14 @@ WITH tx AS (
     SELECT
         tx_hash,
         block_timestamp,
-        sender
+        sender,
+        modified_timestamp
     FROM
         {{ ref(
             'silver__transactions'
         ) }}
     WHERE
         success
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 evnts AS (
     SELECT
@@ -41,7 +33,7 @@ evnts AS (
         event_resource,
         event_data,
         event_type,
-        _inserted_timestamp
+        modified_timestamp
     FROM
         {{ ref(
             'silver__events'
@@ -50,15 +42,6 @@ evnts AS (
         event_address = '0x16fe2df00ea7dde4a63409201f7f4e536bde7bb7335526a35d05111e68aa322c'
         AND event_resource ILIKE 'SwapEvent%'
         AND success
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
 )
 SELECT
     block_number,
@@ -89,7 +72,6 @@ SELECT
     ) }} AS dex_swaps_animeswap_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     evnts A
@@ -97,3 +79,16 @@ FROM
         tx_hash,
         block_timestamp
     )
+
+{% if is_incremental() %}
+WHERE
+    GREATEST(
+        A.modified_timestamp,
+        b.modified_timestamp
+    ) >= (
+        SELECT
+            MAX(modified_timestamp)
+        FROM
+            {{ this }}
+    )
+{% endif %}

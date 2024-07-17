@@ -3,7 +3,7 @@
     unique_key = "dex_swaps_cetus_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+    cluster_by = ['modified_timestamp::DATE'],
     tags = ['noncore']
 ) }}
 
@@ -12,22 +12,14 @@ WITH tx AS (
     SELECT
         tx_hash,
         block_timestamp,
-        sender
+        sender,
+        modified_timestamp
     FROM
         {{ ref(
             'silver__transactions'
         ) }}
     WHERE
         success
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 evnts AS (
     SELECT
@@ -41,7 +33,7 @@ evnts AS (
         event_resource,
         event_data,
         event_type,
-        _inserted_timestamp
+        modified_timestamp
     FROM
         {{ ref(
             'silver__events'
@@ -50,15 +42,6 @@ evnts AS (
         event_address = '0xec42a352cc65eca17a9fa85d0fc602295897ed6b8b8af6a6c79ef490eb8f9eba'
         AND event_resource ILIKE 'SwapEvent%'
         AND success
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 pre_final AS (
     SELECT
@@ -117,14 +100,26 @@ pre_final AS (
         CASE
             WHEN a_out = 0 THEN b_out
             ELSE a_out
-        END AS amount_out_unadj,
-        _inserted_timestamp
+        END AS amount_out_unadj
     FROM
         evnts A
         JOIN tx b USING(
             tx_hash,
             block_timestamp
         )
+
+{% if is_incremental() %}
+WHERE
+    GREATEST(
+        A.modified_timestamp,
+        b.modified_timestamp
+    ) >= (
+        SELECT
+            MAX(modified_timestamp)
+        FROM
+            {{ this }}
+    )
+{% endif %}
 )
 SELECT
     block_number,
@@ -143,7 +138,6 @@ SELECT
     ) }} AS dex_swaps_cetus_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     pre_final

@@ -3,8 +3,7 @@
     unique_key = "dex_swaps_tsunami_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
-    tags = ['noncore']
+    cluster_by = ['modified_timestamp::DATE'],
 ) }}
 
 WITH evnts AS (
@@ -19,8 +18,7 @@ WITH evnts AS (
         event_address,
         event_resource,
         event_data,
-        event_type,
-        _inserted_timestamp
+        event_type
     FROM
         {{ ref(
             'silver__events'
@@ -31,9 +29,9 @@ WITH evnts AS (
         AND success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp)
+        MAX(modified_timestamp)
     FROM
         {{ this }}
 )
@@ -76,7 +74,6 @@ SELECT
     ) }} AS dex_swaps_tsunami_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     evnts A

@@ -3,7 +3,7 @@
     unique_key = "dex_swaps_aires_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
+    cluster_by = ['modified_timestamp::DATE'],
     tags = ['noncore'],
     enabled = false
 ) }}
@@ -34,9 +34,9 @@ WITH evnts AS (
         AND block_timestamp :: DATE >= '2024-06-01'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp)
+        MAX(modified_timestamp)
     FROM
         {{ this }}
 )

@@ -4,7 +4,7 @@
 ) }}
 
 {% set models = [
-    ('anieswap', ref('silver__dex_swaps_animeswap')),
+    ('animeswap', ref('silver__dex_swaps_animeswap')),
     ('auxexchange', ref('silver__dex_swaps_auxexchange')),
     ('batswap', ref('silver__dex_swaps_batswap')),
     ('cellana', ref('silver__dex_swaps_cellana')),
@@ -36,7 +36,6 @@ SELECT
     dex_swaps_animeswap_id AS dex_swaps_combined_id,
     inserted_timestamp,
     modified_timestamp,
-    _inserted_timestamp,
     _invocation_id
 FROM
     ({% for models in models %}
