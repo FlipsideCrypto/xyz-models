@@ -278,3 +278,15 @@ sources:
       - name: fact_liquidity_actions
       - name: fact_loan_open_events
       - name: fact_loan_repayment_events
+  - name: axelar_axelscan
+    database: "{{ 'axelar' if target.database == 'datascience' else 'axelar_dev' }}"
+    schema: axelscan
+    tables:
+      - name: fact_gmp
+      - name: fact_transfers
+  - name: axelar_defi
+    database: "{{ 'axelar' if target.database == 'datascience' else 'axelar_dev' }}"
+    schema: defi
+    tables:
+      - name: ez_bridge_squid
+      - name: ez_bridge_satellite
