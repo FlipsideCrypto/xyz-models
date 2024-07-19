@@ -290,3 +290,28 @@ sources:
     tables:
       - name: ez_bridge_squid
       - name: ez_bridge_satellite
+  - name: sei_gold_core
+    database: "{{ 'sei' if target.database == 'datascience' else 'sei_dev' }}"
+    schema: core
+    tables:
+      - name: dim_labels
+      - name: dim_tokens
+      - name: fact_transactions
+      - name: fact_msg_attributes
+      - name: fact_transfers
+  - name: sei_gold_nft
+    database: "{{ 'sei' if target.database == 'datascience' else 'sei_dev' }}"
+    schema: nft
+    tables:
+      - name: ez_nft_sales
+  - name: sei_gold_defi
+    database: "{{ 'sei' if target.database == 'datascience' else 'sei_dev' }}"
+    schema: defi
+    tables:
+      - name: fact_dex_swaps
+      - name: fact_lp_actions
+  - name: sei_gold_gov
+    database: "{{ 'sei' if target.database == 'datascience' else 'sei_dev' }}"
+    schema: gov
+    tables:
+      - name: fact_staking
