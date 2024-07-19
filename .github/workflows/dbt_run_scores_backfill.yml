@@ -96,17 +96,17 @@ jobs:
         with:
           python-version: "3.7.x"
 
-      - name: install dependencies
-        run: |
-          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
-          dbt deps
+      # - name: install dependencies
+      #   run: |
+      #     pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
+      #     dbt deps
 
       - name: Run DBT Jobs
         run: |
-          IFS=':' read -ra DATE_RANGE <<< "${{ matrix.date_range }}"
+          IFS=':' read -ra DATE_RANGE <<< "2024-04-10:2024-04-14"
           start_date=${DATE_RANGE[0]}
           end_date=${DATE_RANGE[1]}
-          while [[ "$start_date" <= "$end_date" ]]
+          while [[ $(date -d "$start_date" +%s) -le $(date -d "$end_date" +%s) ]]
           do
             echo "Running dbt job for $start_date"
             start_date=$(date -I -d "$start_date + 1 day")
