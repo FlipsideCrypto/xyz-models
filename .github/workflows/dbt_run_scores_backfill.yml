@@ -18,9 +18,8 @@ on:
         required: true 
         options:
           - DBT
-          - DBT_CLOUD
-          - DBT_EMERGENCY
-        default: DBT
+          - DATA_SCIENCE
+        default: DATA_SCIENCE
       chain:
         type: string
         description: 'Chain to run the score backfill on'
@@ -35,10 +34,15 @@ on:
         required: true
       days_per_range:
         type: number
-        description: 'Number of concurnet days to backfill'
+        description: 'Number of days per range'
         required: true
         default: 5
-
+      enable_concurrency:
+        type: boolean
+        description: 'Enable intra range concurrent dbt runs'
+        required: true
+        default: false
+      
 env:
   USE_VARS: "${{ vars.USE_VARS }}"
   DBT_PROFILES_DIR: "${{ vars.DBT_PROFILES_DIR }}"
@@ -49,7 +53,7 @@ env:
   PASSWORD: "${{ secrets.PASSWORD }}"
   REGION: "${{ vars.REGION }}"
   DATABASE: "${{ vars.DATABASE }}"
-  WAREHOUSE: "${{ vars.WAREHOUSE }}"
+  WAREHOUSE: "${{ inputs.warehouse }}"
   SCHEMA: "${{ vars.SCHEMA }}"
 
 concurrency:
@@ -119,13 +123,26 @@ jobs:
 
       - name: Run DBT Jobs
         run: |
+          # Split the date range into start and end dates
           IFS=':' read -ra DATE_RANGE <<< "${{ matrix.date_range }}"
           start_date=${DATE_RANGE[0]}
           end_date=${DATE_RANGE[1]}
+          
+          # Loop over each date in the range
           while [[ $(date -d "$start_date" +%s) -le $(date -d "$end_date" +%s) ]]
           do
             echo "Running dbt job for $start_date"
-            dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}' &
+          
+            if [[ "${{ inputs.enable_concurrency }}" == "true" ]]; then
+              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}' &
+            else
+              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}'
+            fi
+          
             start_date=$(date -I -d "$start_date + 1 day")
           done
-          wait
+          
+          # If concurrency is enabled, wait for all background jobs to finish
+          if [[ "${{ inputs.enable_concurrency }}" == "true" ]]; then
+            wait
+          fi
