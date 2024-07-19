@@ -134,9 +134,9 @@ jobs:
             echo "Running dbt job for $start_date"
           
             if [[ "${{ inputs.enable_concurrency }}" == "true" ]]; then
-              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}' &
+              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars "{\"current_date_var\": \"$start_date\"}" &
             else
-              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}'
+              dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars "{\"current_date_var\": \"$start_date\"}"
             fi
           
             start_date=$(date -I -d "$start_date + 1 day")
