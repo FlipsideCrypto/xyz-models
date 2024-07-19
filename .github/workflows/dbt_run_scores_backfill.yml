@@ -109,5 +109,7 @@ jobs:
           while [[ $(date -d "$start_date" +%s) -le $(date -d "$end_date" +%s) ]]
           do
             echo "Running dbt job for $start_date"
+            dbt run -m onchain_scores__avalanche,version:latest --vars '{"current_date_var": "$start_date"}' &
             start_date=$(date -I -d "$start_date + 1 day")
           done
+          wait
