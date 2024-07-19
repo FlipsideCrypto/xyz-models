@@ -1,5 +1,5 @@
-name: dbt_run_adhoc
-run-name: dbt_run_adhoc
+name: dbt_run_scores_backfill
+run-name: dbt_run_scores_backfill
 
 on:
   workflow_dispatch:
