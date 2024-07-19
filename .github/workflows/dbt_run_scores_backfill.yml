@@ -1,0 +1,113 @@
+name: dbt_run_scores_backfill
+run-name: dbt_run_scores_backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice 
+        description: DBT Run Environment
+        required: true
+        options:
+          - dev
+          - prod
+        default: dev
+      warehouse:
+        type: choice 
+        description: Snowflake warehouse
+        required: true 
+        options:
+          - DBT
+          - DBT_CLOUD
+          - DBT_EMERGENCY
+        default: DBT
+      dbt_command:
+        type: string
+        description: 'DBT Run Command'
+        required: true
+      start_date:
+        type: string
+        description: 'Start date (YYYY-MM-DD)'
+        required: true
+      end_date:
+        type: string
+        description: 'End date (YYYY-MM-DD)'
+        required: true
+      days_per_range:
+        type: number
+        description: 'Number of days per range'
+        required: true
+        default: 5
+
+jobs:
+  generate_date_ranges:
+    runs-on: ubuntu-latest
+    outputs:
+      date_ranges: ${{ steps.set-matrix.outputs.date_ranges }}
+    steps:
+      - name: Generate date ranges
+        id: set-matrix
+        run: |
+          start_date="${{ github.event.inputs.start_date }}"
+          end_date="${{ github.event.inputs.end_date }}"
+          days_per_range=${{ github.event.inputs.days_per_range }}
+          
+          ranges=()
+          current_start=$start_date
+          while [[ "$current_start" < "$end_date" ]]; do
+            range_end=$(date -I -d "$current_start + $((days_per_range - 1)) days")
+            if [[ "$range_end" > "$end_date" ]]; then
+              range_end=$end_date
+            fi
+            ranges+=("$current_start:$range_end")
+            current_start=$(date -I -d "$range_end + 1 day")
+          done
+          
+          # Convert the array to a JSON string manually
+          json_ranges="["
+          for range in "${ranges[@]}"; do
+            json_ranges+="\"$range\","
+          done
+          json_ranges="${json_ranges%,}]"
+          
+          # Escape the JSON string for GitHub Actions
+          escaped_json_ranges="${json_ranges//'%'/'%25'}"
+          escaped_json_ranges="${escaped_json_ranges//$'\n'/'%0A'}"
+          escaped_json_ranges="${escaped_json_ranges//$'\r'/'%0D'}"
+          
+          # Output the escaped JSON string
+          echo "date_ranges=$escaped_json_ranges" >> $GITHUB_OUTPUT
+        shell: /bin/bash
+
+  run_dbt_jobs:
+    needs: generate_date_ranges
+    runs-on: ubuntu-latest
+    environment: 
+      name: workflow_${{ inputs.environment }}
+
+    strategy:
+      matrix:
+        date_range: ${{fromJson(needs.generate_date_ranges.outputs.date_ranges)}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.7.x"
+
+      - name: install dependencies
+        run: |
+          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
+          dbt deps
+
+      - name: Run DBT Jobs
+        run: |
+          IFS=':' read -ra DATE_RANGE <<< "${{ matrix.date_range }}"
+          start_date=${DATE_RANGE[0]}
+          end_date=${DATE_RANGE[1]}
+          while [[ "$start_date" <= "$end_date" ]]
+          do
+            echo "Running dbt job for $start_date"
+            start_date=$(date -I -d "$start_date + 1 day")
+          done
