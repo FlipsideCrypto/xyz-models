@@ -23,6 +23,7 @@ on:
       chain:
         type: string
         description: 'Chain to run the score backfill on'
+=
         required: true
       start_date:
         type: string
