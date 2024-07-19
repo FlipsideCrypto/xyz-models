@@ -21,9 +21,9 @@ on:
           - DBT_CLOUD
           - DBT_EMERGENCY
         default: DBT
-      dbt_command:
+      chain:
         type: string
-        description: 'DBT Run Command'
+        description: 'Chain to run the score backfill on'
         required: true
       start_date:
         type: string
@@ -35,7 +35,7 @@ on:
         required: true
       days_per_range:
         type: number
-        description: 'Number of days per range'
+        description: 'Number of concurnet days to backfill'
         required: true
         default: 5
 
@@ -125,7 +125,7 @@ jobs:
           while [[ $(date -d "$start_date" +%s) -le $(date -d "$end_date" +%s) ]]
           do
             echo "Running dbt job for $start_date"
-            dbt run -s onchain_scores__avalanche,version:latest --vars '{"current_date_var": "$start_date"}' &
+            dbt run -s onchain_scores__${{ inputs.chain }},version:latest --vars '{"current_date_var": "$start_date"}' &
             start_date=$(date -I -d "$start_date + 1 day")
           done
           wait
