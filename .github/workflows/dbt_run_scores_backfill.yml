@@ -74,9 +74,9 @@ jobs:
           
           ranges=()
           current_start=$start_date
-          while [[ "$current_start" < "$end_date" ]]; do
+          while [[ $(date -d "$current_start" +%s) -le $(date -d "$end_date" +%s) ]]; do
             range_end=$(date -I -d "$current_start + $((days_per_range - 1)) days")
-            if [[ "$range_end" > "$end_date" ]]; then
+            if [[ $(date -d "$range_end" +%s) -gt $(date -d "$end_date" +%s) ]]; then
               range_end=$end_date
             fi
             ranges+=("$current_start:$range_end")
