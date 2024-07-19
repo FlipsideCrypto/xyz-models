@@ -77,7 +77,7 @@ jobs:
           
           # Output the escaped JSON string
           echo "date_ranges=$escaped_json_ranges" >> $GITHUB_OUTPUT
-        shell: /bin/bash
+        shell: bash
 
   run_dbt_jobs:
     needs: generate_date_ranges
