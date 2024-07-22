@@ -1,10 +1,9 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = "dex_swaps_thala_id",
+    unique_key = "dex_swaps_thala_v0_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['modified_timestamp::DATE'],
-    tags = ['noncore']
+    cluster_by = ['modified_timestamp::DATE']
 ) }}
 
 WITH tx AS (
@@ -20,6 +19,7 @@ WITH tx AS (
         ) }}
     WHERE
         success
+        AND block_timestamp :: DATE <= '2023-04-05'
 ),
 evnts AS (
     SELECT
@@ -45,59 +45,52 @@ evnts AS (
         )
         AND event_resource LIKE 'SwapEvent%'
         AND success
+        AND block_timestamp :: DATE <= '2023-04-05'
+),
+xfers AS (
+    SELECT
+        block_timestamp,
+        tx_hash,
+        amount,
+        token_address,
+        transfer_event
+    FROM
+        {{ ref('silver__transfers') }}
+    WHERE
+        success
+        AND block_timestamp :: DATE <= '2023-04-05'
 ),
 fin AS (
     SELECT
         block_number,
-        block_timestamp,
+        A.block_timestamp,
         version,
-        tx_hash,
+        A.tx_hash,
         event_index,
         event_address,
         b.sender AS swapper,
-        event_data :idx_in :: INT AS idx_in,
-        event_data :idx_out :: INT AS idx_out,
-        TRIM(SPLIT_PART(SPLIT(event_type, ',') [0], '<', 2), ' ') AS token_0,
-        CASE
-            WHEN event_data :idx_in :: INT > 0 THEN TRIM(SPLIT(event_type, ',') [1], ' ')
-            WHEN event_data :idx_in :: INT = 0 THEN TRIM(SPLIT_PART(SPLIT(event_type, ',') [0], '<', 2), ' ')
-            ELSE TRIM(SPLIT_PART(SPLIT(event_type, ',') [0], '<', 2), ' ')
-        END AS token_in_old,
-        CASE
-            WHEN event_data :idx_out :: INT = 0 THEN TRIM(SPLIT_PART(SPLIT(event_type, ',') [0], '<', 2), ' ')
-            WHEN event_data :idx_out :: INT > 0 THEN TRIM(SPLIT(event_type, ',') [1], ' ')
-            ELSE TRIM(SPLIT(event_type, ',') [1], ' ')
-        END AS token_out_old,
-        CASE
-            WHEN idx_in = 0 THEN token_0
-            ELSE TRIM(SPLIT(event_type, ',') [idx_in], ' ')
-        END AS token_in,
-        CASE
-            WHEN idx_out = 0 THEN token_0
-            ELSE TRIM(SPLIT(event_type, ',') [idx_out], ' ')
-        END AS token_out,
         event_data :amount_in :: INT AS amount_in_unadj,
-        event_data :amount_out :: INT AS amount_out_unadj
+        event_data :amount_out :: INT AS amount_out_unadj,
+        c_in.token_address AS token_in,
+        c_out.token_address AS token_out
     FROM
         evnts A
         JOIN tx b USING(
             tx_hash,
             block_timestamp
         )
+        JOIN xfers c_in
+        ON A.block_timestamp :: DATE = c_in.block_timestamp :: DATE
+        AND A.tx_hash = c_in.tx_hash
+        AND amount_in_unadj = c_in.amount
+        AND c_in.transfer_event = 'WithdrawEvent'
+        JOIN xfers c_out
+        ON A.block_timestamp :: DATE = c_out.block_timestamp :: DATE
+        AND A.tx_hash = c_out.tx_hash
+        AND amount_out_unadj = c_out.amount
+        AND c_out.transfer_event = 'DepositEvent'
     WHERE
-        idx_in IS NOT NULL
-
-{% if is_incremental() %}
-AND GREATEST(
-    A.modified_timestamp,
-    b.modified_timestamp
-) >= (
-    SELECT
-        MAX(modified_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
+        event_data :idx_in IS NULL
 )
 SELECT
     block_number,
@@ -113,7 +106,7 @@ SELECT
     amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
-    ) }} AS dex_swaps_thala_id,
+    ) }} AS dex_swaps_thala_v0_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
