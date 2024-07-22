@@ -14,6 +14,7 @@
     ('pancake', ref('silver__dex_swaps_pancake')),
     ('sushi', ref('silver__dex_swaps_sushi')),
     ('thala', ref('silver__dex_swaps_thala')),
+    ('thala', ref('silver__dex_swaps_thala_v0')),
     ('tsunami', ref('silver__dex_swaps_tsunami'))
 
 ]
