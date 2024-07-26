@@ -17,3 +17,6 @@ WHERE
         FROM
             {{ ref('streamline__chainhead') }}
     )
+UNION ALL
+SELECT
+    0 AS block_number
