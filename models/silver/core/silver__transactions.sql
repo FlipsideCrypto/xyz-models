@@ -92,7 +92,10 @@ WHERE
       from_transactions A
   )
 SELECT
-  block_timestamp,
+  COALESCE(
+    block_timestamp,
+    '1970-01-01 00:00:00.000'
+  ) AS block_timestamp,
   tx_hash,
   version,
   tx_type,
