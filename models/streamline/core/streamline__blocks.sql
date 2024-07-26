@@ -19,3 +19,6 @@ FROM
     ) }}
 WHERE
     _id <= {{ block_height }}
+UNION ALL
+SELECT
+    0 AS block_number
