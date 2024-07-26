@@ -130,7 +130,10 @@ WHERE
         b.value :signature :: STRING AS signature,
         b.value :state_change_hash :: STRING AS state_change_hash,
         b.value :state_checkpoint_hash :: STRING AS state_checkpoint_hash,
-        b.value :timestamp :: bigint AS TIMESTAMP,
+        COALESCE(
+          b.value :timestamp,
+          DATA :block_timestamp
+        ) :: bigint AS TIMESTAMP,
         b.value :vm_status :: STRING AS vm_status,
         {{ dbt_utils.generate_surrogate_key(
           ['tx_hash']
