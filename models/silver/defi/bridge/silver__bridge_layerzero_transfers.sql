@@ -82,7 +82,8 @@ chngs AS (
             WHEN change_module = 'coin' THEN change_data :coin :value
             WHEN change_module = 'oft' THEN change_data :locked_coin :value
         END :: INT AS amount,
-        change_resource :: STRING AS token_address
+        change_resource :: STRING AS token_address,
+        change_index
     FROM
         {{ ref('silver__changes') }}
     WHERE
@@ -112,7 +113,9 @@ chngs_2 AS (
         chngs
     WHERE
         change_module = 'coin'
-        AND token_address LIKE 'CoinInfo%'
+        AND token_address LIKE 'CoinInfo%' qualify(ROW_NUMBER() over(PARTITION BY tx_hash
+    ORDER BY
+        change_index DESC) = 1)
 )
 SELECT
     A.block_number,
