@@ -82,3 +82,6 @@ AND p.modified_timestamp >= (
         {{ this }}
 )
 {% endif %}
+qualify(ROW_NUMBER() over (PARTITION BY hour,token_address
+                    ORDER BY
+                    hour DESC)) = 1
