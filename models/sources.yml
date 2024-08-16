@@ -20,6 +20,12 @@ sources:
     tables:
       - name: blocks_tx
       - name: transactions
+      - name: evm_blocks
+      - name: evm_transactions
+      - name: evm_confirm_blocks
+      - name: evm_receipts
+      - name: evm_traces
+      - name: evm_decoded_logs
   - name: github_actions
     database: M1
     schema: github_actions
