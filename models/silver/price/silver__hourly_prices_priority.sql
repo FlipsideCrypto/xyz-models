@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['token_address', 'hour'],
-    incremental_strategy = 'merge',
+    incremental_strategy = 'delete+insert',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['HOUR::DATE'],
     tags = ['core']
