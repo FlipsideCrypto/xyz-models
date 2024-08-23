@@ -5,7 +5,7 @@ name: "xyz_models"
 version: "1.0.0"
 config-version: 2
 
-require-dbt-version: ">=1.4.0"
+require-dbt-version: ">=1.8.0"
 
 # This setting configures which "profile" dbt uses for this project.
 profile: "xyz"
@@ -52,3 +52,29 @@ on-run-start:
 
 on-run-end:
   - '{{ apply_meta_as_tags(results) }}'
+
+dispatch:
+  - macro_namespace: dbt
+    search_order:
+      - xyz-models
+      - dbt_snowflake_query_tags
+      - dbt
+
+query-comment:
+  comment: '{{ dbt_snowflake_query_tags.get_query_comment(node) }}'
+  append: true # Snowflake removes prefixed comments.
+
+vars:
+  "dbt_date:time_zone": GMT
+  OBSERV_FULL_TEST: False
+  START_GHA_TASKS: False
+  STREAMLINE_INVOKE_STREAMS: False
+  STREAMLINE_RUN_HISTORY: False
+  STREAMLINE_RETRY_UNKNOWN: False
+  UPDATE_SNOWFLAKE_TAGS: True
+  UPDATE_UDFS_AND_SPS: False 
+
+  API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}'
+  EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
+  ROLES: |
+      ["INTERNAL_DEV"]

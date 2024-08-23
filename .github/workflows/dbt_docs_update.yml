@@ -22,8 +22,7 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  scheduled_run:
-    name: docs_update
+  run_dbt_jobs:
     runs-on: ubuntu-latest
     environment: 
       name: workflow_prod
@@ -31,20 +30,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.7.x"
+          python-version: "${{ vars.PYTHON_VERSION }}"
+          cache: "pip"
 
       - name: install dependencies
         run: |
-          pip install dbt-snowflake==${{ vars.DBT_VERSION }}
+          pip install -r requirements.txt
           dbt deps
+      
+      - name: refresh ddl for datashare
+        run: |
+          cnt=$(dbt ls -m fsc_utils.datashare._datashare___create_gold | wc -l ); if [ $cnt -eq 1 ]; then dbt run -m fsc_utils.datashare._datashare___create_gold; fi; 
       - name: checkout docs branch
         run: |
-          git checkout -b docs origin/main
-          
+          git checkout -B docs origin/main
       - name: generate dbt docs
-        run: dbt docs generate -t prod
+        run: |
+          dbt ls -t prod
+          dbt docs generate --no-compile -t prod
 
       - name: move files to docs directory
         run: |
