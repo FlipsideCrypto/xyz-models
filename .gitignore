@@ -6,6 +6,8 @@ logs/
 
 .venv/
 .python-version
+dbt-env/
+venv/
 
 # Visual Studio Code files
 */.vscode
@@ -16,3 +18,4 @@ logs/
 .env
 .DS_Store
 .user.yml
+
