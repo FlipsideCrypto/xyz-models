@@ -12,7 +12,14 @@ sources:
     database: "{{ 'crosschain' if target.database == 'M1' else 'crosschain_dev' }}"
     schema: silver
     tables:
+      - name: asset_metadata_coin_market_cap
+      - name: asset_metadata_coin_gecko
+      - name: hourly_prices_coin_market_cap
+      - name: hourly_prices_coin_gecko
       - name: number_sequence
+      - name: labels_combined
+      - name: complete_native_asset_metadata
+      - name: complete_native_prices
   - name: bronze_streamline
     database: streamline
     schema: |
@@ -31,3 +38,8 @@ sources:
     schema: github_actions
     tables:
       - name: workflows
+  - name: crosschain_public
+    database: crosschain
+    schema: bronze_public
+    tables:
+      - name: user_abis

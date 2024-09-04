@@ -11,7 +11,9 @@ SELECT
             'Content-Type',
             'application/json',
             'fsc-quantum-state',
-            'livequery'
+            'livequery',
+            'User-Agent',
+            'Flipside_Crypto/0.1'
         ),
         OBJECT_CONSTRUCT(),
         'Vault/prod/m1/devnet'
