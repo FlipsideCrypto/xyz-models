@@ -2,9 +2,29 @@ version: 2
 
 sources:
   - name: crosschain
-    database: "{{ 'crosschain' if target.database == 'xyz' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'aleo' else 'crosschain_dev' }}"
     schema: core
     tables:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'ALEO' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence
+      - name: labels_combined
+
+  - name: bronze_streamline
+    database: streamline
+    schema: |
+      "{{ 'ALEO' if target.database == 'ALEO' else 'ALEO_DEV' }}"
+    tables:
+      - name: blocks
+      - name: transactions
+  - name: github_actions
+    database: ALEO
+    schema: github_actions
+    tables:
+      - name: workflows

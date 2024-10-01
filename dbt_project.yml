@@ -1,14 +1,14 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "xyz_models"
+name: "aleo_models"
 version: "1.0.0"
 config-version: 2
 
 require-dbt-version: ">=1.8.0"
 
 # This setting configures which "profile" dbt uses for this project.
-profile: "xyz"
+profile: "aleo"
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -38,10 +38,10 @@ models:
     relation: true
     columns: true
   +on_schema_change: "append_new_columns"
-
-vars:
-  "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
+  livequery_models:
+    deploy:
+      core:
+        materialized: ephemeral
 
 tests:
   +store_failures: true # all tests
@@ -56,7 +56,7 @@ on-run-end:
 dispatch:
   - macro_namespace: dbt
     search_order:
-      - xyz-models
+      - aleo-models
       - dbt_snowflake_query_tags
       - dbt
 
@@ -72,9 +72,43 @@ vars:
   STREAMLINE_RUN_HISTORY: False
   STREAMLINE_RETRY_UNKNOWN: False
   UPDATE_SNOWFLAKE_TAGS: True
-  UPDATE_UDFS_AND_SPS: False 
+  UPDATE_UDFS_AND_SPS: True 
+  BRONZE_LOOKBACK_DAYS: '{{ env_var("BRONZE_LOOKBACK_DAYS", 3) }}'
+
+#### STREAMLINE 2.0 BEGIN ####
 
   API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}'
   EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
-  ROLES: |
-      ["INTERNAL_DEV"]
+  ROLES: '{{ var("config")[target.name]["ROLES"] }}'
+
+  config:
+  # The keys correspond to dbt profiles and are case sensitive
+    dev:
+      API_INTEGRATION: aws_aleo_api_dev
+      EXTERNAL_FUNCTION_URI: gvmfebiq6g.execute-api.us-east-1.amazonaws.com/stg/
+      ROLES:
+        - AWS_LAMBDA_ALEO_API
+        - INTERNAL_DEV
+    dev-2xl:
+      API_INTEGRATION: aws_aleo_api_dev
+      EXTERNAL_FUNCTION_URI: gvmfebiq6g.execute-api.us-east-1.amazonaws.com/stg/
+      ROLES:
+        - AWS_LAMBDA_ALEO_API
+        - INTERNAL_DEV
+
+    prod:
+      API_INTEGRATION: aws_aleo_api
+      EXTERNAL_FUNCTION_URI:  vnmhcb1q2j.execute-api.us-east-1.amazonaws.com/prod/
+      ROLES:
+        - AWS_LAMBDA_ALEO_API
+        - INTERNAL_DEV
+        - DBT_CLOUD_ALEO
+    prod-2xl:
+      API_INTEGRATION: aws_aleo_api
+      EXTERNAL_FUNCTION_URI:  vnmhcb1q2j.execute-api.us-east-1.amazonaws.com/prod/
+      ROLES:
+        - AWS_LAMBDA_ALEO_API
+        - INTERNAL_DEV
+        - DBT_CLOUD_ALEO
+
+#### STREAMLINE 2.0 END ####

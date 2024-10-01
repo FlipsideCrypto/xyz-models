@@ -1,7 +1,7 @@
 {% macro add_database_or_schema_tags() %}
     {{ set_database_tag_value(
         'BLOCKCHAIN_NAME',
-        'xyz'
+        'aleo'
     ) }}
       {{ set_database_tag_value(
         'BLOCKCHAIN_TYPE',
